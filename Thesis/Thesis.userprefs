@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\..\TabletGameUnity\Assets\Scripts\Collectables\SpawnInCircle.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Hero\Player.cs">
     <Files>
-      <File FileName="..\..\TabletGameUnity\Assets\Scripts\Collectables\SpawnInCircle.cs" Line="26" Column="18" />
+      <File FileName="Assets\Scripts\Hero\Player.cs" Line="8" Column="37" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

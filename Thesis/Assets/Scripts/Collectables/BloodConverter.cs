@@ -29,7 +29,7 @@ public class BloodConverter : MonoBehaviour {
 			{
 				_evo.SubtractBlood(1);
 				_health.Heal(1);
-				audio.PlayOneShot(_healClip);
+				GetComponent<AudioSource>().PlayOneShot(_healClip);
 			}
 		}
 	}

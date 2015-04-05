@@ -59,6 +59,6 @@ public class ArcherAI : MonoBehaviour {
 		float ySpeed = Mathf.Clamp(y * forceMultiplier, -10, 10);
 		arrowVelocity = myTransform.TransformDirection(new Vector3(xSpeed, ySpeed, 0));
 		//assign the velocity to the clamped speed
-		newArrow.rigidbody2D.velocity = arrowVelocity;
+		newArrow.GetComponent<Rigidbody2D>().velocity = arrowVelocity;
 	}
 }

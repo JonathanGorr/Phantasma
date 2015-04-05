@@ -21,9 +21,9 @@ public class TileSprite : MonoBehaviour {
 		GameObject childPrefab = new GameObject();
 		SpriteRenderer childSprite = childPrefab.AddComponent<SpriteRenderer>();
 		//assign the specific sorting layer and number in inspector
-		childPrefab.renderer.sortingLayerName = sprite.renderer.sortingLayerName;
-		childPrefab.renderer.sortingOrder = sprite.renderer.sortingOrder;
-		childPrefab.renderer.material = sprite.renderer.material;
+		childPrefab.GetComponent<Renderer>().sortingLayerName = sprite.GetComponent<Renderer>().sortingLayerName;
+		childPrefab.GetComponent<Renderer>().sortingOrder = sprite.GetComponent<Renderer>().sortingOrder;
+		childPrefab.GetComponent<Renderer>().material = sprite.GetComponent<Renderer>().material;
 
 		childPrefab.transform.position = transform.position;
 		childSprite.sprite = sprite.sprite;

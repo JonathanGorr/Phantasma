@@ -36,7 +36,7 @@ public class CameraZooming : MonoBehaviour {
 	{
 		//TODO: make the camera zoom in with the field of view change to change the depth of the image ;)
 
-		camera.fieldOfView = distance;
+		GetComponent<Camera>().fieldOfView = distance;
 
 		if(_aiming == false && zoomable)
 		{
@@ -48,10 +48,10 @@ public class CameraZooming : MonoBehaviour {
 		//if aiming, and the bow is selected
 		else if(_aiming && _switcher.currentWeapon == 3)
 		{
-			camera.transform.position =
-						new Vector3(camera.transform.position.x + _axisHorizontal * sensitivity,
-                        	camera.transform.position.y + _axisVertical * sensitivity,
-				            camera.transform.position.z);
+			GetComponent<Camera>().transform.position =
+						new Vector3(GetComponent<Camera>().transform.position.x + _axisHorizontal * sensitivity,
+                        	GetComponent<Camera>().transform.position.y + _axisVertical * sensitivity,
+				            GetComponent<Camera>().transform.position.z);
 		}
 	}
 }

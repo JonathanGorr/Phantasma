@@ -22,51 +22,51 @@ public class SFX : MonoBehaviour {
 	{
 		if(_health.playerHurt || _health.enemyHurt)
 		{
-			audio.pitch = 1f;
-			audio.clip = hurt[Random.Range (0, hurt.Length)];
-			audio.Play();
+			GetComponent<AudioSource>().pitch = 1f;
+			GetComponent<AudioSource>().clip = hurt[Random.Range (0, hurt.Length)];
+			GetComponent<AudioSource>().Play();
 		}
 	}
 
 	public void DeathSound()
 	{
-		audio.pitch = 1f;
-		audio.clip = collapse[Random.Range (0, collapse.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().clip = collapse[Random.Range (0, collapse.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void SwingSoundLight()
 	{
-		audio.pitch = 2f;
-		audio.clip = swing[Random.Range (0, swing.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 2f;
+		GetComponent<AudioSource>().clip = swing[Random.Range (0, swing.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void SwingSoundHeavy()
 	{
-		audio.pitch = 1f;
-		audio.clip = swing[Random.Range (0, swing.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().clip = swing[Random.Range (0, swing.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void JumpSound()
 	{
-		audio.pitch = 1f;
-		audio.clip = jump[Random.Range (0, jump.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().clip = jump[Random.Range (0, jump.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void BowDraw()
 	{
-		audio.pitch = 1f;
-		audio.clip = bowDraw[Random.Range (0, bowDraw.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().clip = bowDraw[Random.Range (0, bowDraw.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void BowShoot()
 	{
-		audio.pitch = 1f;
-		audio.clip = bowShoot[Random.Range (0, bowShoot.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().clip = bowShoot[Random.Range (0, bowShoot.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 }

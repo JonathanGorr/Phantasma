@@ -8,7 +8,7 @@ public class Particles : MonoBehaviour {
 
 	public void Start()
 	{
-		particleSystem.renderer.sortingLayerName = LayerName;
-		particleSystem.renderer.sortingOrder = SortingNumber;
+		GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingLayerName = LayerName;
+		GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = SortingNumber;
 	}
 }

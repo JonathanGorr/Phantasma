@@ -91,7 +91,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 	//plays the sound attached to the current sentence
 	IEnumerator PlaySound(AudioClip sound)
 	{
-		audio.PlayOneShot (sound);
+		GetComponent<AudioSource>().PlayOneShot (sound);
 		yield return new WaitForSeconds(conversationSpeed);
 	}
 

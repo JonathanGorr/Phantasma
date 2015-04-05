@@ -136,7 +136,7 @@ public class ShootArrow : MonoBehaviour {
 							drawn = false;
 							//set damage
 							projectile.GetComponent<PlayerAttack>().BlockingAttack();
-							projectile.rigidbody2D.velocity = direction * speed;
+							projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
 						}
 					}
 				}
@@ -176,7 +176,7 @@ public class ShootArrow : MonoBehaviour {
 		//instantiate
 		GameObject projectile = (GameObject) Instantiate(arrowPrefab, transform.position, rotation);
 		drawn = false;
-		projectile.rigidbody2D.velocity = arrowDirection * quickShotSpeed;
+		projectile.GetComponent<Rigidbody2D>().velocity = arrowDirection * quickShotSpeed;
 		//set damage
 		projectile.GetComponent<PlayerAttack>().r1Attack();
 

@@ -226,18 +226,18 @@ public class EnemyAI : MonoBehaviour
 	public IEnumerator Jump()
 	{
 		//TODO: make the jump the same as the players, not floaty like this one...
-		rigidbody2D.AddForce(Vector3.up * jumpForce);
+		GetComponent<Rigidbody2D>().AddForce(Vector3.up * jumpForce);
 		yield return new WaitForSeconds (0.5f);
 	}
 
 	public void Knockback()
 	{
 		if(left){
-			rigidbody2D.AddForce(Vector3.right * knockBackDistance);
+			GetComponent<Rigidbody2D>().AddForce(Vector3.right * knockBackDistance);
 		}
 		else if(!left)
 		{
-			rigidbody2D.AddForce(-Vector3.right * knockBackDistance);
+			GetComponent<Rigidbody2D>().AddForce(-Vector3.right * knockBackDistance);
 		}
 
 		_health.enemyHurt = false;

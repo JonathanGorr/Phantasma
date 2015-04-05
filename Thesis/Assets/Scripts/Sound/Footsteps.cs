@@ -49,36 +49,36 @@ public class Footsteps : MonoBehaviour {
 	/////////////////////////////////// CONCRETE ////////////////////////////////////////
 	IEnumerator WalkOnStone(float length) {
 		step = false;
-		audio.clip = feetStone[Random.Range (0, feetStone.Length)];
-		audio.volume = .1f;
-		audio.Play();
+		GetComponent<AudioSource>().clip = feetStone[Random.Range (0, feetStone.Length)];
+		GetComponent<AudioSource>().volume = .1f;
+		GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds (length);
 		step = true;
 	}
 	
 	IEnumerator RunOnStone(float length) {
 		step = false;
-		audio.clip = feetStone[Random.Range (0, feetStone.Length)];
-		audio.volume = .3f;
-		audio.Play();
+		GetComponent<AudioSource>().clip = feetStone[Random.Range (0, feetStone.Length)];
+		GetComponent<AudioSource>().volume = .3f;
+		GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds (length);
 		step = true;
 	}
 	/////////////////////////////////// Forest ////////////////////////////////////////
 	IEnumerator WalkOnLeaves(float length) {
 		step = false;
-		audio.clip = feetForest[Random.Range (0, feetForest.Length)];
-		audio.volume = .5f;
-		audio.Play();
+		GetComponent<AudioSource>().clip = feetForest[Random.Range (0, feetForest.Length)];
+		GetComponent<AudioSource>().volume = .5f;
+		GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds (length);
 		step = true;
 	}
 	/////////////////////////////////// HardWood Floor ////////////////////////////////////////
 	IEnumerator WalkOnWood(float length) {
 		step = false;
-		audio.clip = feetWood[Random.Range (0, feetWood.Length)];
-		audio.volume = .5f;
-		audio.Play();
+		GetComponent<AudioSource>().clip = feetWood[Random.Range (0, feetWood.Length)];
+		GetComponent<AudioSource>().volume = .5f;
+		GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds (length);
 		step = true;
 	}

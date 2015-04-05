@@ -8,7 +8,7 @@ public class GhostAscend : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		rigidbody2D.velocity = new Vector2(0, this.transform.localScale.y) * speed;
+		GetComponent<Rigidbody2D>().velocity = new Vector2(0, this.transform.localScale.y) * speed;
 	
 	}
 }

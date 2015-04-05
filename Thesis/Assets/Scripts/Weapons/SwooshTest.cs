@@ -32,7 +32,7 @@ public class SwooshTest : MonoBehaviour
 		float frames = _animation.frameRate * _animation.length;
 		_startN = _start/frames;
 		_endN = _end/frames;
-		_animationState = animation[_animation.name];
+		_animationState = GetComponent<Animation>()[_animation.name];
 		_trail.Emit = false;
 	}
 	

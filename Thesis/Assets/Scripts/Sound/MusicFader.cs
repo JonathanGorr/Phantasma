@@ -18,8 +18,8 @@ public class MusicFader : MonoBehaviour {
 	void Awake()
 	{
 		track1 = forestTheme;
-		audio.clip = track1;
-		audio.Play();
+		GetComponent<AudioSource>().clip = track1;
+		GetComponent<AudioSource>().Play();
 	}
 
 	public void Fade(AudioClip music)
@@ -34,20 +34,20 @@ public class MusicFader : MonoBehaviour {
 		// Update the fade.
 		if (fadeSpeed < 0)
 		{
-			audio.volume = Mathf.Max(audio.volume + fadeSpeed * Time.fixedDeltaTime * transitionSpeed, 0);
+			GetComponent<AudioSource>().volume = Mathf.Max(GetComponent<AudioSource>().volume + fadeSpeed * Time.fixedDeltaTime * transitionSpeed, 0);
 			// Done fading out.
-			if(audio.volume == 0)
+			if(GetComponent<AudioSource>().volume == 0)
 			{
-				audio.clip = track2;
-				audio.Play();
+				GetComponent<AudioSource>().clip = track2;
+				GetComponent<AudioSource>().Play();
 				FadeIn();
 			}
 		}
 		else if (fadeSpeed > 0)
 		{
-			audio.volume = Mathf.Min(audio.volume + fadeSpeed * Time.deltaTime * transitionSpeed, 0.5f);
+			GetComponent<AudioSource>().volume = Mathf.Min(GetComponent<AudioSource>().volume + fadeSpeed * Time.deltaTime * transitionSpeed, 0.5f);
 			// Done fading in.
-			if(audio.volume == 0.5f)
+			if(GetComponent<AudioSource>().volume == 0.5f)
 			{
 				fadeSpeed = 0;
 			}
@@ -55,13 +55,13 @@ public class MusicFader : MonoBehaviour {
 	}
 	
 	void FadeIn(){
-		if (audio.volume < 0.5f){
+		if (GetComponent<AudioSource>().volume < 0.5f){
 			fadeSpeed = 1;
 		}
 	}
 	
 	void FadeOut(){
-		if(audio.volume > 0)
+		if(GetComponent<AudioSource>().volume > 0)
 		{
 			fadeSpeed = -1;
 		}

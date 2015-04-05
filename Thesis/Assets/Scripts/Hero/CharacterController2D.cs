@@ -273,9 +273,9 @@ public class CharacterController2D : MonoBehaviour
 			#if UNITY_4_5 || UNITY_4_6
 			rigidbody2D.MovePosition( transform.position + deltaMovement );
 			#else
-			rigidbody2D.velocity = deltaMovement / Time.fixedDeltaTime;
+			GetComponent<Rigidbody2D>().velocity = deltaMovement / Time.fixedDeltaTime;
 			#endif
-			velocity = rigidbody2D.velocity;
+			velocity = GetComponent<Rigidbody2D>().velocity;
 		}
 		else
 		{
@@ -352,7 +352,7 @@ public class CharacterController2D : MonoBehaviour
 	private void primeRaycastOrigins( Vector3 futurePosition, Vector3 deltaMovement )
 	{
 		var scaledColliderSize = new Vector2( boxCollider.size.x * Mathf.Abs( transform.localScale.x ), boxCollider.size.y * Mathf.Abs( transform.localScale.y ) ) / 2;
-		var scaledCenter = new Vector2( boxCollider.center.x * transform.localScale.x, boxCollider.center.y * transform.localScale.y );
+		var scaledCenter = new Vector2( boxCollider.offset.x * transform.localScale.x, boxCollider.offset.y * transform.localScale.y );
 		
 		_raycastOrigins.topRight = transform.position + new Vector3( scaledCenter.x + scaledColliderSize.x, scaledCenter.y + scaledColliderSize.y );
 		_raycastOrigins.topRight.x -= _skinWidth;

@@ -86,9 +86,9 @@ public class WeaponSwitcher : MonoBehaviour {
 	}
 
 	IEnumerator Sheath(float delay) {
-		audio.clip = sheath[Random.Range (0, sheath.Length)];
-		audio.volume = .3f;
-		audio.Play();
+		GetComponent<AudioSource>().clip = sheath[Random.Range (0, sheath.Length)];
+		GetComponent<AudioSource>().volume = .3f;
+		GetComponent<AudioSource>().Play();
 		yield return new WaitForSeconds (delay);
 	}
 	

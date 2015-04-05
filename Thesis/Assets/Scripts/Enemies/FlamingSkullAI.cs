@@ -56,8 +56,8 @@ public class FlamingSkullAI : MonoBehaviour {
 
 		targetPosition = _player.position;
 
-		audio.clip = _chatteringTeeth;
-		audio.Play ();
+		GetComponent<AudioSource>().clip = _chatteringTeeth;
+		GetComponent<AudioSource>().Play ();
 	}
 
 	void FixedUpdate()
@@ -148,18 +148,18 @@ public class FlamingSkullAI : MonoBehaviour {
 
 	void AttackSound()
 	{
-		audio.PlayOneShot (_attack);
+		GetComponent<AudioSource>().PlayOneShot (_attack);
 	}
 
 	void Knockback()
 	{
 		if(left){
-			rigidbody2D.AddForce(Vector3.right * knockBackDistance);
+			GetComponent<Rigidbody2D>().AddForce(Vector3.right * knockBackDistance);
 			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
 		}
 		else if(!left)
 		{
-			rigidbody2D.AddForce(-Vector3.right * knockBackDistance);
+			GetComponent<Rigidbody2D>().AddForce(-Vector3.right * knockBackDistance);
 			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
 		}
 		print ("knocked back");

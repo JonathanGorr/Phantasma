@@ -22,10 +22,10 @@ public class FadeOutSprite : MonoBehaviour {
 		delay += Time.deltaTime;
 
 		//fade sprite out over time
-		renderer.material.color = Color.Lerp (start, end, delay/2);
+		GetComponent<Renderer>().material.color = Color.Lerp (start, end, delay/2);
 
 		//destroy object if not visible
-		if(renderer.material.color.a <= 0.0)
+		if(GetComponent<Renderer>().material.color.a <= 0.0)
 		{
 			Destroy(gameObject);
 		}

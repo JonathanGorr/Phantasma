@@ -86,7 +86,7 @@ public class MeleeWeaponTrail : MonoBehaviour
 		_trailObject.transform.localScale = Vector3.one;
 		_trailObject.AddComponent(typeof(MeshFilter));
 		_trailObject.AddComponent(typeof(MeshRenderer));
-		_trailObject.renderer.material = _material;
+		_trailObject.GetComponent<Renderer>().material = _material;
 
 		_trailMesh = new Mesh();
 		_trailMesh.name = name + "TrailMesh";
@@ -94,8 +94,8 @@ public class MeleeWeaponTrail : MonoBehaviour
 
 		if(_trailObject != null)
 		{
-			_trailObject.renderer.sortingLayerName = sortingLayer;
-			_trailObject.renderer.sortingOrder = sortingNumber;
+			_trailObject.GetComponent<Renderer>().sortingLayerName = sortingLayer;
+			_trailObject.GetComponent<Renderer>().sortingOrder = sortingNumber;
 		}
 
 		_minVertexDistanceSqr = _minVertexDistance * _minVertexDistance;

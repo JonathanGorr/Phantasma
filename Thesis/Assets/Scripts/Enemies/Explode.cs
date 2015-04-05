@@ -30,8 +30,8 @@ public class Explode : MonoBehaviour {
 		{
 			t.TransformPoint(0,-100,0);
 			Blood clone = Instantiate(blood, t.position, Quaternion.identity) as Blood;
-			clone.rigidbody2D.AddForce(Vector3.right * Random.Range(-50,50));
-			clone.rigidbody2D.AddForce(Vector3.up * Random.Range(100,400));
+			clone.GetComponent<Rigidbody2D>().AddForce(Vector3.right * Random.Range(-50,50));
+			clone.GetComponent<Rigidbody2D>().AddForce(Vector3.up * Random.Range(100,400));
 		}
 	}
 }

@@ -11,12 +11,12 @@ public class WeaponSFX : MonoBehaviour {
 
 	public void ShieldCollideSound()
 	{
-		audio.clip = shieldCollide[Random.Range (0, shieldCollide.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().clip = shieldCollide[Random.Range (0, shieldCollide.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 	public void WeaponCollideSound()
 	{
-		audio.clip = weaponCollide[Random.Range (0, weaponCollide.Length)];
-		audio.Play();
+		GetComponent<AudioSource>().clip = weaponCollide[Random.Range (0, weaponCollide.Length)];
+		GetComponent<AudioSource>().Play();
 	}
 }
