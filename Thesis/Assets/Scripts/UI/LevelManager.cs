@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour {
 
@@ -7,6 +10,7 @@ public class LevelManager : MonoBehaviour {
 	public static int bloodCount;
 
 	public bool inMenu;
+	private bool skip;
 
 	[SerializeField, HideInInspector]
 	public GameObject _pauseScreen, _controlScreen, _hud;
@@ -14,14 +18,21 @@ public class LevelManager : MonoBehaviour {
 	private Health _player;
 	private PlayerPreferences _prefs;
 	private Evolution _evo;
+	private Animator cameraAnim;
+	private GameObject pauseButton, menuButton;
 
 	[HideInInspector]
 	public bool paused = false;
-	private bool controlOn;
+	private bool controlOn, pause;
+
+	private GameObject eventSystem;
+	private EventSystem es;
 
 	void Awake()
 	{
 		Application.targetFrameRate = 60;
+
+		cameraAnim = Camera.main.GetComponent<Animator> ();
 		_hud = GameObject.Find ("Hud");
 		_prefs = GetComponent<PlayerPreferences>();
 		_evo = GetComponent<Evolution>();
@@ -29,6 +40,11 @@ public class LevelManager : MonoBehaviour {
 		//find controller and pause screen
 		_pauseScreen = GameObject.Find ("PauseMenu");
 		_controlScreen = GameObject.Find ("ControlScreen");
+		eventSystem = GameObject.Find ("EventSystem");
+		//es = eventSystem.GetComponent<EventSystem> ();
+		menuButton = GameObject.Find ("New Game");
+		pauseButton = GameObject.Find ("Restart");
+
 		//turn them off if existing
 		if(_pauseScreen != null)
 			_pauseScreen.SetActive (false);
@@ -48,12 +64,16 @@ public class LevelManager : MonoBehaviour {
 
 	void Update()
 	{
+		//input
+		pause = Input.GetButtonDown ("360_StartButton") || Input.GetKeyDown (KeyCode.F);
+		skip = Input.anyKeyDown;
+
 		if(!_player.dead)
 		{
 			if(!inMenu)
 			{
 				//pause
-				if(Input.GetButtonDown("360_StartButton"))
+				if(pause)
 				{
 					//toggle
 					paused = !paused;
@@ -90,6 +110,15 @@ public class LevelManager : MonoBehaviour {
 					}
 				}
 			}
+
+			//else if in menu
+			else
+			{
+				if(skip)
+					cameraAnim.SetTrigger("Skip");
+
+				//eventSystem.GetComponent<EventSystem>().firstSelectedGameObject = menuButton;
+			}
 		}
 	}
 
@@ -97,6 +126,8 @@ public class LevelManager : MonoBehaviour {
 	{
 		//actually pause the game
 		_pauseScreen.SetActive (true);
+		//set this button as the active selection
+		//eventSystem.GetComponent<EventSystem>().firstSelectedGameObject = pauseButton;
 		Time.timeScale = 0;
 	}
 	

@@ -7,8 +7,8 @@ public class WeaponSwitcher : MonoBehaviour {
 	public AudioClip[] sheath;
 	private LevelManager _manager;
 
-	public int currentWeapon = 0;
-	private int nrWeapons;
+	[HideInInspector]
+	public int currentWeapon = 0, nrWeapons;
 	public float delay = 0.1f;
 	
 	public bool weaponGet;

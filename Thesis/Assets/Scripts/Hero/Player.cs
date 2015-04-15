@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
 	private ConversationManager _convoManager;
 	private GameObject _managerGO;
 	private LevelManager _manager;
+	private ShootArrow _shootMgr;
 
 	//switch animator controller for each weapon
 	Animator _animator;
@@ -46,7 +47,8 @@ public class Player : MonoBehaviour
 		_strongAttack,
 		_backStep,
 		_roll,
-		rolling;
+		rolling,
+		_switchWep;
 
 	[HideInInspector]
 	public bool
@@ -88,6 +90,7 @@ public class Player : MonoBehaviour
 	
 	private WeaponSwitcher _switcher;
 	public int index = 0;
+	private int[] list = {0,1,2,3};
 
 	//control speed
 	delegate void Speedometer(float num);
@@ -100,6 +103,7 @@ public class Player : MonoBehaviour
 		speed(0);
 		
 		//import components
+		_shootMgr = GetComponent<ShootArrow> ();
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
 		_health = GetComponent<Health>();
@@ -144,23 +148,44 @@ public class Player : MonoBehaviour
 		// a minor bit of trickery here. FixedUpdate sets _up to false so to ensure we never miss any jump presses we leave _up
 		// set to true if it was true the previous frame
 		//getkeydown = once; getkey = continuous
-		_jump = Input.GetKeyDown( KeyCode.Space) || Input.GetButtonDown("360_AButton");
-		_right = Input.GetKey (KeyCode.D);
-		_left = Input.GetKey (KeyCode.A);
-		_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown("360_RightBumper");
-		_blocking = Input.GetMouseButton (1) || Input.GetButton("360_LeftBumper");
-		_strongAttack = Input.GetKeyDown(KeyCode.E) || Input.GetAxis("360_Triggers") > 0.6;
+		_jump = Input.GetKeyDown( KeyCode.Space) || Input.GetButtonDown("360_AButton") || Input.GetKey(KeyCode.DownArrow);
+		_right = Input.GetKey (KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+		_left = Input.GetKey (KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+		_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown("360_RightBumper") || Input.GetKeyDown(KeyCode.J);
+		_blocking = Input.GetMouseButton (1) || Input.GetButton("360_LeftBumper") || Input.GetKey(KeyCode.UpArrow);
+		_strongAttack = Input.GetKeyDown(KeyCode.E) || Input.GetAxis("360_Triggers") > 0.6 || Input.GetKeyDown(KeyCode.G);
 		_backStep = Input.GetKeyDown (KeyCode.LeftControl) || Input.GetButtonDown("360_XButton");
 		_roll = Input.GetKeyDown (KeyCode.Tab) || Input.GetButtonDown ("360_BButton");
 		_run = Input.GetButton("360_BButton") || Input.GetKey (KeyCode.LeftShift);
 		_axis = Input.GetAxis ("360_LeftStickHorizontal");
+		_switchWep = Input.GetKeyDown(KeyCode.S);
+
+		//cycle through weps on each press
+		if(!_manager.inMenu)
+		{
+			if(_switchWep)
+			{
+				if (index >= list.Length -1) {
+					index = 0;
+				}
+				else {
+					index += 1;
+				}
+
+				print(index);
+
+				//apply this change to the weapon switcher
+				_switcher.SwitchWeapon(index);
+				_switcher.currentWeapon = index;
+			}
+		}
 	}
 
 	//handle movement in fps time
 	void FixedUpdate()
 	{
 		//associate these two variables
-		index = _switcher.currentWeapon;
+		//index = _switcher.currentWeapon;
 
 		//animation speed controller
 		_animator.SetFloat ("Speed", Mathf.Abs(_axis));
@@ -185,7 +210,7 @@ public class Player : MonoBehaviour
 			//print ("Bow(3) is equipped");
 			_animator.runtimeAnimatorController = bowOverride;
 			break;
-		default:
+		case 0:
 			//print ("Nothing(0) is equipped");
 			_animator.runtimeAnimatorController = bareFistedOverride;
 			break;
@@ -203,75 +228,85 @@ public class Player : MonoBehaviour
 		//axis flipping and movement
 		if(!_health.dead)
 		{
-			if(_axis > 0.1)
+			if(!_shootMgr._aim)
 			{
-				normalizedHorizontalSpeed = _axis;
-				if(transform.localScale.x < 0f)
+				if(_axis > 0.1)
 				{
-					//setting this to vector2 will squash the 3d collider for blood particles
-					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
+					normalizedHorizontalSpeed = _axis;
+					if(transform.localScale.x < 0f)
+					{
+						//setting this to vector2 will squash the 3d collider for blood particles
+						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
+					}
+					facingLeft = false;
+					moving = true;
 				}
-				facingLeft = false;
-				moving = true;
-			}
-			else if(_axis < -0.1)
-			{
-				normalizedHorizontalSpeed = _axis;
-				if(transform.localScale.x > 0f)
+				else if(_axis < -0.1)
 				{
-					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
+					normalizedHorizontalSpeed = _axis;
+					if(transform.localScale.x > 0f)
+					{
+						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
+					}
+					facingLeft = true;
+					moving = true;
 				}
-				facingLeft = true;
-				moving = true;
+
+				//keyboard movement
+				else if(_left) //if walking left
+				{
+					//animation speed keyboard
+					_animator.SetFloat ("Speed", 1);
+
+					normalizedHorizontalSpeed = -1;
+
+					//flipping
+					if( transform.localScale.x > 0f)
+					{
+						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
+						facingLeft = true;
+					}
+					
+					if( _controller.isGrounded)
+						_animator.SetInteger("AnimState", 1);
+
+				}
+				//keyboard movement
+				else if(_right) //if walking right
+				{
+					//animation speed keyboard
+					_animator.SetFloat ("Speed", 1);
+
+					normalizedHorizontalSpeed = 1;
+
+					if( transform.localScale.x < 0f)
+					{
+						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
+						facingLeft = false;
+					}
+					
+					if( _controller.isGrounded)
+						_animator.SetInteger("AnimState", 1);
+				}
+				else //if standing still
+				{
+					normalizedHorizontalSpeed = 0;
+					
+					if( _controller.isGrounded)
+						_animator.SetInteger("AnimState", 0);
+				}
 			}
-			else //if standing still
+
+			//aiming, cannot move, but can flip
+			else
 			{
 				normalizedHorizontalSpeed = 0;
-				moving = false;
-			}
-
-		//keyboard movement
-			if(_left) //if walking left
-			{
-				//animation speed keyboard
-				_animator.SetFloat ("Speed", 1);
-
-				normalizedHorizontalSpeed = -1;
-
-				//flipping
-				if( transform.localScale.x > 0f)
-					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
-				facingLeft = true;
-				
-				if( _controller.isGrounded)
-					_animator.SetInteger("AnimState", 1);
-
-			}
-			//keyboard movement
-			else if(_right) //if walking right
-			{
-				//animation speed keyboard
-				_animator.SetFloat ("Speed", 1);
-
-				normalizedHorizontalSpeed = 1;
-				if( transform.localScale.x < 0f)
-					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
-				facingLeft = false;
-				
-				if( _controller.isGrounded)
-					_animator.SetInteger("AnimState", 1);
-			}
-			else //if standing still
-			{
-				normalizedHorizontalSpeed = 0;
-				
-				if( _controller.isGrounded)
-					_animator.SetInteger("AnimState", 0);
 			}
 		}
 
 		// we can only jump whilst grounded
-		if(_controller.isGrounded && _jump && !_blocking && !_strongAttack && !_convoManager.talking && !_manager.inMenu && !_health.dead)
+		if(_controller.isGrounded && _jump && !_shootMgr._aim && !_blocking && !_strongAttack && !_convoManager.talking && !_manager.inMenu
+		   && !_health.dead)
 		{
 			//cannot jump for x seconds
 			StartCoroutine(Ready(jumpDelay));

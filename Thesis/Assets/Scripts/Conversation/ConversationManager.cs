@@ -25,6 +25,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 	private AudioClip _sound;
 	private AudioClip _bgMusic;
 	public float conversationSpeed = 2f;
+	private bool submit;
 
 	void Awake()
 	{
@@ -63,6 +64,11 @@ public class ConversationManager : Singleton<ConversationManager> {
 				_DialogBox.SetActive (false);
 			}
 		}
+	}
+
+	void Update()
+	{
+		submit = Input.GetButtonDown ("360_AButton") || Input.GetButtonDown ("Submit");
 	}
 
 	public void PlayMusic(AudioClip music)
@@ -108,7 +114,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 	//while the button is not pressed, stuck in a loop
 	IEnumerator WaitForButton()
 	{
-		while (!Input.GetButtonDown("360_AButton"))
+		while (!submit)
 			yield return null;
 	}
 

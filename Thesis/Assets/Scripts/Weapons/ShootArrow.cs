@@ -17,8 +17,10 @@ public class ShootArrow : MonoBehaviour {
 
 	private bool
 		_shoot,
-		_aim,
 		drawn;
+
+	[HideInInspector]
+	public bool _aim;
 
 	private float 
 		_axisVertical,
@@ -33,6 +35,7 @@ public class ShootArrow : MonoBehaviour {
 	private Vector3 target;
 	private int index;
 	private WeaponSwitcher _switcher;
+	private string[] joysticks;
 
 	//resolution/vertex count of line
 	public int numSteps = 20;
@@ -57,10 +60,24 @@ public class ShootArrow : MonoBehaviour {
 	//inputs
 	void Update()
 	{
-		_shoot = Input.GetButtonDown ("360_RightBumper");
-		_axisVertical = Input.GetAxis ("360_RightStickVertical");
-		_axisHorizontal = Input.GetAxis ("360_RightStickHorizontal");
-		_aim = Input.GetButton ("360_LeftBumper");
+		//how many controller are plugged in?
+		joysticks = Input.GetJoystickNames ();
+
+		_shoot = Input.GetButtonDown ("360_RightBumper") || Input.GetKeyDown (KeyCode.J);
+
+		if(joysticks.Length > 0)
+		{
+			_axisVertical = Input.GetAxis ("360_RightStickVertical");
+			_axisHorizontal = Input.GetAxis ("360_RightStickHorizontal");
+		}
+		else if(joysticks.Length == 0)
+		{
+			_axisHorizontal = Input.GetAxis ("Horizontal");
+			_axisVertical = Input.GetAxis ("Vertical");
+		}
+
+		//if the controller button is held, or the G button is held, while the bow is out, aiming is true
+		_aim = Input.GetButton ("360_LeftBumper") || Input.GetKey (KeyCode.G) && index == 3;
 
 		//target is the players world position plus the axis
 		target = new Vector3(_body.transform.position.x + _axisHorizontal, _body.transform.position.y + _axisVertical, 0);

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class BossHealthBar : MonoBehaviour {
 	
 	private Slider _slider;
+	private GameObject boss;
 	private Health _health;
 	private bool inMenu;
 	private GameObject _victoryScreen;
@@ -20,8 +21,13 @@ public class BossHealthBar : MonoBehaviour {
 	
 	// Use this for initialization
 	void Awake() {
+
 		//health
-		_health = GameObject.Find("Boss").GetComponent<Health>();
+		boss = GameObject.Find ("Boss");
+
+		if(boss)
+			_health = boss.GetComponent<Health>();
+
 		_manager = GetComponentInParent<LevelManager>();
 		_prefs = GetComponentInParent<PlayerPreferences>();
 		_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
