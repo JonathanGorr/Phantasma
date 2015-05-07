@@ -14,12 +14,14 @@ public class LevelManager : MonoBehaviour {
 
 	[SerializeField, HideInInspector]
 	public GameObject _pauseScreen, _controlScreen, _hud;
+	private GameObject pauseButton, menuButton;
 
+	//components
 	private Health _player;
 	private PlayerPreferences _prefs;
 	private Evolution _evo;
 	private Animator cameraAnim;
-	private GameObject pauseButton, menuButton;
+	private PlayerInput _input;
 
 	[HideInInspector]
 	public bool paused = false;
@@ -32,6 +34,7 @@ public class LevelManager : MonoBehaviour {
 	{
 		Application.targetFrameRate = 60;
 
+		_input = GetComponent<PlayerInput> ();
 		cameraAnim = Camera.main.GetComponent<Animator> ();
 		_hud = GameObject.Find ("Hud");
 		_prefs = GetComponent<PlayerPreferences>();
@@ -65,8 +68,8 @@ public class LevelManager : MonoBehaviour {
 	void Update()
 	{
 		//input
-		pause = Input.GetButtonDown ("360_StartButton") || Input.GetKeyDown (KeyCode.F);
-		skip = Input.anyKeyDown;
+		pause = _input._pause;
+		skip = _input._anyKey;
 
 		if(!_player.dead)
 		{

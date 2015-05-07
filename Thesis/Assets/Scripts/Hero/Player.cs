@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
 	private GameObject _managerGO;
 	private LevelManager _manager;
 	private ShootArrow _shootMgr;
+	public PlayerInput _input;
 
 	//switch animator controller for each weapon
 	Animator _animator;
@@ -37,28 +38,14 @@ public class Player : MonoBehaviour
 	public AnimatorOverrideController spearOverride;
 	public AnimatorOverrideController bowOverride;
 
-	// input
-	private bool
-		_right,
-		_left,
-		 _jump,
-		_run,
-		_attack,
-		_strongAttack,
-		_backStep,
-		_roll,
-		rolling,
-		_switchWep;
-
 	[HideInInspector]
 	public bool
-		ready = true,
-		_blocking;
+		_ready = true,
+		_blocking,
+		_rolling;
 
 	[HideInInspector]
 	public bool moving;
-
-	private float _axis;
 
 	[HideInInspector]
 	public bool facingLeft = false;
@@ -106,6 +93,7 @@ public class Player : MonoBehaviour
 		_shootMgr = GetComponent<ShootArrow> ();
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
+		_input = _manager.GetComponent<PlayerInput> ();
 		_health = GetComponent<Health>();
 		_animator = GetComponent<Animator>();
 		_controller = GetComponent<CharacterController2D>();
@@ -145,25 +133,10 @@ public class Player : MonoBehaviour
 	// the Update loop only gathers input. Actual movement is handled in FixedUpdate because we are using the Physics system for movement
 	void Update()
 	{
-		// a minor bit of trickery here. FixedUpdate sets _up to false so to ensure we never miss any jump presses we leave _up
-		// set to true if it was true the previous frame
-		//getkeydown = once; getkey = continuous
-		_jump = Input.GetKeyDown( KeyCode.Space) || Input.GetButtonDown("360_AButton") || Input.GetKey(KeyCode.DownArrow);
-		_right = Input.GetKey (KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
-		_left = Input.GetKey (KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-		_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown("360_RightBumper") || Input.GetKeyDown(KeyCode.J);
-		_blocking = Input.GetMouseButton (1) || Input.GetButton("360_LeftBumper") || Input.GetKey(KeyCode.UpArrow);
-		_strongAttack = Input.GetKeyDown(KeyCode.E) || Input.GetAxis("360_Triggers") > 0.6 || Input.GetKeyDown(KeyCode.G);
-		_backStep = Input.GetKeyDown (KeyCode.LeftControl) || Input.GetButtonDown("360_XButton");
-		_roll = Input.GetKeyDown (KeyCode.Tab) || Input.GetButtonDown ("360_BButton");
-		_run = Input.GetButton("360_BButton") || Input.GetKey (KeyCode.LeftShift);
-		_axis = Input.GetAxis ("360_LeftStickHorizontal");
-		_switchWep = Input.GetKeyDown(KeyCode.S);
-
 		//cycle through weps on each press
 		if(!_manager.inMenu)
 		{
-			if(_switchWep)
+			if(_input._cycleWep)
 			{
 				if (index >= list.Length -1) {
 					index = 0;
@@ -188,7 +161,7 @@ public class Player : MonoBehaviour
 		//index = _switcher.currentWeapon;
 
 		//animation speed controller
-		_animator.SetFloat ("Speed", Mathf.Abs(_axis));
+		_animator.SetFloat ("Speed", Mathf.Abs(_input._axis));
 
 		//make the animator change animations depending on how many times youve attacked
 		_animator.SetFloat ("ComboPoints", Mathf.Clamp(comboPoints, 0, 3));
@@ -230,9 +203,9 @@ public class Player : MonoBehaviour
 		{
 			if(!_shootMgr._aim)
 			{
-				if(_axis > 0.1)
+				if(_input._axis > 0.1)
 				{
-					normalizedHorizontalSpeed = _axis;
+					normalizedHorizontalSpeed = _input._axis;
 					if(transform.localScale.x < 0f)
 					{
 						//setting this to vector2 will squash the 3d collider for blood particles
@@ -241,9 +214,9 @@ public class Player : MonoBehaviour
 					facingLeft = false;
 					moving = true;
 				}
-				else if(_axis < -0.1)
+				else if(_input._axis < -0.1)
 				{
-					normalizedHorizontalSpeed = _axis;
+					normalizedHorizontalSpeed = _input._axis;
 					if(transform.localScale.x > 0f)
 					{
 						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
@@ -253,7 +226,7 @@ public class Player : MonoBehaviour
 				}
 
 				//keyboard movement
-				else if(_left) //if walking left
+				else if(_input._left) //if walking left
 				{
 					//animation speed keyboard
 					_animator.SetFloat ("Speed", 1);
@@ -272,7 +245,7 @@ public class Player : MonoBehaviour
 
 				}
 				//keyboard movement
-				else if(_right) //if walking right
+				else if(_input._right) //if walking right
 				{
 					//animation speed keyboard
 					_animator.SetFloat ("Speed", 1);
@@ -305,7 +278,7 @@ public class Player : MonoBehaviour
 		}
 
 		// we can only jump whilst grounded
-		if(_controller.isGrounded && _jump && !_shootMgr._aim && !_blocking && !_strongAttack && !_convoManager.talking && !_manager.inMenu
+		if(_controller.isGrounded && _input._jump && !_shootMgr._aim && !_blocking && !_input._strongAttack && !_convoManager.talking && !_manager.inMenu
 		   && !_health.dead)
 		{
 			//cannot jump for x seconds
@@ -315,7 +288,7 @@ public class Player : MonoBehaviour
 			_velocity.y = Mathf.Sqrt( 2f * jumpHeight * -gravity);
 		}
 
-		if(!_controller.isGrounded && !rolling)
+		if(!_controller.isGrounded && !_rolling)
 		{
 			_animator.SetBool("Falling", true);
 		}
@@ -323,7 +296,7 @@ public class Player : MonoBehaviour
 			_animator.SetBool("Falling", false);
 
 		//backstepping
-		if(_backStep && _controller.isGrounded && ready && normalizedHorizontalSpeed == 0)
+		if(_input._backStep && _controller.isGrounded && _ready && normalizedHorizontalSpeed == 0)
 		{
 			//cannot roll for x seconds
 			StartCoroutine(Ready(backStepDelay));
@@ -343,9 +316,9 @@ public class Player : MonoBehaviour
 		}
 
 		//rolling
-		if(_roll && _controller.isGrounded && ready && index != 2)
+		if(_input._roll && _controller.isGrounded && _ready && index != 2)
 		{
-			rolling = true;
+			_rolling = true;
 
 			_animator.SetTrigger("Roll");
 			_sfx.JumpSound();
@@ -364,7 +337,7 @@ public class Player : MonoBehaviour
 			}
 		}
 		else
-			rolling = false;
+			_rolling = false;
 
 		//knockback
 		if(_health.playerHurt)
@@ -399,7 +372,7 @@ public class Player : MonoBehaviour
 		_controller.move( _velocity * Time.fixedDeltaTime);
 		
 		// reset input
-		_jump = false;
+		_input._jump = false;
 
 		//animation blocking informed by button
 		if(_blocking)
@@ -409,14 +382,8 @@ public class Player : MonoBehaviour
 		else
 			_animator.SetBool("Blocking", false);
 
-		//speed
-		if((_run && _left) || (_run && _right) || (Mathf.Abs(_axis) > 0 && _run))
-		{
-			if(!_blocking)
-				Speed (runSpeed);
-		}
 		//if blocking 
-		else if(_blocking || _strongAttack)
+		if(_blocking || _input._strongAttack)
 		{
 			if(_controller.isGrounded)
 				Speed (blockSpeed);
@@ -425,21 +392,25 @@ public class Player : MonoBehaviour
 			Speed (walkSpeed);
 		
 		//strong attack
-		if(_strongAttack && _controller.isGrounded && !_jump && !_blocking)
+		if(_controller.isGrounded)
 		{
-			_animator.SetTrigger("StrongAttack");
-			StartCoroutine(Ready(strongAttackDelay));
+			//if strongAttack and not jumping and not blocking
+			if(_input._strongAttack && !_input._jump && !_blocking)
+			{
+				_animator.SetTrigger("StrongAttack");
+				StartCoroutine(Ready(strongAttackDelay));
+			}
 		}
 		
 		//attack
-		if(_attack && !_blocking && normalizedHorizontalSpeed == 0 && _controller.isGrounded)
+		if(_input._attack && !_input._blocking && normalizedHorizontalSpeed == 0 && _controller.isGrounded)
 		{
 			//if the bow is not equipped, just attack
 			if(index != 3)
 				_animator.SetTrigger("Attack");
 
 			//otherwise, delay after an attack
-			else if(index == 3 && ready)
+			else if(index == 3 && _ready)
 			{
 				_animator.SetTrigger("Attack");
 				StartCoroutine(Ready(quickShotDelay));
@@ -447,14 +418,14 @@ public class Player : MonoBehaviour
 		}
 
 		//blockingAttack
-		else if(_attack && _blocking && ready)
+		else if(_input._attack && _blocking && _ready)
 		{
 			_animator.SetTrigger("BlockingAttack");
 			StartCoroutine(Ready(blockAttackDelay));
 		}
 
 		//if bow and aim firing, start enumerator
-		if(index == 3 && _blocking && _attack)
+		if(index == 3 && _blocking && _input._attack)
 		{
 			print("aiming fire arrow");
 			//yield return(StartCoroutine(Reload));
@@ -491,9 +462,9 @@ public class Player : MonoBehaviour
 	//'stamina'
 	public IEnumerator Ready(float delay)
 	{
-		ready = false;
+		_ready = false;
 		yield return new WaitForSeconds (delay);
-		ready = true;
+		_ready = true;
 	}
 
 	//takes a float speed num, changes speed based on input

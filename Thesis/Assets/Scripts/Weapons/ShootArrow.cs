@@ -158,7 +158,7 @@ public class ShootArrow : MonoBehaviour {
 					}
 				}
 				//if not aiming or drawn or moving and ready, quickshot
-				else if(!_aim && !drawn && _player.ready == true && Mathf.Abs(_player.normalizedHorizontalSpeed) < 0.1f)
+				else if(!_aim && !drawn && _player._ready == true && Mathf.Abs(_player.normalizedHorizontalSpeed) < 0.1f)
 				{
 					//turn off line rendering
 					lineRenderer.SetVertexCount(0);

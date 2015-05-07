@@ -89,6 +89,7 @@
      <Compile Include="Assets\Scripts\Hero\GhostAscend.cs" />
      <Compile Include="Assets\Scripts\Hero\PhysicsPlayerTester.cs" />
      <Compile Include="Assets\Scripts\Hero\Player.cs" />
+     <Compile Include="Assets\Scripts\Hero\PlayerInput.cs" />
      <Compile Include="Assets\Scripts\Messaging\Checkpoint.cs" />
      <Compile Include="Assets\Scripts\Messaging\MessagingClientBroadcast.cs" />
      <Compile Include="Assets\Scripts\Messaging\MessagingClientReceiver.cs" />

@@ -43,6 +43,8 @@ public class PlayerPreferences : MonoBehaviour {
 			//blood
 			_evo.blood = PlayerPrefs.GetInt("Blood");
 
+			if(Input.GetKeyDown(KeyCode.P)) { EraseAll(); }
+
 			//if a game has been created, load health
 			if(PlayerPrefs.GetInt("GameCreated") == 1)
 			{
