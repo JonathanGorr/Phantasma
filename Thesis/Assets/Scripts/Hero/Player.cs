@@ -22,7 +22,6 @@ public class Player : MonoBehaviour
 	private Health _health;
 	private SFX _sfx;
 	private ParticleSystem _footDust;
-	private ConversationManager _convoManager;
 	private GameObject _managerGO;
 	private LevelManager _manager;
 	private ShootArrow _shootMgr;
@@ -76,8 +75,6 @@ public class Player : MonoBehaviour
 	private SpriteRenderer[] _sprites;
 	
 	private WeaponSwitcher _switcher;
-	public int index = 0;
-	private int[] list = {0,1,2,3};
 
 	//control speed
 	delegate void Speedometer(float num);
@@ -102,7 +99,6 @@ public class Player : MonoBehaviour
 		_switcher = _manager.GetComponent<WeaponSwitcher> ();
 		_sfx = GetComponent<SFX> ();
 		_footDust = GetComponentInChildren<ParticleSystem>();
-		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
 
 		// listen to some events for illustration purposes
 		_controller.onControllerCollidedEvent += onControllerCollider;
@@ -129,30 +125,6 @@ public class Player : MonoBehaviour
 	}
 
 	#endregion
-	
-	// the Update loop only gathers input. Actual movement is handled in FixedUpdate because we are using the Physics system for movement
-	void Update()
-	{
-		//cycle through weps on each press
-		if(!_manager.inMenu)
-		{
-			if(_input._cycleWep)
-			{
-				if (index >= list.Length -1) {
-					index = 0;
-				}
-				else {
-					index += 1;
-				}
-
-				print(index);
-
-				//apply this change to the weapon switcher
-				_switcher.SwitchWeapon(index);
-				_switcher.currentWeapon = index;
-			}
-		}
-	}
 
 	//handle movement in fps time
 	void FixedUpdate()
@@ -168,7 +140,7 @@ public class Player : MonoBehaviour
 
 		//switch animators
 
-		switch(index)
+		switch(_switcher.currentWeapon)
 		{
 		//shortsword
 		case 1:
@@ -278,7 +250,7 @@ public class Player : MonoBehaviour
 		}
 
 		// we can only jump whilst grounded
-		if(_controller.isGrounded && _input._jump && !_shootMgr._aim && !_blocking && !_input._strongAttack && !_convoManager.talking && !_manager.inMenu
+		if(_controller.isGrounded && _input._jump && !_shootMgr._aim && !_blocking && !_input._strongAttack
 		   && !_health.dead)
 		{
 			//cannot jump for x seconds
@@ -316,7 +288,7 @@ public class Player : MonoBehaviour
 		}
 
 		//rolling
-		if(_input._roll && _controller.isGrounded && _ready && index != 2)
+		if(_input._roll && _controller.isGrounded && _ready && _switcher.currentWeapon != 2)
 		{
 			_rolling = true;
 
@@ -406,11 +378,11 @@ public class Player : MonoBehaviour
 		if(_input._attack && !_input._blocking && normalizedHorizontalSpeed == 0 && _controller.isGrounded)
 		{
 			//if the bow is not equipped, just attack
-			if(index != 3)
+			if(_switcher.currentWeapon != 3)
 				_animator.SetTrigger("Attack");
 
 			//otherwise, delay after an attack
-			else if(index == 3 && _ready)
+			else if(_switcher.currentWeapon == 3 && _ready)
 			{
 				_animator.SetTrigger("Attack");
 				StartCoroutine(Ready(quickShotDelay));
@@ -425,7 +397,7 @@ public class Player : MonoBehaviour
 		}
 
 		//if bow and aim firing, start enumerator
-		if(index == 3 && _blocking && _input._attack)
+		if(_switcher.currentWeapon == 3 && _blocking && _input._attack)
 		{
 			print("aiming fire arrow");
 			//yield return(StartCoroutine(Reload));
@@ -440,7 +412,7 @@ public class Player : MonoBehaviour
 		//if dead turn off all controls, play animation
 		if(_health.dead)
 		{
-			_animator.SetTrigger("Collapse");
+			_animator.SetInteger("AnimState", 2);
 			normalizedHorizontalSpeed = 0;
 		}
 	}

@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour {
 
 	[SerializeField, HideInInspector]
 	public GameObject _pauseScreen, _controlScreen, _hud;
-	private GameObject pauseButton, menuButton;
+	private GameObject menuButton, restartButton;
 
 	//components
 	private Health _player;
@@ -46,7 +46,7 @@ public class LevelManager : MonoBehaviour {
 		eventSystem = GameObject.Find ("EventSystem");
 		//es = eventSystem.GetComponent<EventSystem> ();
 		menuButton = GameObject.Find ("New Game");
-		pauseButton = GameObject.Find ("Restart");
+		restartButton = GameObject.Find ("RestartButton");
 
 		//turn them off if existing
 		if(_pauseScreen != null)
@@ -130,7 +130,7 @@ public class LevelManager : MonoBehaviour {
 		//actually pause the game
 		_pauseScreen.SetActive (true);
 		//set this button as the active selection
-		//eventSystem.GetComponent<EventSystem>().firstSelectedGameObject = pauseButton;
+		eventSystem.GetComponent<EventSystem>().SetSelectedGameObject(restartButton);
 		Time.timeScale = 0;
 	}
 	
