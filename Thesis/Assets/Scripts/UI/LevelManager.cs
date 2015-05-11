@@ -32,6 +32,8 @@ public class LevelManager : MonoBehaviour {
 
 	void Awake()
 	{
+		Cursor.visible = false;
+
 		Application.targetFrameRate = 60;
 
 		_input = GetComponent<PlayerInput> ();
@@ -115,13 +117,7 @@ public class LevelManager : MonoBehaviour {
 			}
 
 			//else if in menu
-			else
-			{
-				if(skip)
-					cameraAnim.SetTrigger("Skip");
-
-				//eventSystem.GetComponent<EventSystem>().firstSelectedGameObject = menuButton;
-			}
+			else{ if(skip) cameraAnim.SetTrigger("Skip");}
 		}
 	}
 
@@ -131,6 +127,7 @@ public class LevelManager : MonoBehaviour {
 		_pauseScreen.SetActive (true);
 		//set this button as the active selection
 		eventSystem.GetComponent<EventSystem>().SetSelectedGameObject(restartButton);
+		Cursor.visible = true;
 		Time.timeScale = 0;
 	}
 	
@@ -139,6 +136,7 @@ public class LevelManager : MonoBehaviour {
 		//resume if not paused
 		_pauseScreen.SetActive (false);
 		Time.timeScale = 1;
+		Cursor.visible = false;
 	}
 
 	public void AddBlood(int blood)
