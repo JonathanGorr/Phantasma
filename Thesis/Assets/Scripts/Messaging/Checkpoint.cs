@@ -107,5 +107,4 @@ public class Checkpoint : MonoBehaviour {
 		Gizmos.color = Color.red;
 		Gizmos.DrawCube(transform.position,new Vector2(1,1));
 	}
-
 }

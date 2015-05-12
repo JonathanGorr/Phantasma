@@ -9,11 +9,9 @@ public class PlayerAttack : MonoBehaviour {
 	private Player _player;
 	private WeaponSFX _wepSFX;
 	private Health _health;
+	private PlayerInput _input;
 	private CharacterController2D _controller;
 	public bool readyToAttack;
-	private bool _attack;
-	private bool _strongAttack;
-	private bool blocking;
 
 	//damages
 	private int damage;
@@ -26,17 +24,11 @@ public class PlayerAttack : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		//get the animator component
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_animator = GetComponent<Animator>();
 		_wepSFX = GetComponent<WeaponSFX>();
 		_player = GetComponentInParent<Player>();
 		_controller = GetComponentInParent<CharacterController2D>();
-	}
-
-	void Update()
-	{
-		blocking = Input.GetMouseButton (1) || Input.GetButton ("360_LeftBumper");
-		_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown("360_RightBumper");
-		_strongAttack = Input.GetKeyDown(KeyCode.E) || Input.GetAxis("360_Triggers")>0.3;
 	}
 
 	void FixedUpdate()
@@ -44,19 +36,19 @@ public class PlayerAttack : MonoBehaviour {
 		if(_player != null)
 		{
 			//regular attack
-			if((_attack) && (!blocking) && _player.moving == false)
+			if((_input._attack) && (!_input._blocking) && _player.moving == false)
 			{
 				r1Attack();
 				_animator.SetTrigger("Attack");
 			}
 			//blocking attack
-			else if((blocking) && (_attack))
+			else if((_input._blocking) && (_input._attack))
 			{
 				BlockingAttack();
 				_animator.SetTrigger("BlockingAttack");
 			}
 			//overheadstrike
-			else if(_strongAttack && _controller.isGrounded && !blocking)
+			else if(_input._strongAttack && _controller.isGrounded && !_input._blocking)
 			{
 				r2Attack();
 				_animator.SetTrigger("StrongAttack");

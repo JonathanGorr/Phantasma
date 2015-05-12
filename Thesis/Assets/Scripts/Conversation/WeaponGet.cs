@@ -16,7 +16,7 @@ public class WeaponGet : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D player)
 	{
-		if(_switcher != null && _spirit != null)
+		if(_switcher && _spirit)
 		{
 			if(player.gameObject.tag == "Player")
 			{

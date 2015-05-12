@@ -8,6 +8,7 @@ public class Camera2DFollow : MonoBehaviour {
 	public float lookAheadFactor = 3;
 	public float lookAheadReturnSpeed = 0.5f;
 	public float lookAheadMoveThreshold = 0.1f;
+	public float yOffset = 15f;
 	
 	float offsetZ;
 	Vector3 lastTargetPosition;
@@ -19,6 +20,7 @@ public class Camera2DFollow : MonoBehaviour {
 		lastTargetPosition = target.position;
 		offsetZ = (transform.position - target.position).z;
 		transform.parent = null;
+		transform.position = new Vector3(target.position.x, target.position.y + yOffset, transform.position.z);
 	}
 	
 	// Update is called once per frame

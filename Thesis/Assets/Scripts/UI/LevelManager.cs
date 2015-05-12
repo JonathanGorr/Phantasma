@@ -32,8 +32,6 @@ public class LevelManager : MonoBehaviour {
 
 	void Awake()
 	{
-		Cursor.visible = false;
-
 		Application.targetFrameRate = 60;
 
 		_input = GetComponent<PlayerInput> ();
@@ -60,10 +58,14 @@ public class LevelManager : MonoBehaviour {
 		{
 			if(inMenu)
 			{
+				Cursor.visible = true;
 				_hud.SetActive(false);
 			}
 			else
+			{
+				Cursor.visible = false;
 				_hud.SetActive(true);
+			}
 		}
 	}
 

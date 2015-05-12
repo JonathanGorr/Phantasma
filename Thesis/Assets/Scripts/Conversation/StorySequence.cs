@@ -8,13 +8,4 @@ public class StorySequence : MonoBehaviour {
 
 	//TODO: save the sequence in playerprefs, so players dont have to go through the beginning if dead
 	//and wont see the same dialog
-
-	void Awake()
-	{
-
-	}
-
-	void Update()
-	{
-	}
 }

@@ -6,6 +6,7 @@ public class PlayerInput : MonoBehaviour {
 	//components
 	private LevelManager _manager;
 	private ConversationManager _convoManager;
+	private WeaponSwitcher _switcher;
 
 	[HideInInspector] public bool 
 		_left, 
@@ -30,6 +31,7 @@ public class PlayerInput : MonoBehaviour {
 	void Awake()
 	{
 		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
+		_switcher = _manager.GetComponent<WeaponSwitcher> ();
 		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
 	}
 
@@ -44,9 +46,13 @@ public class PlayerInput : MonoBehaviour {
 				DPadHorizontal = Input.GetAxis ("360_HorizontalDPAD");
 				DPadVertical = Input.GetAxis ("360_VerticalDPAD");
 				_jump = Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown ("360_AButton") || Input.GetKey (KeyCode.DownArrow);
-				_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown ("360_RightBumper") || Input.GetKeyDown (KeyCode.J);
-				_blocking = Input.GetMouseButton (1) || Input.GetButton ("360_LeftBumper") || Input.GetKey (KeyCode.UpArrow);
-				_strongAttack = Input.GetKeyDown (KeyCode.E) || Input.GetAxis ("360_Triggers") > 0.6 || Input.GetKeyDown (KeyCode.G);
+
+				if(_switcher.currentWeapon != 0)
+				{
+					_attack = Input.GetMouseButtonDown (0) || Input.GetButtonDown ("360_RightBumper") || Input.GetKeyDown (KeyCode.J);
+					_blocking = Input.GetMouseButton (1) || Input.GetButton ("360_LeftBumper") || Input.GetKey (KeyCode.UpArrow);
+					_strongAttack = Input.GetKeyDown (KeyCode.E) || Input.GetAxis ("360_Triggers") > 0.6 || Input.GetKeyDown (KeyCode.G);
+				}
 				_backStep = Input.GetKeyDown (KeyCode.LeftControl) || Input.GetButtonDown ("360_XButton");
 				_roll = Input.GetKeyDown (KeyCode.Tab) || Input.GetButtonDown ("360_BButton");
 				_cycleWep = Input.GetKeyDown (KeyCode.S);
@@ -59,6 +65,9 @@ public class PlayerInput : MonoBehaviour {
 				_axis = 0;
 				_right = false;
 				_left = false;
+				_roll = false;
+				_leftOnce = false;
+				_rightOnce = false;
 			}
 
 			//else move freely

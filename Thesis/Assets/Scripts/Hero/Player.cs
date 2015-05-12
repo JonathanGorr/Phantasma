@@ -25,7 +25,8 @@ public class Player : MonoBehaviour
 	private GameObject _managerGO;
 	private LevelManager _manager;
 	private ShootArrow _shootMgr;
-	public PlayerInput _input;
+	private PlayerInput _input;
+	private ConversationManager _convoManager;
 
 	//switch animator controller for each weapon
 	Animator _animator;
@@ -95,6 +96,7 @@ public class Player : MonoBehaviour
 		_shootMgr = GetComponent<ShootArrow> ();
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
+		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
 		_input = _manager.GetComponent<PlayerInput> ();
 		_health = GetComponent<Health>();
 		_animator = GetComponent<Animator>();
@@ -175,7 +177,7 @@ public class Player : MonoBehaviour
 			_velocity.y = 0;
 		}
 
-		//axis flipping and movement
+		//axis flipping and movement ----------------------------------------------
 		if(!_health.dead)
 		{
 			//if aiming...
@@ -263,6 +265,7 @@ public class Player : MonoBehaviour
 			}
 		}
 
+		//Jump-------------------------------------------------------------
 		//We can only jump whilst grounded
 		if(_controller.isGrounded 		//if grounded
 		   && _input._jump 				//if jump key is pressed
@@ -278,15 +281,17 @@ public class Player : MonoBehaviour
 			_velocity.y = Mathf.Sqrt( 2f * jumpHeight * -gravity);
 		}
 
-		//If not grounded; falling
-		if(!_controller.isGrounded && !_rolling)
+		//Falling
+		//If not grounded; falling ---------------------------------------------------
+		if(!_controller.isGrounded 
+		   && !_rolling)
 		{
 			_animator.SetBool("Falling", true);
 		}
 		else
 			_animator.SetBool("Falling", false);
 
-		//backstepping
+		//Backstepping ------------------------------------------------------------------
 		if(_input._backStep 					//if backstep button is pressed
 		   && _controller.isGrounded 			//if grounded
 		   && _ready 							//if ready
@@ -298,7 +303,8 @@ public class Player : MonoBehaviour
 			_animator.SetTrigger("BackStep");
 			_sfx.JumpSound();
 			
-			if(facingLeft){
+			if(facingLeft)
+			{
 				_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
 				_velocity.x = Mathf.Sqrt(maxDistance);
 			}
@@ -354,7 +360,8 @@ public class Player : MonoBehaviour
 					//cannot roll for x seconds
 					StartCoroutine(Ready(rollDelay));
 					
-					if(!facingLeft){
+					if(!facingLeft)
+					{
 						_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
 						_velocity.x = Mathf.Sqrt(maxDistance);
 					}
@@ -374,6 +381,7 @@ public class Player : MonoBehaviour
 				_rolling = false;
 		}
 
+		//cooldown
 		if ( buttonCooler > 0 )
 			buttonCooler -= 1 * Time.deltaTime ;
 		else
@@ -423,7 +431,7 @@ public class Player : MonoBehaviour
 		else
 			_animator.SetBool("Blocking", false);
 
-		//Blocking and Strong Attack Speed
+		//Blocking and Strong Attack Speed--------------------------------
 		if(_blocking || _input._strongAttack)
 		{
 			if(_controller.isGrounded)
@@ -448,7 +456,8 @@ public class Player : MonoBehaviour
 		if(_input._attack 						//if attack button pressed
 		   && !_input._blocking 				//if not blocking
 		   && normalizedHorizontalSpeed == 0 	//if not moving
-		   && _controller.isGrounded) 			//if grounded
+		   && _controller.isGrounded
+		   && !_convoManager.talking) 			//if grounded
 		{
 			//if the bow is not equipped, just attack
 			if(_switcher.currentWeapon != 3)
@@ -464,7 +473,9 @@ public class Player : MonoBehaviour
 
 		//Blocking Attack--------------------------------------------------------
 		else if(_input._attack 
-		        && _blocking && _ready)
+		        && _blocking 
+		        && _ready
+		        && !_convoManager.talking)
 		{
 			_animator.SetTrigger("BlockingAttack");
 			StartCoroutine(Ready(blockAttackDelay));

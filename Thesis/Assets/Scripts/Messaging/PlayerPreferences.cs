@@ -68,15 +68,14 @@ public class PlayerPreferences : MonoBehaviour {
 		if(!inMenu)
 		{
 			//wheres mom dialog and checkpoint
-			if(dialog[3] != null)
-				dialog[3].SetActive(false);
-			if(checkpoints[2] != null)
-				checkpoints[2].SetActive(false);
+			if(dialog[3]) dialog[3].SetActive(false);
+
+			if(checkpoints[2]) checkpoints[2].SetActive(false);
+
 			//sword lesson and dialog
-			if(checkpoints[1] != null)
-				checkpoints[1].SetActive(false);
-			if(dialog[2] != null)
-				dialog[2].SetActive(false);
+			if(checkpoints[1]) checkpoints[1].SetActive(false);
+
+			if(dialog[2]) dialog[2].SetActive(false);
 			
 			//story sequence checkers
 			if(PlayerPrefs.GetInt("MotherMet") == 1)
