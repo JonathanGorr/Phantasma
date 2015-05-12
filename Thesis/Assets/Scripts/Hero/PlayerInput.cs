@@ -21,7 +21,9 @@ public class PlayerInput : MonoBehaviour {
 		_heal, 
 		_roll,
 		_pause,
-		_anyKey;
+		_anyKey,
+		_leftOnce,
+		_rightOnce;
 
 	[HideInInspector] public float _axis, _scrollWheel, DPadHorizontal, DPadVertical;
 
@@ -65,6 +67,9 @@ public class PlayerInput : MonoBehaviour {
 				_axis = Input.GetAxis ("360_LeftStickHorizontal");
 				_right = Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow);
 				_left = Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow);
+				//
+				_rightOnce = Input.GetKeyDown (KeyCode.D) || Input.GetKeyDown (KeyCode.RightArrow);
+				_leftOnce = Input.GetKeyDown (KeyCode.A) || Input.GetKeyDown (KeyCode.LeftArrow);
 			}
 		}
 

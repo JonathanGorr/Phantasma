@@ -51,6 +51,7 @@ public class Player : MonoBehaviour
 
 	private float resultSpeed;
 
+	//public variables
 	public float 
 		walkSpeed = 3f,
 		runSpeed = 6f,
@@ -62,6 +63,10 @@ public class Player : MonoBehaviour
 		blockAttackDelay = 0.5f,
 		strongAttackDelay = 0.5f,
 		quickShotDelay = 1f;
+
+	//double tapping
+	public float buttonCooler = 0.5f;
+	private int buttonCount;
 
 	//combocounter
 	private int comboPoints = 0;
@@ -173,8 +178,10 @@ public class Player : MonoBehaviour
 		//axis flipping and movement
 		if(!_health.dead)
 		{
+			//if aiming...
 			if(!_shootMgr._aim)
 			{
+				//if pushing right on the joystick...
 				if(_input._axis > 0.1)
 				{
 					normalizedHorizontalSpeed = _input._axis;
@@ -186,6 +193,8 @@ public class Player : MonoBehaviour
 					facingLeft = false;
 					moving = true;
 				}
+
+				//else if pushing left on the joystick...
 				else if(_input._axis < -0.1)
 				{
 					normalizedHorizontalSpeed = _input._axis;
@@ -197,7 +206,9 @@ public class Player : MonoBehaviour
 					moving = true;
 				}
 
-				//keyboard movement
+				//keyboard movement------------------------------------------------
+
+				//else if pushing left on the keyboard
 				else if(_input._left) //if walking left
 				{
 					//animation speed keyboard
@@ -216,7 +227,8 @@ public class Player : MonoBehaviour
 						_animator.SetInteger("AnimState", 1);
 
 				}
-				//keyboard movement
+
+				//else if pushing right on the keyboard...
 				else if(_input._right) //if walking right
 				{
 					//animation speed keyboard
@@ -233,7 +245,9 @@ public class Player : MonoBehaviour
 					if( _controller.isGrounded)
 						_animator.SetInteger("AnimState", 1);
 				}
-				else //if standing still
+
+				//else if no input, stand still...
+				else
 				{
 					normalizedHorizontalSpeed = 0;
 					
@@ -242,16 +256,20 @@ public class Player : MonoBehaviour
 				}
 			}
 
-			//aiming, cannot move, but can flip
+			//else if aiming, cannot move, but can flip...
 			else
 			{
 				normalizedHorizontalSpeed = 0;
 			}
 		}
 
-		// we can only jump whilst grounded
-		if(_controller.isGrounded && _input._jump && !_shootMgr._aim && !_blocking && !_input._strongAttack
-		   && !_health.dead)
+		//We can only jump whilst grounded
+		if(_controller.isGrounded 		//if grounded
+		   && _input._jump 				//if jump key is pressed
+		   && !_shootMgr._aim 			//if not aiming
+		   && !_blocking 				//if not blocking
+		   && !_input._strongAttack 	//if not attacking
+		   && !_health.dead) 			//if not dead
 		{
 			//cannot jump for x seconds
 			StartCoroutine(Ready(jumpDelay));
@@ -260,6 +278,7 @@ public class Player : MonoBehaviour
 			_velocity.y = Mathf.Sqrt( 2f * jumpHeight * -gravity);
 		}
 
+		//If not grounded; falling
 		if(!_controller.isGrounded && !_rolling)
 		{
 			_animator.SetBool("Falling", true);
@@ -268,7 +287,10 @@ public class Player : MonoBehaviour
 			_animator.SetBool("Falling", false);
 
 		//backstepping
-		if(_input._backStep && _controller.isGrounded && _ready && normalizedHorizontalSpeed == 0)
+		if(_input._backStep 					//if backstep button is pressed
+		   && _controller.isGrounded 			//if grounded
+		   && _ready 							//if ready
+		   && normalizedHorizontalSpeed == 0) 	//if not moving
 		{
 			//cannot roll for x seconds
 			StartCoroutine(Ready(backStepDelay));
@@ -287,8 +309,12 @@ public class Player : MonoBehaviour
 			}
 		}
 
-		//rolling
-		if(_input._roll && _controller.isGrounded && _ready && _switcher.currentWeapon != 2)
+		/*
+		//Rolling----------------------------------------------------------------
+		if(_input._roll 					//if roll button is pressed
+		   && _controller.isGrounded 		//if grounded
+		   && _ready 						//if ready
+		   && _switcher.currentWeapon != 2) //if a certain weapon is not pressed
 		{
 			_rolling = true;
 
@@ -311,7 +337,49 @@ public class Player : MonoBehaviour
 		else
 			_rolling = false;
 
-		//knockback
+		*/
+
+		//Arcade Rolling -------------------------------------------------
+		if(_controller.isGrounded && _ready && _switcher.currentWeapon != 2)
+		{
+			if (_input._leftOnce || _input._rightOnce)
+			{
+				if ( buttonCooler > 0 && buttonCount == 1/*Number of Taps you want Minus One*/){
+					//Has double tapped
+					_rolling = true;
+					
+					_animator.SetTrigger("Roll");
+					_sfx.JumpSound();
+					
+					//cannot roll for x seconds
+					StartCoroutine(Ready(rollDelay));
+					
+					if(!facingLeft){
+						_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
+						_velocity.x = Mathf.Sqrt(maxDistance);
+					}
+					else
+					{
+						_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
+						_velocity.x = -Mathf.Sqrt(maxDistance);
+					}
+				}
+				else
+				{
+					buttonCooler = 0.5f ; 
+					buttonCount += 1 ;
+				}
+			}
+			else
+				_rolling = false;
+		}
+
+		if ( buttonCooler > 0 )
+			buttonCooler -= 1 * Time.deltaTime ;
+		else
+			buttonCount = 0 ;
+
+		//knockback on player hurt -------------------------------------------
 		if(_health.playerHurt)
 		{
 			//TODO: find a way to make this only when sword is out
@@ -335,7 +403,7 @@ public class Player : MonoBehaviour
 			_health.playerHurt = false;
 		}
 		
-		// apply horizontal speed smoothing
+		// apply horizontal speed smoothing ------------------------------------------------------------------------------
 		var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
 		_velocity.x = Mathf.Lerp( _velocity.x, normalizedHorizontalSpeed * resultSpeed, Time.fixedDeltaTime * smoothedMovementFactor );
 		
@@ -346,6 +414,7 @@ public class Player : MonoBehaviour
 		// reset input
 		_input._jump = false;
 
+		//Blocking -----------------------------------------------------
 		//animation blocking informed by button
 		if(_blocking)
 		{
@@ -354,7 +423,7 @@ public class Player : MonoBehaviour
 		else
 			_animator.SetBool("Blocking", false);
 
-		//if blocking 
+		//Blocking and Strong Attack Speed
 		if(_blocking || _input._strongAttack)
 		{
 			if(_controller.isGrounded)
@@ -363,19 +432,23 @@ public class Player : MonoBehaviour
 		else
 			Speed (walkSpeed);
 		
-		//strong attack
+		//strong attack --------------------------------------------------
 		if(_controller.isGrounded)
 		{
-			//if strongAttack and not jumping and not blocking
-			if(_input._strongAttack && !_input._jump && !_blocking)
+			if(_input._strongAttack 	//if strong attack button pressed
+			   && !_input._jump 		//if not jumping
+			   && !_blocking) 			//if not blocking
 			{
 				_animator.SetTrigger("StrongAttack");
 				StartCoroutine(Ready(strongAttackDelay));
 			}
 		}
 		
-		//attack
-		if(_input._attack && !_input._blocking && normalizedHorizontalSpeed == 0 && _controller.isGrounded)
+		//Quick Attack----------------------------------------------------------
+		if(_input._attack 						//if attack button pressed
+		   && !_input._blocking 				//if not blocking
+		   && normalizedHorizontalSpeed == 0 	//if not moving
+		   && _controller.isGrounded) 			//if grounded
 		{
 			//if the bow is not equipped, just attack
 			if(_switcher.currentWeapon != 3)
@@ -389,22 +462,26 @@ public class Player : MonoBehaviour
 			}
 		}
 
-		//blockingAttack
-		else if(_input._attack && _blocking && _ready)
+		//Blocking Attack--------------------------------------------------------
+		else if(_input._attack 
+		        && _blocking && _ready)
 		{
 			_animator.SetTrigger("BlockingAttack");
 			StartCoroutine(Ready(blockAttackDelay));
 		}
 
 		//if bow and aim firing, start enumerator
-		if(_switcher.currentWeapon == 3 && _blocking && _input._attack)
+		if(_switcher.currentWeapon == 3 
+		   && _blocking 
+		   && _input._attack)
 		{
 			print("aiming fire arrow");
 			//yield return(StartCoroutine(Reload));
 		}
 
 		//foot dust
-		if(_controller.isGrounded && Mathf.Abs(normalizedHorizontalSpeed) < 0.1f)
+		if(_controller.isGrounded 
+		   && Mathf.Abs(normalizedHorizontalSpeed) < 0.1f)
 		{
 			_footDust.Play();
 		}
@@ -431,7 +508,7 @@ public class Player : MonoBehaviour
 		comboPoints ++;
 	}
 
-	//'stamina'
+	//Stamina
 	public IEnumerator Ready(float delay)
 	{
 		_ready = false;
