@@ -24,7 +24,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 	private Image _portrait;
 	private AudioClip _sound;
 	private AudioClip _bgMusic;
-	public float conversationSpeed = 2f;
+	private float conversationSpeed = .1f;
 	private bool submit;
 
 	void Awake()
@@ -46,7 +46,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 
 	void FixedUpdate()
 	{
-		if(_dialog != null)
+		if(_dialog)
 		{
 			//toggle dialog on conversation
 			if(talking)
@@ -57,7 +57,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 				_portrait.sprite = currentConversationLine.DisplayPic;
 				_sound = currentConversationLine.sentenceSound;
 			}
-			else if(!talking)//hide if not talking
+			else//hide if not talking
 			{
 				_dialog.text = null;
 				_name.text = null;
@@ -78,7 +78,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 
 	IEnumerator Music(AudioClip music)
 	{
-		if(_fader != null)
+		if(_fader)
 		{
 			//fade in
 			_fader.Fade(music);

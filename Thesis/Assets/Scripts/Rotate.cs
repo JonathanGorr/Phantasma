@@ -7,8 +7,6 @@ public class Rotate : MonoBehaviour {
 
 	void Awake()
 	{
-		int number = Random.Range (0, 2);
-
 		float left = -speed;
 		float right = speed;
 

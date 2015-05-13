@@ -15,8 +15,7 @@ public class DeathMessage : MonoBehaviour {
 		_manager = GetComponent<LevelManager> ();
 		deathMessage = GameObject.Find ("DeathMessage");
 
-		if(deathMessage != null)
-			deathMessage.SetActive (false);
+		if(deathMessage) deathMessage.SetActive (false);
 	}
 
 	void FixedUpdate()
@@ -27,8 +26,14 @@ public class DeathMessage : MonoBehaviour {
 		}
 	}
 
+	public void StartRestart()
+	{
+		StartCoroutine ("Restart");
+	}
+
 	public IEnumerator Restart()
 	{
+		Camera.main.GetComponent<Camera2DFollow> ().enabled = false;
 		deathMessage.SetActive (true);
 		yield return new WaitForSeconds(delay);
 		deathMessage.SetActive (false);

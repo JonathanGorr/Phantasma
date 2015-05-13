@@ -7,7 +7,6 @@ public class PlayerAttack : MonoBehaviour {
 	private Animator _animator;
 	//import Player script
 	private Player _player;
-	private WeaponSFX _wepSFX;
 	private Health _health;
 	private PlayerInput _input;
 	private CharacterController2D _controller;
@@ -25,7 +24,6 @@ public class PlayerAttack : MonoBehaviour {
 	void Awake () {
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_animator = GetComponent<Animator>();
-		_wepSFX = GetComponent<WeaponSFX>();
 		_player = GetComponentInParent<Player>();
 		_controller = GetComponentInParent<CharacterController2D>();
 	}

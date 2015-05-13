@@ -4,7 +4,6 @@ using System.Collections;
 public class Checkpoint : MonoBehaviour {
 
 	private PlayerPreferences _prefs;
-	private GameObject _checkpointMessage;
 	private Animator _anim;
 	private LevelManager _manager;
 	private Evolution _evo;
@@ -35,7 +34,6 @@ public class Checkpoint : MonoBehaviour {
 		//if not in menu, find the checkpoint and its animated text
 		if(!_manager.inMenu)
 		{
-			_checkpointMessage = GameObject.Find("Checkpoint");
 			_anim = GameObject.Find("CheckpointReached").GetComponent<Animator>();
 		}
 	}
@@ -52,7 +50,7 @@ public class Checkpoint : MonoBehaviour {
 				if(_prefs)
 				{
 					_prefs.SaveStats(transform.position.x, transform.position.y, _evo.blood, _playerHealth.health);
-					StartCoroutine(ShowMessage());
+					ShowMessage();
 
 					//set bools in prefs accordingly
 					if(motherMet)
@@ -90,7 +88,7 @@ public class Checkpoint : MonoBehaviour {
 		}
 	}
 
-	IEnumerator ShowMessage()
+	private void ShowMessage()
 	{
 		if(_anim)
 		{
@@ -99,13 +97,6 @@ public class Checkpoint : MonoBehaviour {
 		}
 		else
 			print("theres no animator");
-
-		yield return new WaitForSeconds(2f);
-
-		if(_checkpointMessage)
-			_checkpointMessage.SetActive (false);
-
-		Destroy (gameObject);
 	}
 
 	void OnDrawGizmos()

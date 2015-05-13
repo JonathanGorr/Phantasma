@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Rotate.cs" />
      <Compile Include="Assets\Scripts\Attack\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\PlayerAttack.cs" />
      <Compile Include="Assets\Scripts\Camera\Camera2DFollow.cs" />
@@ -102,6 +101,7 @@
      <Compile Include="Assets\Scripts\Particles\KillParticles.cs" />
      <Compile Include="Assets\Scripts\Particles\Particles.cs" />
      <Compile Include="Assets\Scripts\Particles\SortingOrder.cs" />
+     <Compile Include="Assets\Scripts\Rotate.cs" />
      <Compile Include="Assets\Scripts\Singleton.cs" />
      <Compile Include="Assets\Scripts\SnapLink.cs" />
      <Compile Include="Assets\Scripts\Sound\Footsteps.cs" />

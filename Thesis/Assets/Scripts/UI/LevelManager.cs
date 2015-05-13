@@ -25,7 +25,7 @@ public class LevelManager : MonoBehaviour {
 	private PlayerInput _input;
 
 	[HideInInspector]
-	public bool paused = false;
+	public bool paused;
 	private bool controlOn;
 
 	private GameObject eventSystem;

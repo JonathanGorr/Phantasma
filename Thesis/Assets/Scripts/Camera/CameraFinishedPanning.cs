@@ -5,6 +5,7 @@ public class CameraFinishedPanning : MonoBehaviour {
 
 	private GameObject _eventSystem;
 	private GameObject _title;
+	private bool done;
 
 	void Awake()
 	{
@@ -21,11 +22,8 @@ public class CameraFinishedPanning : MonoBehaviour {
 	public void EnableControl()
 	{
 		if(_eventSystem) _eventSystem.SetActive (true);
-		if (_title)
-		{
-			_title.SetActive(true);
-			//_title.GetComponent<Animation>()["Title"].speed = Random.Range(0,2);
-			_title.GetComponent<Animator>().Play ("Title");
-		}
+
+		_title.SetActive(true);
+		_title.GetComponent<Animator>().Play ("Title");
 	}
 }

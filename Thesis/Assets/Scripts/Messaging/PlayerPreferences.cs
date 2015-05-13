@@ -117,7 +117,6 @@ public class PlayerPreferences : MonoBehaviour {
 			else
 			{
 				swordLesson = false;
-				print("sword tut never done");
 			}
 			
 			//mother should be destroyed, father dialog should be destroyed
@@ -139,7 +138,6 @@ public class PlayerPreferences : MonoBehaviour {
 			else
 			{
 				bowLesson = false;
-				print("bow tut never done");
 			}
 
 			//puzzle dialog
