@@ -8,13 +8,14 @@ public class LevelManager : MonoBehaviour {
 
 	[HideInInspector]
 	public static int bloodCount;
+	public float timeLeft = 30f;
+	public bool exhibition;
 
-	public bool inMenu;
-	private bool skip;
+	[HideInInspector] public bool inMenu;
 
 	[SerializeField, HideInInspector]
-	public GameObject _pauseScreen, _controlScreen, _hud;
-	private GameObject menuButton, restartButton;
+	public GameObject _pauseScreen, _controlScreen, _hud, _dialog;
+	private GameObject restartButton;
 
 	//components
 	private Health _player;
@@ -25,7 +26,7 @@ public class LevelManager : MonoBehaviour {
 
 	[HideInInspector]
 	public bool paused = false;
-	private bool controlOn, pause;
+	private bool controlOn;
 
 	private GameObject eventSystem;
 	private EventSystem es;
@@ -34,27 +35,31 @@ public class LevelManager : MonoBehaviour {
 	{
 		Application.targetFrameRate = 60;
 
+		//components
 		_input = GetComponent<PlayerInput> ();
+		_dialog = GameObject.Find("Dialog");
 		cameraAnim = Camera.main.GetComponent<Animator> ();
 		_hud = GameObject.Find ("Hud");
 		_prefs = GetComponent<PlayerPreferences>();
 		_evo = GetComponent<Evolution>();
 		_player = GameObject.Find("_Player").GetComponent<Health>();
-		//find controller and pause screen
 		_pauseScreen = GameObject.Find ("PauseMenu");
 		_controlScreen = GameObject.Find ("ControlScreen");
 		eventSystem = GameObject.Find ("EventSystem");
-		//es = eventSystem.GetComponent<EventSystem> ();
-		menuButton = GameObject.Find ("New Game");
 		restartButton = GameObject.Find ("RestartButton");
 
 		//turn them off if existing
-		if(_pauseScreen != null)
+		if(_pauseScreen)
 			_pauseScreen.SetActive (false);
-		if(_controlScreen != null)
+		if(_controlScreen)
 			_controlScreen.SetActive (false);
 
-		if(_hud != null)
+		if (Application.loadedLevelName == "Menu")
+			inMenu = true;
+		else
+			inMenu = false;
+
+		if(_hud)
 		{
 			if(inMenu)
 			{
@@ -71,16 +76,36 @@ public class LevelManager : MonoBehaviour {
 
 	void Update()
 	{
-		//input
-		pause = _input._pause;
-		skip = _input._anyKey;
+		if(_dialog)
+		{
+			if(!ConversationManager.Instance.talking)
+				_dialog.SetActive(false);
+			else
+				_dialog.SetActive(true);
+		}
+
+		//if no buttons are pressed, count down from timeLeft
+		if(!inMenu)
+		{
+			if(exhibition)
+			{
+				if (!_input._anyKey)
+					timeLeft -= Time.deltaTime; 
+				else
+					timeLeft = 30;
+
+				//return to menu if x seconds passed
+				if (timeLeft <= 0)
+					ReturnToMenu ();
+			}
+		}
 
 		if(!_player.dead)
 		{
 			if(!inMenu)
 			{
 				//pause
-				if(pause)
+				if(_input._pause)
 				{
 					//toggle
 					paused = !paused;
@@ -119,7 +144,7 @@ public class LevelManager : MonoBehaviour {
 			}
 
 			//else if in menu
-			else{ if(skip) cameraAnim.SetTrigger("Skip");}
+			else{ if(_input._anyKey) cameraAnim.SetTrigger("Skip");}
 		}
 	}
 

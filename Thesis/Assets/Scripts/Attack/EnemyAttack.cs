@@ -7,7 +7,6 @@ public class EnemyAttack : MonoBehaviour {
 	private Animator _animator;
 	//import Player script
 	private Player _player;
-	private WeaponSFX _wepSFX;
 	public int damage;
 	public GameObject hitSprite;
 	public bool readyToAttack = false;
@@ -16,7 +15,6 @@ public class EnemyAttack : MonoBehaviour {
 	void Awake () {
 		//get the animator component
 		_animator = GetComponent<Animator> ();
-		_wepSFX = GetComponent<WeaponSFX> ();
 	}
 
 	public void Attack(int trigger)

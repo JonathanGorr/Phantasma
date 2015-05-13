@@ -11,6 +11,7 @@ public class Checkpoint : MonoBehaviour {
 	private Evolution _evo;
 	private GameObject _playerGO;
 	private Health _playerHealth;
+	private Transform _target;
 	public bool 
 		motherMet,
 		fatherMet,
@@ -20,8 +21,11 @@ public class Checkpoint : MonoBehaviour {
 		bowTut,
 		puzzle;
 
+	public float convoDistance = 2;
+
 	// Use this for initialization
 	void Awake () {
+		_target = GameObject.Find ("_Player").transform;
 		_manager = GameObject.Find ("_LevelManager");
 		_prefs = _manager.GetComponent<PlayerPreferences>();
 		_managerComp = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
@@ -40,11 +44,13 @@ public class Checkpoint : MonoBehaviour {
 	}
 
 	//when the player enters the checkpoint, his location(checkpoint) is saved to the prefs
-	void OnTriggerEnter2D(Collider2D player)
+	void Update()
 	{
-		if(_prefs != null)
+		float distance = Vector3.Distance (transform.position, _target.position);
+
+		if(distance < convoDistance)
 		{
-			if(player.gameObject.tag == "Player")
+			if(_prefs)
 			{
 				_prefs.SaveStats(transform.position.x, transform.position.y, _evo.blood, _playerHealth.health);
 				StartCoroutine(ShowMessage());
@@ -79,9 +85,9 @@ public class Checkpoint : MonoBehaviour {
 					_prefs.Puzzle();
 				}
 			}
+			else
+				print ("prefs could not be found");
 		}
-		else
-			print ("prefs could not be found");
 	}
 
 	IEnumerator ShowMessage()

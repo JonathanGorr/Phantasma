@@ -44,7 +44,7 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField]
 	[Range( 0, 5f )]
 	public float size;
-	private Color color;
+	//private Color color;
 	public Color green;
 	public Color yellow;
 	public Color red;
@@ -98,7 +98,7 @@ public class EnemyAI : MonoBehaviour
 			if(distance > lookAtDistance)
 			{
 				speed = 0;
-				color = green;
+				//color = green;
 			}
 			if (distance < attackRange)
 			{
@@ -133,7 +133,7 @@ public class EnemyAI : MonoBehaviour
 	void LookAt()
 	{
 		//yellow color
-		color = yellow;
+		//color = yellow;
 
 		if(!attacking)
 		{
@@ -152,7 +152,7 @@ public class EnemyAI : MonoBehaviour
 	
 	void ChasePlayer(float modifiedSpeed)
 	{
-		color = red;
+		//color = red;
 
 		speed = modifiedSpeed;
 

@@ -161,7 +161,8 @@ public class ShootArrow : MonoBehaviour {
 				else if(!_aim && !drawn && _player._ready == true && Mathf.Abs(_player.normalizedHorizontalSpeed) < 0.1f)
 				{
 					//turn off line rendering
-					lineRenderer.SetVertexCount(0);
+					if(lineRenderer)
+						lineRenderer.SetVertexCount(0);
 
 					if(_shoot)
 						StartCoroutine(QuickShot());

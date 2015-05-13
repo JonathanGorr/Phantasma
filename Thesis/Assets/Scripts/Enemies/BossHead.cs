@@ -4,21 +4,21 @@ using System.Collections;
 public class BossHead : MonoBehaviour {
 
 	private Health _BossHealth;
-	private Transform _neck;
-	private Transform myTransform;
+	//private Transform _neck;
+	//private Transform myTransform;
 	private FlamingSkullAI _ai;
 
 	void Awake()
 	{
 		_BossHealth = GetComponentInParent<Health>();
-		_neck = GameObject.Find("Neck").GetComponent<Transform>();
+		//_neck = GameObject.Find("Neck").GetComponent<Transform>();
 		_ai = GetComponent<FlamingSkullAI>();
 
 		if (_ai != null)
 			_ai.enabled = false;
 
 		//cache it
-		myTransform = transform;
+		//myTransform = transform;
 	}
 
 	void FixedUpdate()
@@ -33,7 +33,7 @@ public class BossHead : MonoBehaviour {
 		//bind the head to the neck
 		else
 		{
-			myTransform = _neck;
+			//myTransform = _neck;
 		}
 
 	}

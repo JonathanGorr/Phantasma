@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
 	private ShootArrow _shootMgr;
 	private PlayerInput _input;
 	private ConversationManager _convoManager;
+	private PlayerPreferences _prefs;
 
 	//switch animator controller for each weapon
 	Animator _animator;
@@ -96,6 +97,7 @@ public class Player : MonoBehaviour
 		_shootMgr = GetComponent<ShootArrow> ();
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
+		_prefs = _manager.GetComponent<PlayerPreferences>();
 		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
 		_input = _manager.GetComponent<PlayerInput> ();
 		_health = GetComponent<Health>();
@@ -177,92 +179,108 @@ public class Player : MonoBehaviour
 			_velocity.y = 0;
 		}
 
-		//axis flipping and movement ----------------------------------------------
-		if(!_health.dead)
+		//if heal is held down, stop movement and flipping and jumping
+		//select weapon with heal(hold) + joystick direction
+		if(_prefs.itemsGet)
 		{
-			//if aiming...
-			if(!_shootMgr._aim)
+			if(_input._healHold)
 			{
-				//if pushing right on the joystick...
-				if(_input._axis > 0.1)
+				if(_input._down)
+					_switcher.currentWeapon = 1;
+				else if(_input._jump)
+					_switcher.currentWeapon = 0;
+				else if(_input._left)
+					_switcher.currentWeapon = 2;
+				else if(_input._right)
+					_switcher.currentWeapon = 3;
+
+				//print(_switcher.currentWeapon);
+			}
+		}
+
+		//if not aiming...
+		if(!_shootMgr._aim && !_input._healHold)
+		{
+			//axis flipping and movement ----------------------------------------------
+			//if pushing right on the joystick...
+			if(_input._axis > 0.1)
+			{
+				normalizedHorizontalSpeed = _input._axis;
+				if(transform.localScale.x < 0f)
 				{
-					normalizedHorizontalSpeed = _input._axis;
-					if(transform.localScale.x < 0f)
-					{
-						//setting this to vector2 will squash the 3d collider for blood particles
-						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
-					}
-					facingLeft = false;
-					moving = true;
+					//setting this to vector2 will squash the 3d collider for blood particles
+					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
 				}
-
-				//else if pushing left on the joystick...
-				else if(_input._axis < -0.1)
-				{
-					normalizedHorizontalSpeed = _input._axis;
-					if(transform.localScale.x > 0f)
-					{
-						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
-					}
-					facingLeft = true;
-					moving = true;
-				}
-
-				//keyboard movement------------------------------------------------
-
-				//else if pushing left on the keyboard
-				else if(_input._left) //if walking left
-				{
-					//animation speed keyboard
-					_animator.SetFloat ("Speed", 1);
-
-					normalizedHorizontalSpeed = -1;
-
-					//flipping
-					if( transform.localScale.x > 0f)
-					{
-						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
-						facingLeft = true;
-					}
-					
-					if( _controller.isGrounded)
-						_animator.SetInteger("AnimState", 1);
-
-				}
-
-				//else if pushing right on the keyboard...
-				else if(_input._right) //if walking right
-				{
-					//animation speed keyboard
-					_animator.SetFloat ("Speed", 1);
-
-					normalizedHorizontalSpeed = 1;
-
-					if( transform.localScale.x < 0f)
-					{
-						transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
-						facingLeft = false;
-					}
-					
-					if( _controller.isGrounded)
-						_animator.SetInteger("AnimState", 1);
-				}
-
-				//else if no input, stand still...
-				else
-				{
-					normalizedHorizontalSpeed = 0;
-					
-					if( _controller.isGrounded)
-						_animator.SetInteger("AnimState", 0);
-				}
+				facingLeft = false;
+				moving = true;
 			}
 
-			//else if aiming, cannot move, but can flip...
+			//else if pushing left on the joystick...
+			else if(_input._axis < -0.1)
+			{
+				normalizedHorizontalSpeed = _input._axis;
+				if(transform.localScale.x > 0f)
+				{
+					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
+				}
+				facingLeft = true;
+				moving = true;
+			}
+
+			//keyboard movement------------------------------------------------------
+
+			//else if pushing left on the keyboard
+			else if(_input._left) //if walking left
+			{
+				//animation speed keyboard
+				_animator.SetFloat ("Speed", 1);
+
+				normalizedHorizontalSpeed = -1;
+
+				//flipping
+				if( transform.localScale.x > 0f)
+				{
+					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
+					facingLeft = true;
+				}
+				
+				if( _controller.isGrounded)
+					_animator.SetInteger("AnimState", 1);
+
+			}
+
+			//else if pushing right on the keyboard...
+			else if(_input._right) //if walking right
+			{
+				//animation speed keyboard
+				_animator.SetFloat ("Speed", 1);
+
+				normalizedHorizontalSpeed = 1;
+
+				if( transform.localScale.x < 0f)
+				{
+					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
+					facingLeft = false;
+				}
+				
+				if( _controller.isGrounded)
+					_animator.SetInteger("AnimState", 1);
+			}
+
+			//else if no input, stand still...
 			else
 			{
 				normalizedHorizontalSpeed = 0;
+				
+				if( _controller.isGrounded)
+					_animator.SetInteger("AnimState", 0);
 			}
+		}
+
+		//else if aiming, cannot move, but can flip...
+		else
+		{
+			normalizedHorizontalSpeed = 0;
 		}
 
 		//Jump-------------------------------------------------------------
@@ -272,7 +290,8 @@ public class Player : MonoBehaviour
 		   && !_shootMgr._aim 			//if not aiming
 		   && !_blocking 				//if not blocking
 		   && !_input._strongAttack 	//if not attacking
-		   && !_health.dead) 			//if not dead
+		   && !_health.dead 			//if not dead
+		   && !_input._healHold)
 		{
 			//cannot jump for x seconds
 			StartCoroutine(Ready(jumpDelay));
@@ -295,7 +314,8 @@ public class Player : MonoBehaviour
 		if(_input._backStep 					//if backstep button is pressed
 		   && _controller.isGrounded 			//if grounded
 		   && _ready 							//if ready
-		   && normalizedHorizontalSpeed == 0) 	//if not moving
+		   && normalizedHorizontalSpeed == 0 	//if not moving
+		   && !_input._healHold)
 		{
 			//cannot roll for x seconds
 			StartCoroutine(Ready(backStepDelay));
@@ -345,8 +365,11 @@ public class Player : MonoBehaviour
 
 		*/
 
-		//Arcade Rolling -------------------------------------------------
-		if(_controller.isGrounded && _ready && _switcher.currentWeapon != 2)
+		//Arcade (Double Tap) Rolling -------------------------------------------------
+		if(_controller.isGrounded
+		   && _ready 
+		   && _switcher.currentWeapon != 2
+		   && !_input._healHold)
 		{
 			if (_input._leftOnce || _input._rightOnce)
 			{

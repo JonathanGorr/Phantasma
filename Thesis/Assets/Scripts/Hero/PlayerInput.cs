@@ -19,7 +19,8 @@ public class PlayerInput : MonoBehaviour {
 		_cycleWep,
 		_blocking,
 		_backStep,
-		_heal, 
+		_heal,
+		_healHold,
 		_roll,
 		_pause,
 		_anyKey,
@@ -57,6 +58,8 @@ public class PlayerInput : MonoBehaviour {
 				_roll = Input.GetKeyDown (KeyCode.Tab) || Input.GetButtonDown ("360_BButton");
 				_cycleWep = Input.GetKeyDown (KeyCode.S);
 				_scrollWheel = Input.GetAxisRaw("Mouse ScrollWheel");
+				_healHold = Input.GetKey(KeyCode.Q);
+				_heal = Input.GetKeyDown(KeyCode.Q);
 			}
 
 			//if talking, stop and dont move

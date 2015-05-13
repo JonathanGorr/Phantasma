@@ -5,15 +5,11 @@ public class WeaponSwitcher : MonoBehaviour {
 	
 	public GameObject[] weapons; // push your prefabs
 	public AudioClip[] sheath;
-	private LevelManager _manager;
 	private PlayerInput _input;
 
 	[HideInInspector]
 	public int currentWeapon = 0, nrWeapons;
 	public float delay = 0.1f;
-	private int[] list = {0,1,2,3};
-	
-	public bool weaponGet, inMenu;
 
 	public int
 		up,
@@ -23,13 +19,13 @@ public class WeaponSwitcher : MonoBehaviour {
 
 	void Awake() {
 		_input = GetComponent<PlayerInput> ();
-		_manager = GetComponent<LevelManager>();
 		nrWeapons = weapons.Length;
 		SwitchWeapon(currentWeapon); // Set default weapon
 	}
 
 	void Update () {
 
+		//DPAD 360 Controller------------------------------------
 		if(_input.DPadVertical == 1)
 		{
 			currentWeapon = up;
@@ -51,6 +47,8 @@ public class WeaponSwitcher : MonoBehaviour {
 			StartCoroutine(Sheath(delay));
 		}
 
+		//Press one button to cycle through--------------------------------
+/*
 		if (currentWeapon > list.Length - 1) {
 			currentWeapon = 0;
 		}
@@ -63,7 +61,8 @@ public class WeaponSwitcher : MonoBehaviour {
 		{
 			currentWeapon += 1;
 		}
-		
+*/
+		//Mouse Scroll Wheel-----------------------------------
 		if(_input._scrollWheel > 0)
 		{
 			currentWeapon += 1;
