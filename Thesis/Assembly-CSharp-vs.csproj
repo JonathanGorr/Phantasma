@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Rotate.cs" />
      <Compile Include="Assets\Scripts\Attack\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\PlayerAttack.cs" />
      <Compile Include="Assets\Scripts\Camera\Camera2DFollow.cs" />

@@ -35,7 +35,7 @@ public class ShootArrow : MonoBehaviour {
 
 	void Awake()
 	{
-		_input = GameObject.Find ("LevelManager").GetComponent<PlayerInput> ();
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_player = GetComponent<Player>();
 		_body = GameObject.Find("_Player/BodyParts/Body");
 		_switcher = GameObject.Find("_LevelManager").GetComponent<WeaponSwitcher>();

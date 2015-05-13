@@ -1,10 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Attack\PlayerAttack.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Camera\CameraFinishedPanning.cs">
     <Files>
-      <File FileName="Assets\Scripts\Weapons\ShootArrow.cs" Line="66" Column="22" />
-      <File FileName="Assets\Scripts\Hero\PlayerInput.cs" Line="52" Column="34" />
-      <File FileName="Assets\Scripts\Attack\PlayerAttack.cs" Line="41" Column="36" />
+      <File FileName="Assets\Rotate.cs" Line="9" Column="3" />
+      <File FileName="Assets\Scripts\Weapons\ShootArrow.cs" Line="37" Column="3" />
+      <File FileName="Assets\Scripts\Camera\CameraFinishedPanning.cs" Line="17" Column="28" />
+      <File FileName="Assets\Scripts\Enemies\Explode.cs" Line="12" Column="14" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
