@@ -1,8 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Messaging\PlayerPreferences.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Messaging\Checkpoint.cs">
     <Files>
-      <File FileName="Assets\Scripts\Messaging\PlayerPreferences.cs" Line="69" Column="69" />
+      <File FileName="Assets\Scripts\Messaging\Checkpoint.cs" Line="30" Column="55" />
+      <File FileName="Assets\Scripts\Messaging\PlayerPreferences.cs" Line="82" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

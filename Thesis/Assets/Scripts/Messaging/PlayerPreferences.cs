@@ -95,34 +95,24 @@ public class PlayerPreferences : MonoBehaviour {
 				fatherMet = true;
 				//destroy mom and dad dialog
 				Destroy(dialog[0]);
-				Destroy(dialog[1]);
+				//Destroy(dialog[1]);
 				//destroy dad checkpoint
-				Destroy (checkpoints[0]);
+				//Destroy (checkpoints[0]);
 				
 				//set sword tut and checkpoint to true
-				if(dialog[2] != null)
-					dialog[2].SetActive(true);
-				if(checkpoints[1] != null)
-					checkpoints[1].SetActive(true);
+				dialog[2].SetActive(true);
+				checkpoints[1].SetActive(true);
 			}
 			else
-			{
 				fatherMet = false;
-			}
 			
 			//sword tut
 			if(PlayerPrefs.GetInt("SwordTutorial") == 1)
 			{
 				swordLesson = true;
 
-				if(dialog[3] != null)
-					dialog[3].SetActive(true);
-				if(checkpoints[2] != null)
-					checkpoints[2].SetActive(true);
-				
-				//destroy sword tut
-				Destroy(dialog[2]);
-				Destroy(checkpoints[1]);
+				dialog[3].SetActive(true);
+				checkpoints[2].SetActive(true);
 			}
 			else
 			{
@@ -135,8 +125,6 @@ public class PlayerPreferences : MonoBehaviour {
 			if(PlayerPrefs.GetInt("ReturnedHome") == 1)
 			{
 				returnedHome = true;
-				Destroy(dialog[3]);
-				Destroy(checkpoints[2]);
 			}
 			else
 			{
@@ -147,8 +135,6 @@ public class PlayerPreferences : MonoBehaviour {
 			if(PlayerPrefs.GetInt("BowTutorial") == 1)
 			{
 				bowLesson = true;
-				Destroy(dialog[4]);
-				Destroy(checkpoints[3]);
 			}
 			else
 			{
@@ -160,8 +146,6 @@ public class PlayerPreferences : MonoBehaviour {
 			if(PlayerPrefs.GetInt("Puzzle") == 1)
 			{
 				puzzle = true;
-				Destroy(dialog[5]);
-				Destroy(checkpoints[6]);
 			}
 			else
 			{
@@ -187,13 +171,15 @@ public class PlayerPreferences : MonoBehaviour {
 		{
 			if(_player != null)
 			{
-				if(Input.GetKeyDown(KeyCode.Return))
+				if(Input.GetKeyDown(KeyCode.R))
 				{
+					print("Data Erased");
 					EraseAll();
 				}
 
 				if(Input.GetKeyDown(KeyCode.P))
 				{
+					print("Data Saved");
 					SaveStats(_player.position.x, _player.position.y, _evo.blood, _health.health);
 				}
 			}
