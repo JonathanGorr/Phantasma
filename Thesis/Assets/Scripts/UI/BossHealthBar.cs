@@ -85,7 +85,7 @@ public class BossHealthBar : MonoBehaviour {
 	//while the button is not pressed, stuck in a loop
 	IEnumerator WaitForButton()
 	{
-		while (!_input._attack)
+		while (!_input._strongAttack)
 			yield return null;
 	}
 }
