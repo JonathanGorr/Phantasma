@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 087bcceb4d6c7c2418ea34ba2c246c8c
+timeCreated: 1431495045
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: BridgeEnd
@@ -34,6 +36,7 @@ TextureImporter:
     21300058: StairBox
     21300060: StoneWall2xDistance
     21300062: Banner
+    21300064: PressurePlate
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -346,6 +349,16 @@ TextureImporter:
         y: 32
         width: 143
         height: 784
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: PressurePlate
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 3584
+        width: 173
+        height: 87
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}

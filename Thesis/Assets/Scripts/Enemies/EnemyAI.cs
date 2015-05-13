@@ -31,6 +31,7 @@ public class EnemyAI : MonoBehaviour
 	public float walkSpeed = 2f;
 	public float runSpeed = 4f;
 	public float jumpForce = 17f;
+	public float attackDelay = 0.5f;
 
 	private bool left;
 	public bool attacking;
@@ -211,6 +212,9 @@ public class EnemyAI : MonoBehaviour
 				_bossWeapon1.GetComponent<EnemyAttack>().Attack(1);
 				_bossWeapon2.GetComponent<EnemyAttack>().Attack(1);
 			}
+
+			if(_health.health < 50)
+				attackDelay = .1f;
 		}
 		//this is for non-boss enemies
 		else
@@ -219,7 +223,7 @@ public class EnemyAI : MonoBehaviour
 			_weapon.Attack(0);
 		}
 
-		yield return new WaitForSeconds (0.5f);
+		yield return new WaitForSeconds (attackDelay);
 		ready = true;
 	}
 

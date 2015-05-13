@@ -6,8 +6,8 @@ public class DoorTrigger : MonoBehaviour {
 	public Door door;
 	public bool ignoreTrigger;
 
-	void OnTriggerEnter2D(Collider2D target)
-	{
+	void OnTriggerEnter2D(Collider2D target){
+
 		//tests for a value at the beginning of the function,
 		//if the value yields true, return/exit out of function;
 		//door.open() will not be called
@@ -20,8 +20,7 @@ public class DoorTrigger : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerExit2D(Collider2D target)
-		{
+	void OnTriggerExit2D(Collider2D target){
 
 		if (ignoreTrigger)
 			return;
