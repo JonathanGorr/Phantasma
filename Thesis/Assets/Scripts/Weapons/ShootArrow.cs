@@ -15,25 +15,16 @@ public class ShootArrow : MonoBehaviour {
 		min,
 		max;
 
-	private bool
-		_shoot,
-		drawn;
-
-	[HideInInspector]
-	public bool _aim;
-
-	private float 
-		_axisVertical,
-		_axisHorizontal;
+	private bool drawn;
 
 	private Player _player;
 	private CharacterController2D _controller;
+	private PlayerInput _input;
 	private LineRenderer lineRenderer;
 	public string sortingLayer = "Player";
 	public int sortingNumber = -1;
 	private GameObject _body;
 	private Vector3 target;
-	private int index;
 	private WeaponSwitcher _switcher;
 	private string[] joysticks;
 
@@ -44,13 +35,14 @@ public class ShootArrow : MonoBehaviour {
 
 	void Awake()
 	{
+		_input = GameObject.Find ("LevelManager").GetComponent<PlayerInput> ();
 		_player = GetComponent<Player>();
 		_body = GameObject.Find("_Player/BodyParts/Body");
 		_switcher = GameObject.Find("_LevelManager").GetComponent<WeaponSwitcher>();
 		lineRenderer = GetComponentInChildren<LineRenderer>();
 		_controller = GetComponent<CharacterController2D>();
 
-		if(lineRenderer != null)
+		if(lineRenderer)
 		{
 			lineRenderer.sortingLayerName = sortingLayer;
 			lineRenderer.sortingOrder = sortingNumber;
@@ -60,39 +52,18 @@ public class ShootArrow : MonoBehaviour {
 	//inputs
 	void Update()
 	{
-		//how many controller are plugged in?
-		joysticks = Input.GetJoystickNames ();
-
-		_shoot = Input.GetButtonDown ("360_RightBumper") || Input.GetKeyDown (KeyCode.J);
-
-		if(joysticks.Length > 0)
-		{
-			_axisVertical = Input.GetAxis ("360_RightStickVertical");
-			_axisHorizontal = Input.GetAxis ("360_RightStickHorizontal");
-		}
-		else if(joysticks.Length == 0)
-		{
-			_axisHorizontal = Input.GetAxis ("Horizontal");
-			_axisVertical = Input.GetAxis ("Vertical");
-		}
-
-		//if the controller button is held, or the G button is held, while the bow is out, aiming is true
-		_aim = Input.GetButton ("360_LeftBumper") || Input.GetKey (KeyCode.G) && index == 3;
-
 		//target is the players world position plus the axis
-		target = new Vector3(_body.transform.position.x + _axisHorizontal, _body.transform.position.y + _axisVertical, 0);
-
-		index = _switcher.currentWeapon;
+		target = new Vector3(_body.transform.position.x + _input._axisHorizontal, _body.transform.position.y + _input._axisVertical, 0);
 	}
 
 	//these things come after the animator; overwrite the animator transforms
 	void LateUpdate()
 	{
-		if(index == 3)
+		if(_switcher.currentWeapon == 3)
 		{
 			if(_controller.isGrounded)
 			{
-				if(_aim)
+				if(_input._aiming)
 				{
 					//the vector for the players facing
 					Vector3 direction = new Vector3();
@@ -101,12 +72,12 @@ public class ShootArrow : MonoBehaviour {
 					Vector2 dir = target - _body.transform.position;
 					float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-					if(_player.facingLeft == false)
+					if(!_player.facingLeft)
 					{
 						direction = Vector3.forward;
 						angle = Mathf.Clamp(angle, -15, 80);
 					}
-					else if(_player.facingLeft == true)
+					else
 					{
 						direction = Vector3.back;
 						angle += 180;
@@ -122,30 +93,33 @@ public class ShootArrow : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		if(index == 3)
+		//if the bow is out...
+		if(_switcher.currentWeapon == 3)
 		{
+			//if not jumping or falling...
 			if(_controller.isGrounded)
 			{
-				if(_aim)
+				//if aiming...
+				if(_input._aiming)
 				{
 					//lock linerender to either side of player, based on facing
 					if(_player.facingLeft == false)
 					{
-						direction.x = Mathf.Clamp(_axisHorizontal * 2, 0, 2);
+						direction.x = Mathf.Clamp(_input._axisHorizontal * 2, 0, 2);
 					}
 					else if(_player.facingLeft == true)
 					{
-						direction.x = Mathf.Clamp(_axisHorizontal * 2, -2, 0);
+						direction.x = Mathf.Clamp(_input._axisHorizontal * 2, -2, 0);
 					}
 
 					//direction.x = _axisHorizontal * 2;
-					direction.y = Mathf.Clamp(_axisVertical * 2f + 1.5f, 1f, 3f);
+					direction.y = Mathf.Clamp(_input._axisVertical * 2f + 1.5f, 1f, 3f);
 
 					UpdateTrajectory(transform.position, direction, gravity);//transform.position, transform.forward, gravity
 
 					if(drawn)
 					{
-						if(_shoot)
+						if(_input._attack)
 						{
 							//TODO: instantiate in a ienumerator so that theres a delay each time an arrow is instantiated
 							Quaternion rotation = Quaternion.Euler( 0, 0, Mathf.Atan2 ( direction.y, direction.x ) * Mathf.Rad2Deg );
@@ -157,14 +131,18 @@ public class ShootArrow : MonoBehaviour {
 						}
 					}
 				}
+
 				//if not aiming or drawn or moving and ready, quickshot
-				else if(!_aim && !drawn && _player._ready == true && Mathf.Abs(_player.normalizedHorizontalSpeed) < 0.1f)
+				else if(//!_input._aiming
+				        !drawn
+				        && _player._ready
+				        && Mathf.Abs(_player.normalizedHorizontalSpeed) < 0.1f)
 				{
 					//turn off line rendering
 					if(lineRenderer)
 						lineRenderer.SetVertexCount(0);
 
-					if(_shoot)
+					if(_input._attack)
 						StartCoroutine(QuickShot());
 				}
 				else

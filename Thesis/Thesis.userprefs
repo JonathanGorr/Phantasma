@@ -1,9 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Messaging\Checkpoint.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Attack\PlayerAttack.cs">
     <Files>
-      <File FileName="Assets\Scripts\Messaging\Checkpoint.cs" Line="30" Column="55" />
-      <File FileName="Assets\Scripts\Messaging\PlayerPreferences.cs" Line="82" Column="4" />
+      <File FileName="Assets\Scripts\Weapons\ShootArrow.cs" Line="66" Column="22" />
+      <File FileName="Assets\Scripts\Hero\PlayerInput.cs" Line="52" Column="34" />
+      <File FileName="Assets\Scripts\Attack\PlayerAttack.cs" Line="41" Column="36" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

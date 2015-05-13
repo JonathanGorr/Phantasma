@@ -18,12 +18,11 @@ public class PlayerAttack : MonoBehaviour {
 	public int r1Damage;
 	public int r2Damage;
 	public int blockingAttackDmg;
+	public float delay = .2f;
 
 	public GameObject hitSprite;
-
-	// Use this for initialization
+	
 	void Awake () {
-		//get the animator component
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_animator = GetComponent<Animator>();
 		_wepSFX = GetComponent<WeaponSFX>();
@@ -31,12 +30,12 @@ public class PlayerAttack : MonoBehaviour {
 		_controller = GetComponentInParent<CharacterController2D>();
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
-		if(_player != null)
+		if(_player)
 		{
 			//regular attack
-			if((_input._attack) && (!_input._blocking) && _player.moving == false)
+			if((_input._attack) && (!_input._blocking) && !_player.moving)
 			{
 				r1Attack();
 				_animator.SetTrigger("Attack");
@@ -47,7 +46,7 @@ public class PlayerAttack : MonoBehaviour {
 				BlockingAttack();
 				_animator.SetTrigger("BlockingAttack");
 			}
-			//overheadstrike
+			//Strong Attack
 			else if(_input._strongAttack && _controller.isGrounded && !_input._blocking)
 			{
 				r2Attack();
@@ -97,13 +96,13 @@ public class PlayerAttack : MonoBehaviour {
 				readyToAttack = false;
 			}
 		}
+		/*
 		else if (target.gameObject.tag == "Shield")
 		{
 			//test if the player is ready to attack
 			if(readyToAttack)
 			{
-				if(_wepSFX != null)
-					_wepSFX.ShieldCollideSound();
+				if(_wepSFX) _wepSFX.ShieldCollideSound();
 				readyToAttack = false;
 			}
 		}
@@ -112,16 +111,16 @@ public class PlayerAttack : MonoBehaviour {
 			//test if the player is ready to attack
 			if(readyToAttack)
 			{
-				if(_wepSFX != null)
-					_wepSFX.WeaponCollideSound();
+				if(_wepSFX) _wepSFX.WeaponCollideSound();
 				readyToAttack = false;
 			}
 		}
+		*/
 	}
 
 	//when the enemy is already dealt damage, dont keep dealing; once per swing
 	void onTriggerExit2D (Collider2D target)
 	{
-		readyToAttack = false;
+		//readyToAttack = false;
 	}
 }

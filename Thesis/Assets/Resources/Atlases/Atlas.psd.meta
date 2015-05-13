@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: ac7ac756bbf7a7142bef6567fb123a1f
+timeCreated: 1431482916
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: ground
@@ -49,6 +51,7 @@ TextureImporter:
     21300088: AButton
     21300090: Mother
     21300092: FatherPortrait
+    21300094: Button
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -521,6 +524,16 @@ TextureImporter:
         y: 785
         width: 321
         height: 417
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Button
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 808
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}

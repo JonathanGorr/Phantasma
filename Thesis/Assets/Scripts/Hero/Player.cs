@@ -24,7 +24,6 @@ public class Player : MonoBehaviour
 	private ParticleSystem _footDust;
 	private GameObject _managerGO;
 	private LevelManager _manager;
-	private ShootArrow _shootMgr;
 	private PlayerInput _input;
 	private ConversationManager _convoManager;
 	private PlayerPreferences _prefs;
@@ -94,7 +93,6 @@ public class Player : MonoBehaviour
 		speed(0);
 		
 		//import components
-		_shootMgr = GetComponent<ShootArrow> ();
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
 		_prefs = _manager.GetComponent<PlayerPreferences>();
@@ -199,7 +197,7 @@ public class Player : MonoBehaviour
 		}
 
 		//if not aiming...
-		if(!_shootMgr._aim && !_input._healHold)
+		if(!_input._aiming && !_input._healHold)
 		{
 			//axis flipping and movement ----------------------------------------------
 			//if pushing right on the joystick...
@@ -287,7 +285,7 @@ public class Player : MonoBehaviour
 		//We can only jump whilst grounded
 		if(_controller.isGrounded 		//if grounded
 		   && _input._jump 				//if jump key is pressed
-		   && !_shootMgr._aim 			//if not aiming
+		   && !_input._aiming 			//if not aiming
 		   && !_blocking 				//if not blocking
 		   && !_input._strongAttack 	//if not attacking
 		   && !_health.dead 			//if not dead
@@ -510,7 +508,6 @@ public class Player : MonoBehaviour
 		   && _input._attack)
 		{
 			print("aiming fire arrow");
-			//yield return(StartCoroutine(Reload));
 		}
 
 		//foot dust

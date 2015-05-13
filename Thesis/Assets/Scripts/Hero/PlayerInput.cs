@@ -15,7 +15,8 @@ public class PlayerInput : MonoBehaviour {
 		_down, 
 		_jump, 
 		_attack, 
-		_strongAttack, 
+		_strongAttack,
+		_aiming,
 		_cycleWep,
 		_blocking,
 		_backStep,
@@ -27,7 +28,7 @@ public class PlayerInput : MonoBehaviour {
 		_leftOnce,
 		_rightOnce;
 
-	[HideInInspector] public float _axis, _scrollWheel, DPadHorizontal, DPadVertical;
+	[HideInInspector] public float _axis, _axisHorizontal, _axisVertical, _scrollWheel, DPadHorizontal, DPadVertical;
 
 	void Awake()
 	{
@@ -60,6 +61,29 @@ public class PlayerInput : MonoBehaviour {
 				_scrollWheel = Input.GetAxisRaw("Mouse ScrollWheel");
 				_healHold = Input.GetKey(KeyCode.Q);
 				_heal = Input.GetKeyDown(KeyCode.Q);
+
+				//if the bow is out, can aim...
+				if(_switcher.currentWeapon == 3)
+				{
+					_aiming = Input.GetKey(KeyCode.G) || Input.GetButton ("360_LeftBumper");
+					if(_aiming)print("Aiming");
+
+					//how many controller are plugged in?
+					string[] joysticks = Input.GetJoystickNames ();
+					
+					//if there are joysticks...
+					if(joysticks.Length > 0)
+					{
+						_axisVertical = Input.GetAxis ("360_RightStickVertical");
+						_axisHorizontal = Input.GetAxis ("360_RightStickHorizontal");
+					}
+					//if there are no joysticks...
+					else if(joysticks.Length == 0)
+					{
+						_axisHorizontal = Input.GetAxis ("Horizontal");
+						_axisVertical = Input.GetAxis ("Vertical");
+					}
+				}
 			}
 
 			//if talking, stop and dont move
