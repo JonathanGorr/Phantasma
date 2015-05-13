@@ -3,21 +3,30 @@ using System.Collections;
 
 public class MusicFader : MonoBehaviour {
 
-	private float fadeSpeed = 0f;
+	private Transform player;
 
-	public float transitionSpeed = 2f;
+	private float fadeSpeed = 0f;
+	public float transitionSpeed = 2f, safeDistance = 6f;
 	
 	private AudioClip track1, track2;
 
 	public AudioClip
+		menuTheme,
 		forestTheme,
-		combatTheme,
+		battleTheme,
 		motherTheme,
-		fatherTheme;
+		fatherTheme,
+		victoryTheme,
+		bossTheme;
 
 	void Awake()
 	{
-		track1 = forestTheme;
+		if(Application.loadedLevelName == "Menu")
+			track1 = menuTheme;
+		else
+			track1 = forestTheme;
+
+		player = GameObject.FindGameObjectWithTag ("Player").transform;
 		GetComponent<AudioSource>().clip = track1;
 		GetComponent<AudioSource>().Play();
 	}
@@ -26,7 +35,21 @@ public class MusicFader : MonoBehaviour {
 	{
 		track2 = music;
 		FadeOut ();
-		//print ("fading");
+	}
+
+	public void CheckIfSafe()
+	{
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		
+		foreach(GameObject enemy in enemies)
+		{
+			float distance = Vector3.Distance(enemy.transform.position, player.position);
+
+			/*
+			if(distance < safeDistance)
+				Fade(forestTheme);
+			*/
+		}
 	}
 
 	void FixedUpdate()
@@ -48,23 +71,18 @@ public class MusicFader : MonoBehaviour {
 			GetComponent<AudioSource>().volume = Mathf.Min(GetComponent<AudioSource>().volume + fadeSpeed * Time.deltaTime * transitionSpeed, 0.5f);
 			// Done fading in.
 			if(GetComponent<AudioSource>().volume == 0.5f)
-			{
 				fadeSpeed = 0;
-			}
 		}
 	}
 	
 	void FadeIn(){
-		if (GetComponent<AudioSource>().volume < 0.5f){
+		if (GetComponent<AudioSource>().volume < 0.5f)
 			fadeSpeed = 1;
-		}
 	}
 	
 	void FadeOut(){
 		if(GetComponent<AudioSource>().volume > 0)
-		{
 			fadeSpeed = -1;
-		}
 	}
 }
 

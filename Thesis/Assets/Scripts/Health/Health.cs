@@ -4,11 +4,11 @@ using UnityEngine.UI;
 
 public class Health : MonoBehaviour {
 
-	public int 
+	public int
 		health,
 		maxHealth;
 
-	public bool 
+	public bool
 		playerHurt,
 		enemyHurt,
 		healing, 
@@ -22,16 +22,27 @@ public class Health : MonoBehaviour {
 	private Explode _explode;
 
 	private WeaponSwitcher _switcher;
+	private LevelManager _manager;
 	private HitPoints _hitPoints;
 	private PlayerPreferences _prefs;
+	private MusicFader _mFader;
+	private PlayerInput _input;
 
 	// Use this for initialization
 	void Awake () {
 		health = maxHealth;
 		//import the enemy script
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
+		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
 		_switcher = GameObject.Find("_LevelManager").GetComponent<WeaponSwitcher>();
 		_hitPoints = GetComponent<HitPoints>();
 		_explode = GetComponent<Explode>();
+		_mFader = GameObject.Find ("Music").GetComponent<MusicFader> ();
+	}
+
+	void Update()
+	{
+
 	}
 
 	void FixedUpdate()
@@ -49,7 +60,7 @@ public class Health : MonoBehaviour {
 			playerHurt = true;
 
 			//if blocking, damage is half and you dont get knocked back
-			if(Input.GetButton("360_LeftBumper") && _switcher.currentWeapon == 1)
+			if(_input._blocking && _switcher.currentWeapon == 1)
 			{
 				playerDamage = value/2;
 				print ("half damage:" + "only" + playerDamage + " of " + value);
@@ -97,8 +108,7 @@ public class Health : MonoBehaviour {
 	{
 		health += heal;
 		healing = true;
-		if(_hitPoints != null)
-			_hitPoints.Heal(heal);
+		if(_hitPoints) _hitPoints.Heal(heal);
 	}
 
 	public void Invincible()
@@ -108,7 +118,16 @@ public class Health : MonoBehaviour {
 
 	public void OnKill()
 	{
-		if(_explode != null)
+		//run a check to see if the player has killed all remaining enemies
+		//_mFader.CheckIfSafe ();
+		//_manager.canTransition = true;
+
+		if(gameObject.name == "Boss")
+		{
+			_mFader.Fade(_mFader.victoryTheme);
+		}
+
+		if(_explode)
 		{
 			//enemyHurt = false;
 			_explode.OnExplode();

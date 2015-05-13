@@ -11,7 +11,7 @@ public class LevelManager : MonoBehaviour {
 	public float timeLeft = 30f;
 	public bool exhibition;
 
-	[HideInInspector] public bool inMenu;
+	[HideInInspector] public bool inMenu, canTransition;
 
 	[SerializeField, HideInInspector]
 	public GameObject _pauseScreen, _controlScreen, _hud, _dialog;
@@ -34,6 +34,7 @@ public class LevelManager : MonoBehaviour {
 	void Awake()
 	{
 		Application.targetFrameRate = 60;
+		AudioListener.volume = 1f;
 
 		//components
 		_input = GetComponent<PlayerInput> ();
@@ -76,6 +77,7 @@ public class LevelManager : MonoBehaviour {
 
 	void Update()
 	{
+		/*
 		if(_dialog)
 		{
 			if(!ConversationManager.Instance.talking)
@@ -83,6 +85,7 @@ public class LevelManager : MonoBehaviour {
 			else
 				_dialog.SetActive(true);
 		}
+		*/
 
 		//if no buttons are pressed, count down from timeLeft
 		if(!inMenu)
@@ -144,13 +147,14 @@ public class LevelManager : MonoBehaviour {
 			}
 
 			//else if in menu
-			else{ if(_input._anyKey) cameraAnim.SetTrigger("Skip");}
+			else if(_input._anyKey) cameraAnim.SetTrigger("Skip");
 		}
 	}
 
 	private void Pause()
 	{
 		//actually pause the game
+		AudioListener.volume = .1f;
 		_pauseScreen.SetActive (true);
 		//set this button as the active selection
 		eventSystem.GetComponent<EventSystem>().SetSelectedGameObject(restartButton);
@@ -161,6 +165,7 @@ public class LevelManager : MonoBehaviour {
 	public void Resume()
 	{
 		//resume if not paused
+		AudioListener.volume = 1f;
 		_pauseScreen.SetActive (false);
 		Time.timeScale = 1;
 		Cursor.visible = false;
@@ -246,14 +251,14 @@ public IEnumerator Restart()
 		yield return new WaitForSeconds (fadeTime);
 
 		//player is not dead, set position to last checkpoint
-		if(_prefs != null && !_player.dead)
+		if(_prefs && !_player.dead)
 		{
 			//if a checkpoint was never met, set respawn to respawn
 			if(PlayerPrefs.GetFloat("playerX") == 0 && PlayerPrefs.GetFloat("playerY") == 0)
 				_prefs.SaveStats(_prefs._spawn.position.x, _prefs._spawn.position.y, _evo.blood, _player.GetComponent<Health>().health);
 				//else if a checkpoint was hit, set the respawn location to that
 			else
-				_prefs.SaveStats (PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"), _evo.blood, _player.GetComponent<Health>().health);
+				_prefs.SaveStats (PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), _evo.blood, _player.GetComponent<Health>().health);
 		}
 		//else, set their health to max and remove their blood, set location to prefs location
 		else

@@ -48,6 +48,7 @@ public class PlayerInput : MonoBehaviour {
 				DPadHorizontal = Input.GetAxis ("360_HorizontalDPAD");
 				DPadVertical = Input.GetAxis ("360_VerticalDPAD");
 				_jump = Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown ("360_AButton") || Input.GetKey (KeyCode.DownArrow);
+				_down = Input.GetMouseButtonDown (1) || Input.GetButtonDown ("360_LeftBumper") || Input.GetKeyDown (KeyCode.UpArrow);
 
 				if(_switcher.currentWeapon != 0)
 				{

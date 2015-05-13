@@ -63,9 +63,9 @@ public class EnemyAI : MonoBehaviour
 		_bossWeapon1 = GameObject.Find("BossSwordLeft");
 		_bossWeapon2 = GameObject.Find("BossSwordRight");
 
-		if(_bossWeapon1 == null || _bossWeapon2 == null)
-			print("weapons not found");
-		//cache transform, dont call every frame 
+		if(!_bossWeapon1 || !_bossWeapon2)
+			print("Boss Weapon not found");
+
 		myTransform = transform;
 
 		faceLeft = new Vector2(myTransform.localScale.x, myTransform.localScale.y);
@@ -133,9 +133,6 @@ public class EnemyAI : MonoBehaviour
 	
 	void LookAt()
 	{
-		//yellow color
-		//color = yellow;
-
 		if(!attacking)
 		{
 			//flip
@@ -153,8 +150,6 @@ public class EnemyAI : MonoBehaviour
 	
 	void ChasePlayer(float modifiedSpeed)
 	{
-		//color = red;
-
 		speed = modifiedSpeed;
 
 		if(!attacking)

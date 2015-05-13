@@ -19,7 +19,6 @@ public class WeaponSwitcher : MonoBehaviour {
 
 	void Awake() {
 		_input = GetComponent<PlayerInput> ();
-		nrWeapons = weapons.Length;
 		SwitchWeapon(currentWeapon); // Set default weapon
 	}
 
@@ -66,33 +65,21 @@ public class WeaponSwitcher : MonoBehaviour {
 		if(_input._scrollWheel > 0)
 		{
 			currentWeapon += 1;
+			StartCoroutine(Sheath(delay));
 		}
 		
 		if(_input._scrollWheel < 0)
 		{
 			currentWeapon -= 1;
+			StartCoroutine(Sheath(delay));
 		}
 
 		SwitchWeapon(currentWeapon);
-
-		/*
-		//keys
-		for (int i=1; i <= nrWeapons; i++)
-		{ 
-			//number key correlates to weapon
-			if (Input.GetKeyDown("" + i)) {
-				currentWeapon = i-1;
-				
-				SwitchWeapon(currentWeapon);
-				StartCoroutine(Sheath(delay));
-			}
-		}
-		*/
 	}
 	
 	public void SwitchWeapon(int index)
 	{
-		for (int i=0; i < nrWeapons; i++)
+		for (int i=0; i < weapons.Length; i++)
 		{
 			if (i == index) {
 				weapons[i].gameObject.SetActive(true);

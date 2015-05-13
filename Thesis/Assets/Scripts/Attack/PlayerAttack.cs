@@ -10,7 +10,9 @@ public class PlayerAttack : MonoBehaviour {
 	private Health _health;
 	private PlayerInput _input;
 	private CharacterController2D _controller;
+	private LevelManager _manager;
 	public bool readyToAttack;
+	private MusicFader _mFader;
 
 	//damages
 	private int damage;
@@ -20,8 +22,10 @@ public class PlayerAttack : MonoBehaviour {
 	public float delay = .2f;
 
 	public GameObject hitSprite;
-	
+
 	void Awake () {
+		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
+		_mFader = GameObject.Find("Music").GetComponent<MusicFader> ();
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_animator = GetComponent<Animator>();
 		_player = GetComponentInParent<Player>();
@@ -82,6 +86,11 @@ public class PlayerAttack : MonoBehaviour {
 	{
 		if (target.gameObject.tag == "Enemy")
 		{
+			if(_manager.canTransition)
+			{
+				_mFader.Fade(_mFader.battleTheme);
+				_manager.canTransition = false;
+			}
 			//test if the player is ready to attack
 			if(readyToAttack)
 			{

@@ -23,14 +23,11 @@ public class EnemyHealthBar : MonoBehaviour {
 	public float scale;
 
 	//import health component
-	private Health targetHealthComponent;
+	private Health _health;
 
-	//establish which object this health is representing
-	public GameObject target;
-
-	void Start()
+	void Awake()
 	{
-		targetHealthComponent = target.GetComponent<Health>();
+		_health = GetComponent<Health>();
 
 		//texture dimensions = healthbar dimensions
 		barWidth = borderTexture.width;
@@ -39,6 +36,8 @@ public class EnemyHealthBar : MonoBehaviour {
 
 	void FixedUpdate()
 	{
+		Mathf.Clamp (_health.health, 0, _health.maxHealth);
+
 		//update the healthbar location every frame
 		playerScreen = Camera.main.WorldToScreenPoint(transform.position);
 		left = playerScreen.x + offsetX;
@@ -48,8 +47,8 @@ public class EnemyHealthBar : MonoBehaviour {
 	void OnGUI()
 	{
 		//shrink the healthbar relative to damage
-		var percent = ((double)targetHealthComponent.health /
-		               (double)targetHealthComponent.maxHealth);
+		var percent = ((double)_health.health /
+		               (double)_health.maxHealth);
 
 		//draw the textures
 		GUI.DrawTexture (new Rect (left, top, barWidth * scale, barHeight * scale), backgroundTexture);

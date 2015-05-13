@@ -11,6 +11,7 @@ public class BossHealthBar : MonoBehaviour {
 	private GameObject _victoryScreen;
 	private LevelManager _manager;
 	private PlayerPreferences _prefs;
+	private PlayerInput _input;
 	
 	[HideInInspector]
 	public bool bossFight = false;
@@ -29,6 +30,7 @@ public class BossHealthBar : MonoBehaviour {
 			_health = boss.GetComponent<Health>();
 
 		_manager = GetComponentInParent<LevelManager>();
+		_input = GetComponentInParent<PlayerInput> ();
 		_prefs = GetComponentInParent<PlayerPreferences>();
 		_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
 		//victory Screen
@@ -83,7 +85,7 @@ public class BossHealthBar : MonoBehaviour {
 	//while the button is not pressed, stuck in a loop
 	IEnumerator WaitForButton()
 	{
-		while (!Input.GetButtonDown("360_AButton"))
+		while (!_input._attack)
 			yield return null;
 	}
 }

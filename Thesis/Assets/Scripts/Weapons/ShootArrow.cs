@@ -146,8 +146,11 @@ public class ShootArrow : MonoBehaviour {
 						StartCoroutine(QuickShot());
 				}
 				else
+				{
 					//turn off line rendering
-					lineRenderer.SetVertexCount(0);
+					if(lineRenderer)
+						lineRenderer.SetVertexCount(0);
+				}
 			}
 		}
 	}

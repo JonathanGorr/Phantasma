@@ -101,9 +101,7 @@
      <Compile Include="Assets\Scripts\Particles\KillParticles.cs" />
      <Compile Include="Assets\Scripts\Particles\Particles.cs" />
      <Compile Include="Assets\Scripts\Particles\SortingOrder.cs" />
-     <Compile Include="Assets\Scripts\Rotate.cs" />
      <Compile Include="Assets\Scripts\Singleton.cs" />
-     <Compile Include="Assets\Scripts\SnapLink.cs" />
      <Compile Include="Assets\Scripts\Sound\Footsteps.cs" />
      <Compile Include="Assets\Scripts\Sound\MusicFader.cs" />
      <Compile Include="Assets\Scripts\Sound\SFX.cs" />
@@ -119,14 +117,15 @@
      <Compile Include="Assets\Scripts\UI\GUIAreaTitle.cs" />
      <Compile Include="Assets\Scripts\UI\Gizmo.cs" />
      <Compile Include="Assets\Scripts\UI\HealthBar.cs" />
-     <Compile Include="Assets\Scripts\UI\HideCursor.cs" />
      <Compile Include="Assets\Scripts\UI\HitPoints.cs" />
      <Compile Include="Assets\Scripts\UI\InventoryItem.cs" />
      <Compile Include="Assets\Scripts\UI\KillVolume.cs" />
      <Compile Include="Assets\Scripts\UI\LevelManager.cs" />
      <Compile Include="Assets\Scripts\UI\LockOnTargeting.cs" />
      <Compile Include="Assets\Scripts\UI\Menu.cs" />
+     <Compile Include="Assets\Scripts\UI\Rotate.cs" />
      <Compile Include="Assets\Scripts\UI\ShowDialog.cs" />
+     <Compile Include="Assets\Scripts\UI\SnapLink.cs" />
      <Compile Include="Assets\Scripts\UI\TileSprite.cs" />
      <Compile Include="Assets\Scripts\Weapons\ArrowStick.cs" />
      <Compile Include="Assets\Scripts\Weapons\Interpolate.cs" />

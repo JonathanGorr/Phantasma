@@ -41,8 +41,9 @@ public class Player : MonoBehaviour
 	[HideInInspector]
 	public bool
 		_ready = true,
-		_blocking,
 		_rolling;
+
+	private bool transitioned;
 
 	[HideInInspector]
 	public bool moving;
@@ -183,14 +184,14 @@ public class Player : MonoBehaviour
 		{
 			if(_input._healHold)
 			{
-				if(_input._down)
-					_switcher.currentWeapon = 1;
-				else if(_input._jump)
-					_switcher.currentWeapon = 0;
-				else if(_input._left)
-					_switcher.currentWeapon = 2;
-				else if(_input._right)
-					_switcher.currentWeapon = 3;
+				if(_input._down){
+					_switcher.currentWeapon = 1; print("1");}
+				else if(_input._jump){
+					_switcher.currentWeapon = 0; print("0");}
+				else if(_input._left){
+					_switcher.currentWeapon = 2; print("2");}
+				else if(_input._right){
+					_switcher.currentWeapon = 3; print("3");}
 
 				//print(_switcher.currentWeapon);
 			}
@@ -286,7 +287,7 @@ public class Player : MonoBehaviour
 		if(_controller.isGrounded 		//if grounded
 		   && _input._jump 				//if jump key is pressed
 		   && !_input._aiming 			//if not aiming
-		   && !_blocking 				//if not blocking
+		   && !_input._blocking 				//if not blocking
 		   && !_input._strongAttack 	//if not attacking
 		   && !_health.dead 			//if not dead
 		   && !_input._healHold)
@@ -412,7 +413,7 @@ public class Player : MonoBehaviour
 		if(_health.playerHurt)
 		{
 			//TODO: find a way to make this only when sword is out
-			if(!_blocking)
+			if(!_input._blocking)
 			{
 				if(facingLeft){
 					_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
@@ -444,16 +445,18 @@ public class Player : MonoBehaviour
 		_input._jump = false;
 
 		//Blocking -----------------------------------------------------
-		//animation blocking informed by button
-		if(_blocking)
+		if(_switcher.currentWeapon == 1)
 		{
-			_animator.SetBool("Blocking", true);
+			if(_input._blocking)
+			{
+				_animator.SetBool("Blocking", true);
+			}
+			else
+				_animator.SetBool("Blocking", false);
 		}
-		else
-			_animator.SetBool("Blocking", false);
 
 		//Blocking and Strong Attack Speed--------------------------------
-		if(_blocking || _input._strongAttack)
+		if(_input._blocking || _input._strongAttack)
 		{
 			if(_controller.isGrounded)
 				Speed (blockSpeed);
@@ -466,7 +469,7 @@ public class Player : MonoBehaviour
 		{
 			if(_input._strongAttack 	//if strong attack button pressed
 			   && !_input._jump 		//if not jumping
-			   && !_blocking) 			//if not blocking
+			   && !_input._blocking) 			//if not blocking
 			{
 				_animator.SetTrigger("StrongAttack");
 				StartCoroutine(Ready(strongAttackDelay));
@@ -494,7 +497,7 @@ public class Player : MonoBehaviour
 
 		//Blocking Attack--------------------------------------------------------
 		else if(_input._attack 
-		        && _blocking 
+		        && _input._blocking 
 		        && _ready
 		        && !_convoManager.talking)
 		{
@@ -504,7 +507,7 @@ public class Player : MonoBehaviour
 
 		//if bow and aim firing, start enumerator
 		if(_switcher.currentWeapon == 3 
-		   && _blocking 
+		   && _input._blocking 
 		   && _input._attack)
 		{
 			print("aiming fire arrow");
