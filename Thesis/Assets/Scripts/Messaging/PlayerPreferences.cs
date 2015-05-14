@@ -12,6 +12,7 @@ public class PlayerPreferences : MonoBehaviour {
 	public GameObject[] checkpoints;
 	[HideInInspector]
 	public Transform _spawn;
+	private GameObject _motherTalkBlock;
 
 	public bool 
 		motherMet,
@@ -34,6 +35,7 @@ public class PlayerPreferences : MonoBehaviour {
 			_evo = GameObject.Find("_LevelManager").GetComponent<Evolution>();
 			_skull = GameObject.Find("Father").GetComponent<FollowEntity>();
 			_health = _player.GetComponent<Health>();
+			_motherTalkBlock = GameObject.Find("MomTalkBlock");
 
 			//update story after all references gathered
 			UpdateStory();
@@ -82,9 +84,12 @@ public class PlayerPreferences : MonoBehaviour {
 
 			dialog[2].SetActive(false);
 			
-			//story sequence checkers
+			//Mother met
 			if(PlayerPrefs.GetInt("MotherMet") == 1)
+			{
 				motherMet = true;
+				Destroy(_motherTalkBlock);
+			}
 			else
 				motherMet = false;
 			
@@ -95,9 +100,6 @@ public class PlayerPreferences : MonoBehaviour {
 				fatherMet = true;
 				//destroy mom and dad dialog
 				Destroy(dialog[0]);
-				//Destroy(dialog[1]);
-				//destroy dad checkpoint
-				//Destroy (checkpoints[0]);
 				
 				//set sword tut and checkpoint to true
 				dialog[2].SetActive(true);
@@ -167,7 +169,7 @@ public class PlayerPreferences : MonoBehaviour {
 	{
 		if(!_manager.inMenu)
 		{
-			if(_player != null)
+			if(_player)
 			{
 				if(Input.GetKeyDown(KeyCode.R))
 				{

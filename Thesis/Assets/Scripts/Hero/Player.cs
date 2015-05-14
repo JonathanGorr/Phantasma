@@ -184,16 +184,14 @@ public class Player : MonoBehaviour
 		{
 			if(_input._healHold)
 			{
-				if(_input._down){
-					_switcher.currentWeapon = 1; print("1");}
-				else if(_input._jump){
-					_switcher.currentWeapon = 0; print("0");}
-				else if(_input._left){
-					_switcher.currentWeapon = 2; print("2");}
-				else if(_input._right){
-					_switcher.currentWeapon = 3; print("3");}
-
-				//print(_switcher.currentWeapon);
+				if(_input._down)
+					_switcher.currentWeapon = 1;
+				else if(_input._jump)
+					_switcher.currentWeapon = 0;
+				else if(_input._left)
+					_switcher.currentWeapon = 2;
+				else if(_input._right)
+					_switcher.currentWeapon = 3;
 			}
 		}
 

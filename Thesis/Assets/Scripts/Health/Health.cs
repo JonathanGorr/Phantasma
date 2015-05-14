@@ -22,7 +22,6 @@ public class Health : MonoBehaviour {
 	private Explode _explode;
 
 	private WeaponSwitcher _switcher;
-	private LevelManager _manager;
 	private HitPoints _hitPoints;
 	private PlayerPreferences _prefs;
 	private MusicFader _mFader;
@@ -33,16 +32,10 @@ public class Health : MonoBehaviour {
 		health = maxHealth;
 		//import the enemy script
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
-		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
 		_switcher = GameObject.Find("_LevelManager").GetComponent<WeaponSwitcher>();
 		_hitPoints = GetComponent<HitPoints>();
 		_explode = GetComponent<Explode>();
 		_mFader = GameObject.Find ("Music").GetComponent<MusicFader> ();
-	}
-
-	void Update()
-	{
-
 	}
 
 	void FixedUpdate()

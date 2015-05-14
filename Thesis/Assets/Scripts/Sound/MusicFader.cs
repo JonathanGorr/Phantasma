@@ -3,8 +3,6 @@ using System.Collections;
 
 public class MusicFader : MonoBehaviour {
 
-	private Transform player;
-
 	private float fadeSpeed = 0f;
 	public float transitionSpeed = 2f, safeDistance = 6f;
 	
@@ -26,7 +24,6 @@ public class MusicFader : MonoBehaviour {
 		else
 			track1 = forestTheme;
 
-		player = GameObject.FindGameObjectWithTag ("Player").transform;
 		GetComponent<AudioSource>().clip = track1;
 		GetComponent<AudioSource>().Play();
 	}
@@ -39,17 +36,17 @@ public class MusicFader : MonoBehaviour {
 
 	public void CheckIfSafe()
 	{
+		/*
 		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		
 		foreach(GameObject enemy in enemies)
 		{
 			float distance = Vector3.Distance(enemy.transform.position, player.position);
 
-			/*
 			if(distance < safeDistance)
 				Fade(forestTheme);
-			*/
 		}
+		*/
 	}
 
 	void FixedUpdate()
