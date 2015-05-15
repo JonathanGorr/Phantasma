@@ -182,21 +182,10 @@ public class Player : MonoBehaviour
 		//select weapon with heal(hold) + joystick direction
 		if(_prefs.itemsGet)
 		{
-			if(_input._healHold)
-			{
-				if(_input._down)
-					_switcher.currentWeapon = 1;
-				else if(_input._jump)
-					_switcher.currentWeapon = 0;
-				else if(_input._left)
-					_switcher.currentWeapon = 2;
-				else if(_input._right)
-					_switcher.currentWeapon = 3;
-			}
 		}
 
 		//if not aiming...
-		if(!_input._aiming && !_input._healHold)
+		if(!_input._aiming)
 		{
 			//axis flipping and movement ----------------------------------------------
 			//if pushing right on the joystick...
@@ -287,8 +276,7 @@ public class Player : MonoBehaviour
 		   && !_input._aiming 			//if not aiming
 		   && !_input._blocking 				//if not blocking
 		   && !_input._strongAttack 	//if not attacking
-		   && !_health.dead 			//if not dead
-		   && !_input._healHold)
+		   && !_health.dead) 			//if not dead
 		{
 			//cannot jump for x seconds
 			StartCoroutine(Ready(jumpDelay));
@@ -311,8 +299,7 @@ public class Player : MonoBehaviour
 		if(_input._backStep 					//if backstep button is pressed
 		   && _controller.isGrounded 			//if grounded
 		   && _ready 							//if ready
-		   && normalizedHorizontalSpeed == 0 	//if not moving
-		   && !_input._healHold)
+		   && normalizedHorizontalSpeed == 0) 	//if not moving
 		{
 			//cannot roll for x seconds
 			StartCoroutine(Ready(backStepDelay));
@@ -332,45 +319,12 @@ public class Player : MonoBehaviour
 			}
 		}
 
-		/*
-		//Rolling----------------------------------------------------------------
-		if(_input._roll 					//if roll button is pressed
-		   && _controller.isGrounded 		//if grounded
-		   && _ready 						//if ready
-		   && _switcher.currentWeapon != 2) //if a certain weapon is not pressed
-		{
-			_rolling = true;
-
-			_animator.SetTrigger("Roll");
-			_sfx.JumpSound();
-
-			//cannot roll for x seconds
-			StartCoroutine(Ready(rollDelay));
-
-			if(!facingLeft){
-				_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
-				_velocity.x = Mathf.Sqrt(maxDistance);
-			}
-			else
-			{
-				_velocity.y = Mathf.Sqrt(maxHeight * -gravity);
-				_velocity.x = -Mathf.Sqrt(maxDistance);
-			}
-		}
-		else
-			_rolling = false;
-
-		*/
-
 		//Arcade (Double Tap) Rolling -------------------------------------------------
-		if(_controller.isGrounded
-		   && _ready 
-		   && _switcher.currentWeapon != 2
-		   && !_input._healHold)
+		if(_controller.isGrounded && _ready && _switcher.currentWeapon != 2)
 		{
-			if (_input._leftOnce || _input._rightOnce)
+			if (_input._leftOnce || _input._rightOnce || _input._roll)
 			{
-				if ( buttonCooler > 0 && buttonCount == 1/*Number of Taps you want Minus One*/){
+				if ( buttonCooler > 0 && buttonCount == 1 || _input._roll/*Number of Taps you want Minus One*/){
 					//Has double tapped
 					_rolling = true;
 					
@@ -405,12 +359,11 @@ public class Player : MonoBehaviour
 		if ( buttonCooler > 0 )
 			buttonCooler -= 1 * Time.deltaTime ;
 		else
-			buttonCount = 0 ;
+			buttonCount = 0;
 
 		//knockback on player hurt -------------------------------------------
 		if(_health.playerHurt)
 		{
-			//TODO: find a way to make this only when sword is out
 			if(!_input._blocking)
 			{
 				if(facingLeft){
@@ -446,28 +399,28 @@ public class Player : MonoBehaviour
 		if(_switcher.currentWeapon == 1)
 		{
 			if(_input._blocking)
-			{
 				_animator.SetBool("Blocking", true);
-			}
 			else
 				_animator.SetBool("Blocking", false);
 		}
 
 		//Blocking and Strong Attack Speed--------------------------------
-		if(_input._blocking || _input._strongAttack)
+		if(_controller.isGrounded)
 		{
-			if(_controller.isGrounded)
+			if(_input._blocking)
 				Speed (blockSpeed);
+			else if(_input._strongAttack || _input._attack)
+				Speed (blockSpeed);
+			else
+				Speed (walkSpeed);
 		}
-		else
-			Speed (walkSpeed);
 		
 		//strong attack --------------------------------------------------
 		if(_controller.isGrounded)
 		{
 			if(_input._strongAttack 	//if strong attack button pressed
 			   && !_input._jump 		//if not jumping
-			   && !_input._blocking) 			//if not blocking
+			   && !_input._blocking) 	//if not blocking
 			{
 				_animator.SetTrigger("StrongAttack");
 				StartCoroutine(Ready(strongAttackDelay));
@@ -478,7 +431,7 @@ public class Player : MonoBehaviour
 		if(_input._attack 						//if attack button pressed
 		   && !_input._blocking 				//if not blocking
 		   && normalizedHorizontalSpeed == 0 	//if not moving
-		   && _controller.isGrounded
+		   && _controller.isGrounded			//if grounded
 		   && !_convoManager.talking) 			//if grounded
 		{
 			//if the bow is not equipped, just attack

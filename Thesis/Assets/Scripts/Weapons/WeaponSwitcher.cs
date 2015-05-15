@@ -17,37 +17,44 @@ public class WeaponSwitcher : MonoBehaviour {
 		down,
 		left;
 
+	private int[] list = new int[] {0, 1, 2, 3};
+
 	void Awake() {
 		_input = GetComponent<PlayerInput> ();
-		SwitchWeapon(currentWeapon); // Set default weapon
+
+		//hide all but selected weapons
+		SwitchWeapon(currentWeapon);
 	}
 
 	void Update () {
 
 		//DPAD 360 Controller------------------------------------
-		if(_input.DPadVertical == 1)
+		if(_input._controller)
 		{
-			currentWeapon = up;
-			StartCoroutine(Sheath(delay));
-		}
-		else if(_input.DPadVertical == -1)
-		{
-			currentWeapon = down;
-			StartCoroutine(Sheath(delay));
-		}
-		else if(_input.DPadHorizontal == -1)
-		{
-			currentWeapon = left;
-			StartCoroutine(Sheath(delay));
-		}
-		else if(_input.DPadHorizontal == 1)
-		{
-			currentWeapon = right;
-			StartCoroutine(Sheath(delay));
+			if(_input._DPadVertical == 1)
+			{
+				currentWeapon = up;
+				StartCoroutine(Sheath(delay));
+			}
+			else if(_input._DPadVertical == -1)
+			{
+				currentWeapon = down;
+				StartCoroutine(Sheath(delay));
+			}
+			else if(_input._DPadHorizontal == -1)
+			{
+				currentWeapon = left;
+				StartCoroutine(Sheath(delay));
+			}
+			else if(_input._DPadHorizontal == 1)
+			{
+				currentWeapon = right;
+				StartCoroutine(Sheath(delay));
+			}
 		}
 
 		//Press one button to cycle through--------------------------------
-/*
+
 		if (currentWeapon > list.Length - 1) {
 			currentWeapon = 0;
 		}
@@ -60,7 +67,8 @@ public class WeaponSwitcher : MonoBehaviour {
 		{
 			currentWeapon += 1;
 		}
-*/
+
+		/*
 		//Mouse Scroll Wheel-----------------------------------
 		if(_input._scrollWheel > 0)
 		{
@@ -73,6 +81,7 @@ public class WeaponSwitcher : MonoBehaviour {
 			currentWeapon -= 1;
 			StartCoroutine(Sheath(delay));
 		}
+		*/
 
 		SwitchWeapon(currentWeapon);
 	}
@@ -81,11 +90,10 @@ public class WeaponSwitcher : MonoBehaviour {
 	{
 		for (int i=0; i < weapons.Length; i++)
 		{
-			if (i == index) {
+			if (i == index)
 				weapons[i].gameObject.SetActive(true);
-			} else { 
+			else 
 				weapons[i].gameObject.SetActive(false);
-			}
 		}
 	}
 

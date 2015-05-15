@@ -9,9 +9,12 @@ public class ShowDialog : MonoBehaviour {
 	private Transform _target;
 	public float convoDistance = 2;
 	public bool talked;
+	private PlayerInput _input;
+	private Conversation conversation;
 
 	void Awake()
 	{
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_target = GameObject.Find ("_Player").transform;
 		_DialogBox = GameObject.Find ("Dialog");
 	}
@@ -34,7 +37,12 @@ public class ShowDialog : MonoBehaviour {
 					{
 						if (dialog.Conversations != null && dialog.Conversations.Length > 0)
 						{
-							var conversation = dialog.Conversations[0];
+							//what the character says is determined by the control scheme
+							if(!_input._controller)
+								conversation = dialog.Conversations[0];
+							else
+								conversation = dialog.Conversations[1];
+
 							//get music in conversation
 							var bgMusic = conversation.bgMusic;
 

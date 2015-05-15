@@ -92,7 +92,7 @@ public class LevelManager : MonoBehaviour {
 		{
 			if(exhibition)
 			{
-				if (!_input._anyKey)
+				if (!_input._anyKeyDown)
 					timeLeft -= Time.deltaTime; 
 				else
 					timeLeft = 30;
@@ -147,7 +147,7 @@ public class LevelManager : MonoBehaviour {
 			}
 
 			//else if in menu
-			else if(_input._anyKey) cameraAnim.SetTrigger("Skip");
+			else if(_input._anyKeyDown) cameraAnim.SetTrigger("Skip");
 		}
 	}
 

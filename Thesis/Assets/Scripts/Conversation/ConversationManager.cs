@@ -10,7 +10,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 
     //Is there a converastion going on
 	[HideInInspector]
-    public bool talking = false;
+    public bool talking;
 
     //The current line of text being displayed
     ConversationEntry currentConversationLine;
@@ -26,13 +26,15 @@ public class ConversationManager : Singleton<ConversationManager> {
 	private AudioClip _bgMusic;
 	private float conversationSpeed = .1f;
 	private bool submit;
+	private PlayerInput _input;
 
 	void Awake()
 	{
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_DialogBox = GameObject.Find ("Dialog");
 		_fader = GameObject.Find("Music").GetComponent<MusicFader>();
 
-		if(_DialogBox != null)
+		if(_DialogBox)
 		{
 			_dialog = GameObject.Find("DialogText").GetComponent<Text>();
 			_name = GameObject.Find ("CharacterName").GetComponent<Text>();
@@ -44,7 +46,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 		}
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
 		if(_dialog)
 		{
@@ -57,18 +59,15 @@ public class ConversationManager : Singleton<ConversationManager> {
 				_portrait.sprite = currentConversationLine.DisplayPic;
 				_sound = currentConversationLine.sentenceSound;
 			}
-			else//hide if not talking
+
+			//hide if not talking
+			else
 			{
 				_dialog.text = null;
 				_name.text = null;
 				_DialogBox.SetActive (false);
 			}
 		}
-	}
-
-	void Update()
-	{
-		submit = Input.GetButtonDown ("360_AButton") || Input.GetButtonDown ("Submit");
 	}
 
 	public void PlayMusic(AudioClip music)
@@ -82,6 +81,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 		{
 			//fade in
 			_fader.Fade(music);
+
 			//loop in here until finished talking,
 			while(talking)
 			{
@@ -90,8 +90,6 @@ public class ConversationManager : Singleton<ConversationManager> {
 			//fade out
 			_fader.Fade(_fader.forestTheme);
 		}
-		else
-			print("fader cannot be found");
 	}
 
 	//plays the sound attached to the current sentence
@@ -103,7 +101,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 
     public void StartConversation(Conversation conversation)
     {
-        //Start displying the supplied conversation
+        //Start displaying the supplied conversation
         if (!talking)
         {
 			_DialogBox.SetActive (true);
@@ -114,7 +112,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 	//while the button is not pressed, stuck in a loop
 	IEnumerator WaitForButton()
 	{
-		while (!submit)
+		while (!_input._submit)
 			yield return null;
 	}
 
