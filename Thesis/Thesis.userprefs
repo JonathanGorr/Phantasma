@@ -1,6 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Attack\PlayerAttack.cs">
+    <Files>
+      <File FileName="Assets\Scripts\Hero\Player.cs" Line="96" Column="49" />
+      <File FileName="Assets\Scripts\Attack\PlayerAttack.cs" Line="91" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

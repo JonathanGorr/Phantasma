@@ -26,7 +26,6 @@ public class Player : MonoBehaviour
 	private LevelManager _manager;
 	private PlayerInput _input;
 	private ConversationManager _convoManager;
-	private PlayerPreferences _prefs;
 
 	//switch animator controller for each weapon
 	Animator _animator;
@@ -45,8 +44,7 @@ public class Player : MonoBehaviour
 
 	private bool transitioned;
 
-	[HideInInspector]
-	public bool moving;
+	[HideInInspector] public bool moving;
 
 	[HideInInspector]
 	public bool facingLeft = false;
@@ -62,6 +60,7 @@ public class Player : MonoBehaviour
 		rollDelay = 0.65f,
 		backStepDelay = 0.65f,
 		jumpDelay = 0.3f,
+		quickAttackDelay = 0.5f,
 		blockAttackDelay = 0.5f,
 		strongAttackDelay = 0.5f,
 		quickShotDelay = 1f;
@@ -78,7 +77,7 @@ public class Player : MonoBehaviour
 	private Flash _flash;
 	public int flashes = 6;
 	public float flashDuration = 0.05f;
-	public bool disable = false;
+	public bool disable;
 	private SpriteRenderer[] _sprites;
 	
 	private WeaponSwitcher _switcher;
@@ -96,7 +95,6 @@ public class Player : MonoBehaviour
 		//import components
 		_managerGO = GameObject.Find("_LevelManager");
 		_manager = _managerGO.GetComponent<LevelManager>();
-		_prefs = _manager.GetComponent<PlayerPreferences>();
 		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
 		_input = _manager.GetComponent<PlayerInput> ();
 		_health = GetComponent<Health>();
@@ -134,12 +132,17 @@ public class Player : MonoBehaviour
 
 	#endregion
 
+	void Update()
+	{
+		if(normalizedHorizontalSpeed > 0)
+			moving = true;
+		else
+			moving = false;
+	}
+
 	//handle movement in fps time
 	void FixedUpdate()
 	{
-		//associate these two variables
-		//index = _switcher.currentWeapon;
-
 		//animation speed controller
 		_animator.SetFloat ("Speed", Mathf.Abs(_input._axis));
 
@@ -178,12 +181,6 @@ public class Player : MonoBehaviour
 			_velocity.y = 0;
 		}
 
-		//if heal is held down, stop movement and flipping and jumping
-		//select weapon with heal(hold) + joystick direction
-		if(_prefs.itemsGet)
-		{
-		}
-
 		//if not aiming...
 		if(!_input._aiming)
 		{
@@ -198,7 +195,6 @@ public class Player : MonoBehaviour
 					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
 				}
 				facingLeft = false;
-				moving = true;
 			}
 
 			//else if pushing left on the joystick...
@@ -210,7 +206,6 @@ public class Player : MonoBehaviour
 					transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, 1);
 				}
 				facingLeft = true;
-				moving = true;
 			}
 
 			//keyboard movement------------------------------------------------------
@@ -274,9 +269,8 @@ public class Player : MonoBehaviour
 		if(_controller.isGrounded 		//if grounded
 		   && _input._jump 				//if jump key is pressed
 		   && !_input._aiming 			//if not aiming
-		   && !_input._blocking 				//if not blocking
-		   && !_input._strongAttack 	//if not attacking
-		   && !_health.dead) 			//if not dead
+	 	   && !_input._blocking 		//if not blocking
+		   && !_input._strongAttack) 	//if not attacking
 		{
 			//cannot jump for x seconds
 			StartCoroutine(Ready(jumpDelay));
@@ -420,10 +414,11 @@ public class Player : MonoBehaviour
 		{
 			if(_input._strongAttack 	//if strong attack button pressed
 			   && !_input._jump 		//if not jumping
-			   && !_input._blocking) 	//if not blocking
+			   && !_input._blocking 	//if not blocking
+			   && _ready)
 			{
 				_animator.SetTrigger("StrongAttack");
-				StartCoroutine(Ready(strongAttackDelay));
+				if(strongAttackDelay > 0) StartCoroutine(Ready(strongAttackDelay));
 			}
 		}
 		
@@ -432,11 +427,15 @@ public class Player : MonoBehaviour
 		   && !_input._blocking 				//if not blocking
 		   && normalizedHorizontalSpeed == 0 	//if not moving
 		   && _controller.isGrounded			//if grounded
+		   && _ready							//if ready
 		   && !_convoManager.talking) 			//if grounded
 		{
 			//if the bow is not equipped, just attack
 			if(_switcher.currentWeapon != 3)
+			{
 				_animator.SetTrigger("Attack");
+				if(quickAttackDelay > 0) StartCoroutine(Ready(quickAttackDelay));
+			}
 
 			//otherwise, delay after an attack
 			else if(_switcher.currentWeapon == 3 && _ready)
@@ -453,20 +452,19 @@ public class Player : MonoBehaviour
 		        && !_convoManager.talking)
 		{
 			_animator.SetTrigger("BlockingAttack");
-			StartCoroutine(Ready(blockAttackDelay));
+			if(blockAttackDelay > 0) StartCoroutine(Ready(blockAttackDelay));
 		}
 
 		//if bow and aim firing, start enumerator
-		if(_switcher.currentWeapon == 3 
+		if(_switcher.currentWeapon == 3
 		   && _input._blocking 
 		   && _input._attack)
 		{
-			print("aiming fire arrow");
+			print("aiming arrow");
 		}
 
 		//foot dust
-		if(_controller.isGrounded 
-		   && Mathf.Abs(normalizedHorizontalSpeed) < 0.1f)
+		if(_controller.isGrounded && Mathf.Abs(normalizedHorizontalSpeed) < 0.1f)
 		{
 			_footDust.Play();
 		}

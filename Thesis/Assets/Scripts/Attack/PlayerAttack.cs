@@ -10,61 +10,106 @@ public class PlayerAttack : MonoBehaviour {
 	private Health _health;
 	private PlayerInput _input;
 	private CharacterController2D _controller;
-	private LevelManager _manager;
-	public bool readyToAttack;
-	private MusicFader _mFader;
+	public bool readyToAttack = true;
+	public float radius = .3f;
+	private Transform _tip;
+	private Vector2 location;
 
 	//damages
 	private int damage;
 	public int r1Damage;
 	public int r2Damage;
 	public int blockingAttackDmg;
-	public float delay = .2f;
+	private float delay = .3f;
 
 	public GameObject hitSprite;
 
 	void Awake () {
-		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
-		_mFader = GameObject.Find("Music").GetComponent<MusicFader> ();
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_animator = GetComponent<Animator>();
 		_player = GetComponentInParent<Player>();
 		_controller = GetComponentInParent<CharacterController2D>();
+		_tip = transform.Find ("Tip");
 	}
 
 	void Update()
 	{
+		if(_tip) location = new Vector2 (_tip.position.x, _tip.position.y);
+
+		//arrow attack
+		if(gameObject.tag == "Arrow")
+		{
+			delay = 1f;
+			r1Attack();
+			StartCoroutine("Damage");
+			_animator.SetTrigger("Attack");
+		}
+
 		if(_player)
 		{
-			//regular attack
-			if((_input._attack) && (!_input._blocking) && !_player.moving)
+			if(readyToAttack)
 			{
-				r1Attack();
-				_animator.SetTrigger("Attack");
-			}
-			//blocking attack
-			else if((_input._blocking) && (_input._attack))
-			{
-				BlockingAttack();
-				_animator.SetTrigger("BlockingAttack");
-			}
-			//Strong Attack
-			else if(_input._strongAttack && _controller.isGrounded && !_input._blocking)
-			{
-				r2Attack();
-				_animator.SetTrigger("StrongAttack");
+				if(_player.normalizedHorizontalSpeed < 0.3f)
+				{
+					//regular attack
+					if(_input._attack && !_input._blocking)
+					{
+						delay = .3f;
+						r1Attack();
+						StartCoroutine("Damage");
+						_animator.SetTrigger("Attack");
+					}
+
+					//blocking attack
+					else if(_input._blocking && _input._attack)
+					{
+						delay = .3f;
+						BlockingAttack();
+						StartCoroutine("Damage");
+						_animator.SetTrigger("BlockingAttack");
+					}
+
+					//Strong Attack
+					else if(_input._strongAttack && _controller.isGrounded && !_input._blocking)
+					{
+						delay = .05f;
+						r2Attack();
+						StartCoroutine("Damage");
+						_animator.SetTrigger("StrongAttack");
+					}
+				}
 			}
 		}
 	}
 
-	void Ready()
+	IEnumerator Damage()
 	{
-		readyToAttack = true;
-	}
-
-	void NotReady()
-	{
-		readyToAttack = false;
+		Collider2D[] enemies = Physics2D.OverlapCircleAll(location, radius);
+		
+		if(enemies.Length > 0)
+		{
+			foreach(Collider2D enemy in enemies)
+			{
+				if(enemy.gameObject)
+				{
+					if(enemy.gameObject.tag == "Enemy")
+					{
+						if(readyToAttack)
+						{
+							Health _health = enemy.GetComponent<Health>();
+							//instantiate hit sprite at collider
+							Transform source = GetComponent<BoxCollider2D>().transform;
+							_health.EnemyTakeDamage(damage);
+							readyToAttack = false;
+							//instantiate hit sprite
+							Instantiate(hitSprite, source.position, source.rotation);
+							yield return new WaitForSeconds(delay);
+							readyToAttack = true;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public void r1Attack()
@@ -82,52 +127,14 @@ public class PlayerAttack : MonoBehaviour {
 		damage = blockingAttackDmg;
 	}
 
-	void OnTriggerStay2D(Collider2D target)
-	{
-		if (target.gameObject.tag == "Enemy")
-		{
-			if(_manager.canTransition)
-			{
-				_mFader.Fade(_mFader.battleTheme);
-				_manager.canTransition = false;
-			}
-			//test if the player is ready to attack
-			if(readyToAttack)
-			{
-				var _health = target.GetComponent<Health>();
-				//instantiate hit sprite at collider
-				Transform source = GetComponent<BoxCollider2D>().transform;
-				_health.EnemyTakeDamage(damage);
-				//instantiate hit sprite
-				Instantiate(hitSprite, source.position, source.rotation);
-				readyToAttack = false;
-			}
-		}
-		/*
-		else if (target.gameObject.tag == "Shield")
-		{
-			//test if the player is ready to attack
-			if(readyToAttack)
-			{
-				if(_wepSFX) _wepSFX.ShieldCollideSound();
-				readyToAttack = false;
-			}
-		}
-		else if (target.gameObject.tag == "Weapon")
-		{
-			//test if the player is ready to attack
-			if(readyToAttack)
-			{
-				if(_wepSFX) _wepSFX.WeaponCollideSound();
-				readyToAttack = false;
-			}
-		}
-		*/
-	}
-
 	//when the enemy is already dealt damage, dont keep dealing; once per swing
 	void onTriggerExit2D (Collider2D target)
 	{
-		//readyToAttack = false;
+		readyToAttack = true;
+	}
+
+	void OnDrawGizmos()
+	{
+		Gizmos.DrawSphere (location, radius);
 	}
 }
