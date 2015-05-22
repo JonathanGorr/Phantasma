@@ -77,16 +77,6 @@ public class LevelManager : MonoBehaviour {
 
 	void Update()
 	{
-		/*
-		if(_dialog)
-		{
-			if(!ConversationManager.Instance.talking)
-				_dialog.SetActive(false);
-			else
-				_dialog.SetActive(true);
-		}
-		*/
-
 		//if no buttons are pressed, count down from timeLeft
 		if(!inMenu)
 		{

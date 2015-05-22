@@ -19,12 +19,9 @@ public class SnapLink : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter2D(Collider2D arrow)
+	public void Break()
 	{
-		if(arrow.gameObject.tag == "Arrow")
-		{
-			_distanceJoint.enabled = false;
-			_joint.enabled = false;
-		}
+		_distanceJoint.enabled = false;
+		_joint.enabled = false;
 	}
 }

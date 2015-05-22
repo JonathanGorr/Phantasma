@@ -10,8 +10,6 @@ public class ShootArrow : MonoBehaviour {
 
 	public float 
 		speed,
-		quickShotDelay = 1f,
-		aimShotDelay = 1f,
 		quickShotSpeed = 20f,
 		min,
 		max;
@@ -26,6 +24,10 @@ public class ShootArrow : MonoBehaviour {
 	private Vector3 target;
 	private WeaponSwitcher _switcher;
 	private bool ready = true;
+	[HideInInspector] public Ray ray;
+
+	private Vector2 dir;
+	private float angle;
 
 	//resolution/vertex count of line
 	public int numSteps = 20;
@@ -57,26 +59,42 @@ public class ShootArrow : MonoBehaviour {
 			{
 				if(_input._aiming)
 				{
+					//target is the players world position plus the axis
+					if(_input._controller)
+					{
+						target = new Vector3(_body.transform.position.x + _input._axisHorizontal, _body.transform.position.y + _input._axisVertical, 0);
+
+						//the direction of the projectile is the position difference between the target and origin
+						dir = target - _body.transform.position;
+					}
+					
+					//target is the mouse pos
+					else
+					{
+						target = ray.direction;
+
+						//the direction of the projectile is the mousePos
+						dir = ray.direction;
+					}
+
+					angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
 					//the vector for the players facing
 					Vector3 direction = new Vector3();
 
-					//the direction of the projectile is the position difference between the target and origin
-					Vector2 dir = target - _body.transform.position;
-					float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+					//facing left
+					if(_player.facingLeft)
+					{
+						direction = Vector3.back;
+						angle -= 180;
+						angle = Mathf.Clamp(angle, min, max); //none of these values seem to clamp
+					}
 
 					//facing right
-					if(!_player.facingLeft)
+					else
 					{
 						direction = Vector3.forward;
 						angle = Mathf.Clamp(angle, -15, 80);
-					}
-
-					//facing left
-					else
-					{
-						direction = Vector3.back;
-						angle += 180;
-						//angle = Mathf.Clamp(angle, min, max); //none of these values seem to clamp
 					}
 
 					//rotate body sprite
@@ -91,46 +109,71 @@ public class ShootArrow : MonoBehaviour {
 		//if the bow is out...
 		if(_switcher.currentWeapon == 3)
 		{
+			ray = Camera.main.ScreenPointToRay(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+
 			//if not jumping or falling...
 			if(_controller.isGrounded)
 			{
 				//if aiming...
 				if(_input._aiming)
 				{
+					Debug.DrawRay(ray.origin, ray.direction * 10, Color.red);
+
 					if(ready)
 					{
-						//lock linerender to either side of player, based on facing
-						if(_player.facingLeft)
-							direction.x = Mathf.Clamp(_input._axisHorizontal * 2, -2, 0);
+						//controller
+						if(_input._controller)
+						{
+							Cursor.visible = false;
+							//lock linerender to either side of player, based on facing
+							if(_player.facingLeft)
+								direction.x = Mathf.Clamp(_input._axisHorizontal * 2, -2, 0);
+							else
+								direction.x = Mathf.Clamp(_input._axisHorizontal * 2, 0, 2);
+
+							direction.y = Mathf.Clamp(_input._axisVertical * 2f + 1.5f, 1f, 3f);
+						}
+
+						//no controller
 						else
-							direction.x = Mathf.Clamp(_input._axisHorizontal * 2, 0, 2);
+						{
+							Cursor.visible = true;
 
-						direction.y = Mathf.Clamp(_input._axisVertical * 2f + 1.5f, 1f, 3f);
-
-						UpdateTrajectory(transform.position, direction, gravity);
+							//lock linerender to either side of player, based on facing
+							if(_player.facingLeft)
+								direction.x = Mathf.Clamp(ray.direction.x * 2 - .05f, -2, 0);
+							else
+								direction.x = Mathf.Clamp(ray.direction.x * 2 - .05f, 0, 2);
+							
+							direction.y = Mathf.Clamp(ray.direction.y * 2 + 2f, 0, 3);
+						}
 
 						//if aiming and shoot, shoot
 						if(_input._attack) StartCoroutine(AimShot());
 					}
+
+					UpdateTrajectory(transform.position, direction, gravity);
 				}
 
-				//if not aiming or moving and ready, quickshot
-				if(!_input._aiming && _player.normalizedHorizontalSpeed < 0.3)
+				else
 				{
-					//turn off line rendering
-					if(lineRenderer) lineRenderer.SetVertexCount(0);
+					Cursor.visible = false;
 
-					if(ready)
+					//if not aiming or moving and ready, quickshot
+					if(_player.normalizedHorizontalSpeed < 0.05f)
 					{
-						//if attack, shoot an arrow
-						if(_input._attack) StartCoroutine(QuickShot());
+						//turn off line rendering
+						if(lineRenderer) lineRenderer.SetVertexCount(0);
+
+						if(ready)
+						{
+							//if attack, shoot an arrow
+							if(_input._attack) StartCoroutine(QuickShot());
+						}
 					}
 				}
 			}
 		}
-
-		//target is the players world position plus the axis
-		target = new Vector3(_body.transform.position.x + _input._axisHorizontal, _body.transform.position.y + _input._axisVertical, 0);
 	}
 
 	IEnumerator AimShot()
@@ -143,7 +186,7 @@ public class ShootArrow : MonoBehaviour {
 		projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
 
 		ready = false;
-		yield return new WaitForSeconds(aimShotDelay);
+		yield return new WaitForSeconds(_player.quickShotDelay);
 		ready = true;
 	}
 
@@ -167,18 +210,19 @@ public class ShootArrow : MonoBehaviour {
 		projectile.GetComponent<PlayerAttack>().r1Attack();
 
 		ready = false;
-		yield return new WaitForSeconds(quickShotDelay);
+		yield return new WaitForSeconds(_player.quickShotDelay);
 		ready = true;
 	}
 
 	void UpdateTrajectory(Vector3 initialPosition, Vector3 initialVelocity, Vector3 gravity)
 	{
-		timeDelta = 1.0f / initialVelocity.magnitude;
+		timeDelta = 1f / initialVelocity.magnitude;
 
 		if(lineRenderer) lineRenderer.SetVertexCount(numSteps);
 		
 		Vector3 position = initialPosition;
 		Vector3 velocity = initialVelocity;
+
 		for (int i = 0; i < numSteps; ++i)
 		{
 			lineRenderer.SetPosition(i, position);

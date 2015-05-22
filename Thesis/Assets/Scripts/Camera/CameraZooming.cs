@@ -12,46 +12,48 @@ public class CameraZooming : MonoBehaviour {
 	public float sensitivity = 0.5f;
 
 	public bool zoomable;
-	private bool _aiming;
-	private float _axisVertical;
-	private float _axisHorizontal;
 
+	//components
 	private WeaponSwitcher _switcher;
+	private PlayerInput _input;
+	private ShootArrow _shoot;
 
 	void Awake()
 	{
+		_shoot = GameObject.Find ("_Player").GetComponent<ShootArrow> ();
+		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_switcher = GameObject.Find ("_LevelManager").GetComponent<WeaponSwitcher>();
-	}
-
-	void Update()
-	{
-		_aiming = Input.GetButton ("360_LeftBumper");
-		//clamp vertical looking to ground and above
-		_axisVertical = Mathf.Clamp(Input.GetAxis ("360_RightStickVertical"), 0, 0.3f);
-		//clamp horizontal looking to where the player is always visible
-		_axisHorizontal = Mathf.Clamp(Input.GetAxis("360_RightStickHorizontal"),-0.6f, 0.6f);
 	}
 
 	void FixedUpdate()
 	{
-		//TODO: make the camera zoom in with the field of view change to change the depth of the image ;)
-
 		GetComponent<Camera>().fieldOfView = distance;
 
-		if(_aiming == false && zoomable)
+		if(!_input._aiming && zoomable)
 		{
 			distance = Mathf.Clamp(distance -
                        Input.GetAxis("360_RightStickVertical") * zoomSpeed,
                        distanceMin,
                        distanceMax);
 		}
+
 		//if aiming, and the bow is selected
-		else if(_aiming && _switcher.currentWeapon == 3)
+		if(_input._aiming && _switcher.currentWeapon == 3)
 		{
-			GetComponent<Camera>().transform.position =
-						new Vector3(GetComponent<Camera>().transform.position.x + _axisHorizontal * sensitivity,
-                        	GetComponent<Camera>().transform.position.y + _axisVertical * sensitivity,
-				            GetComponent<Camera>().transform.position.z);
+			if(_input._controller)
+			{
+				GetComponent<Camera>().transform.position = new Vector3
+					(GetComponent<Camera>().transform.position.x + _input._axisHorizontal * sensitivity,
+	        		GetComponent<Camera>().transform.position.y + _input._axisVertical * sensitivity / 2,
+	            	GetComponent<Camera>().transform.position.z);
+			}
+			else
+			{
+				GetComponent<Camera>().transform.position = new Vector3
+				(GetComponent<Camera>().transform.position.x + _shoot.ray.direction.x * sensitivity,
+				 GetComponent<Camera>().transform.position.y + _shoot.ray.direction.y * sensitivity,
+				 GetComponent<Camera>().transform.position.z);
+			}
 		}
 	}
 }

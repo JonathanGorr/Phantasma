@@ -49,7 +49,7 @@ public class PlayerAttack : MonoBehaviour {
 		{
 			if(readyToAttack)
 			{
-				if(_player.normalizedHorizontalSpeed < 0.3f)
+				if(_player.normalizedHorizontalSpeed < 0.05f)
 				{
 					//regular attack
 					if(_input._attack && !_input._blocking)
@@ -90,21 +90,26 @@ public class PlayerAttack : MonoBehaviour {
 		{
 			foreach(Collider2D enemy in enemies)
 			{
-				if(enemy.gameObject)
+				if(enemy)
 				{
-					if(enemy.gameObject.tag == "Enemy")
+					if(readyToAttack)
 					{
-						if(readyToAttack)
+						if(enemy.gameObject.tag == "Enemy")
 						{
-							Health _health = enemy.GetComponent<Health>();
-							//instantiate hit sprite at collider
-							Transform source = GetComponent<BoxCollider2D>().transform;
-							_health.EnemyTakeDamage(damage);
-							readyToAttack = false;
-							//instantiate hit sprite
-							Instantiate(hitSprite, source.position, source.rotation);
-							yield return new WaitForSeconds(delay);
-							readyToAttack = true;
+								Health _health = enemy.GetComponent<Health>();
+								//instantiate hit sprite at collider
+								Transform source = GetComponent<BoxCollider2D>().transform;
+								_health.EnemyTakeDamage(damage);
+								readyToAttack = false;
+								//instantiate hit sprite
+								Instantiate(hitSprite, source.position, source.rotation);
+								yield return new WaitForSeconds(delay);
+								readyToAttack = true;
+						}
+
+						else if(enemy.gameObject.tag == "Link")
+						{
+							enemy.GetComponent<SnapLink>().Break();
 						}
 					}
 				}

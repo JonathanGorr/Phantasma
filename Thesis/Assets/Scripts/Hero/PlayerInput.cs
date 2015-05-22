@@ -49,7 +49,7 @@ public class PlayerInput : MonoBehaviour {
 	void Update()
 	{
 		//bool true if theres a controller
-		_controller = (Input.GetJoystickNames ().Length > 0) ? true : false;
+		_controller = (Input.GetJoystickNames ().Length == 1) ? true : false;
 
 		//if player is not dead...
 		if(!_playerHealth.dead)
@@ -125,7 +125,10 @@ public class PlayerInput : MonoBehaviour {
 
 						//no controller
 						else
+						{
+							_attack = Input.GetMouseButtonDown(0);
 							_aiming = Input.GetMouseButton(1);
+						}
 
 						//if aiming
 						if(_aiming)
