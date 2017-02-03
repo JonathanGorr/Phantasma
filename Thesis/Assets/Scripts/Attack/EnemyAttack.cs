@@ -44,7 +44,7 @@ public class EnemyAttack : MonoBehaviour {
 					var _health = target.GetComponent<Health>();
 					//instantiate hit sprite at collider
 					Transform source = GetComponent<BoxCollider2D>().transform;
-					_health.PlayerTakeDamage(damage);
+					_health.TakeDamage(damage);
 					//instantiate hitsprite
 					Instantiate(hitSprite, source.position, source.rotation);
 					readyToAttack = false;

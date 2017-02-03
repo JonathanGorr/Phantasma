@@ -12,10 +12,9 @@ public class DayNightSystem : MonoBehaviour {
 	private bool inAVolume;
 	private Color nextColor;
 	
-	void Awake()
+	void Start()
 	{
 		Camera.main.backgroundColor = currentColor;
-
 		if (Colors.Length > 0)
 		{
 			currentColor = Colors[0];

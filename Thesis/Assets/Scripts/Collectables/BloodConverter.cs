@@ -9,7 +9,7 @@ public class BloodConverter : MonoBehaviour {
 	public AudioClip _healClip;
 	private PlayerInput _input;
 
-	void Awake()
+	void Start()
 	{
 		_health = GameObject.Find("_Player").GetComponent<Health>();
 		_evo = GameObject.Find("_LevelManager").GetComponent<Evolution>();

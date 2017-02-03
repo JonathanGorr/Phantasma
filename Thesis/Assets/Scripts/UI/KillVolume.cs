@@ -3,7 +3,6 @@ using System.Collections;
 
 public class KillVolume : MonoBehaviour {
 
-	private Camera2DFollow _camera;
 	private DeathMessage _message;
 
 	void Awake()

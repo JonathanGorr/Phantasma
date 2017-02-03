@@ -99,7 +99,7 @@ public class PlayerAttack : MonoBehaviour {
 								Health _health = enemy.GetComponent<Health>();
 								//instantiate hit sprite at collider
 								Transform source = GetComponent<BoxCollider2D>().transform;
-								_health.EnemyTakeDamage(damage);
+								_health.TakeDamage(damage);
 								readyToAttack = false;
 								//instantiate hit sprite
 								Instantiate(hitSprite, source.position, source.rotation);

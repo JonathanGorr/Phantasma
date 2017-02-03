@@ -13,7 +13,7 @@ public class Footsteps : MonoBehaviour {
 	public float audioStepLengthWalk = 0.45f;
 	public float audioStepLengthRun = 0.25f;
 
-	void Awake()
+	void Start()
 	{
 		_controller = GameObject.Find("_Player").GetComponent<CharacterController2D>();
 	}

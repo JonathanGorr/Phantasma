@@ -6,7 +6,7 @@ public class PlayerInput : MonoBehaviour {
 	//components
 	private LevelManager _manager;
 	private ConversationManager _convoManager;
-	private WeaponSwitcher _switcher;
+	private WeaponController _switcher;
 	private Health _playerHealth;
 
 	[HideInInspector] public bool 
@@ -38,12 +38,12 @@ public class PlayerInput : MonoBehaviour {
 		_DPadHorizontal,
 		_DPadVertical;
 
-	void Awake()
+	void Start()
 	{
-		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager> ();
-		_switcher = _manager.GetComponent<WeaponSwitcher> ();
-		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
-		_playerHealth = GameObject.Find ("_Player").GetComponent<Health> ();
+		_manager = GetComponent<LevelManager>();
+		_switcher = GameObject.Find("_Player").GetComponent<WeaponController>();
+		_convoManager = GetComponent<ConversationManager>();
+		_playerHealth = GameObject.Find ("_Player").GetComponent<Health>();
 	}
 
 	void Update()
@@ -91,7 +91,6 @@ public class PlayerInput : MonoBehaviour {
 						_scrollWheel = 0;
 						_heal = Input.GetButtonDown ("360_YButton");
 					}
-
 					//no controller
 					else
 					{
@@ -114,7 +113,7 @@ public class PlayerInput : MonoBehaviour {
 					}
 					
 					//if the bow is out, can aim...
-					if(_switcher.currentWeapon == 3)
+					if(_switcher.IsWeapon(Weapons.Bow))
 					{
 						//controller
 						if(_controller)
@@ -152,7 +151,7 @@ public class PlayerInput : MonoBehaviour {
 					}
 
 					//if you are not bare-Fisted
-					else if(_switcher.currentWeapon != 0)
+					else if(!_switcher.IsWeapon(Weapons.Empty))
 					{
 						//controller
 						if(_controller)
@@ -168,7 +167,7 @@ public class PlayerInput : MonoBehaviour {
 							_attack = Input.GetMouseButtonDown (0);
 
 							//if the sword is out, hold right mouse to block
-							if(_switcher.currentWeapon == 1)
+							if(_switcher.IsWeapon(Weapons.SwordShield))
 								_blocking = Input.GetMouseButton (1);
 
 							//right mouse strong attacks for every other weapon

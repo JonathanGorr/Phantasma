@@ -10,6 +10,11 @@ public class Fading : MonoBehaviour {
 	private float alpha = 1.0f; 	//texture alpha value
 	private int fadeDir = -1; 		//direction to fade: in is -1, out is 1
 
+	void Awake()
+	{
+		BeginFade (-1); //call the fade in function
+	}
+
 	void OnGUI ()
 	{
 		//fade out/in the alpha value using direction, speed and time.deltaTime to convert the operation to seconds
@@ -28,12 +33,5 @@ public class Fading : MonoBehaviour {
 	{
 		fadeDir = direction;
 		return (fadeSpeed); //return the fadeSpeed variable so its easy to time the apllication.loadlevel();
-	}
-
-	//OnLevelWasLoaded is called when a level is loaded. It takes loaded level index (int) as a parameter so you can limit the fade in to certain scenes
-	void OnLevelWasLoaded()
-	{
-		//alpha = 1;
-		BeginFade (-1); //call the fade in function
 	}
 }

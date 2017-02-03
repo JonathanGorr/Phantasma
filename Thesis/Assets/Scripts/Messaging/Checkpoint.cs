@@ -23,7 +23,7 @@ public class Checkpoint : MonoBehaviour {
 	public float distance = 2;
 
 	// Use this for initialization
-	void Awake () {
+	void Start () {
 		_target = GameObject.Find ("_Player").transform;
 		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
 		_prefs = _manager.GetComponent<PlayerPreferences>();
@@ -49,8 +49,8 @@ public class Checkpoint : MonoBehaviour {
 			{
 				if(_prefs)
 				{
-					_prefs.SaveStats(transform.position.x, transform.position.y, _evo.blood, _playerHealth.health);
-					ShowMessage();
+					_prefs.SaveStats(transform.position, _evo.blood, _playerHealth.health);
+					_anim.SetTrigger("CheckpointReached");
 
 					//set bools in prefs accordingly
 					if(motherMet)
@@ -86,17 +86,6 @@ public class Checkpoint : MonoBehaviour {
 				}
 			}
 		}
-	}
-
-	private void ShowMessage()
-	{
-		if(_anim)
-		{
-			_anim.SetTrigger("CheckpointReached");
-			print ("checkpoint reached");
-		}
-		else
-			print("theres no animator");
 	}
 
 	void OnDrawGizmos()

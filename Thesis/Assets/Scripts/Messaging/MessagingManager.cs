@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class MessagingManager : Singleton<MessagingManager>
+public class MessagingManager
 {
-    protected MessagingManager() { } // guarantee this will be always a singleton only - can't use the constructor!
+	public static MessagingManager Instance = null;
 
     // public property for manager
     private List<Action> subscribers = new List<Action>();
     private List<Action<bool>> uiEventSubscribers = new List<Action<bool>>();
     private List<Action<InventoryItem>> inventorySubscribers = new List<Action<InventoryItem>>();
+
+	void Awake()
+	{
+		if(Instance == null) Instance = this;
+	}
 
     // Subscribe method for manager
     public void Subscribe(Action subscriber)

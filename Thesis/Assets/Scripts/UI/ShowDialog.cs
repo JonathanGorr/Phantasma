@@ -12,8 +12,11 @@ public class ShowDialog : MonoBehaviour {
 	private PlayerInput _input;
 	private Conversation conversation;
 
-	void Awake()
+	private ConversationManager _conversationManager;
+
+	void Start()
 	{
+		_conversationManager = GameObject.Find("_LevelManager").GetComponent<ConversationManager>();
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_target = GameObject.Find ("_Player").transform;
 		_DialogBox = GameObject.Find ("Dialog");
@@ -48,9 +51,9 @@ public class ShowDialog : MonoBehaviour {
 
 							if (conversation)
 							{
-								ConversationManager.Instance.StartConversation(conversation);
+								_conversationManager.StartConversation(conversation);
 								//play music in conversation manager
-								ConversationManager.Instance.PlayMusic(bgMusic);
+								_conversationManager.PlayMusic(bgMusic);
 								talked = true;
 							}
 						}

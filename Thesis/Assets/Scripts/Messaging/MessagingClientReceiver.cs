@@ -2,6 +2,15 @@
 
 public class MessagingClientReceiver : MonoBehaviour
 {
+	public ConversationManager _conversationManager;
+	public MessagingManager _messagingManager;
+
+	void Awake()
+	{
+		_conversationManager = GameObject.Find("_LevelManager").GetComponent<ConversationManager>();
+		_messagingManager = GameObject.Find("_LevelManager").GetComponent<MessagingManager>();
+	}
+
     void Start()
     {
         MessagingManager.Instance.Subscribe(ThePlayerIsTryingToLeave);
@@ -17,7 +26,7 @@ public class MessagingClientReceiver : MonoBehaviour
                 var conversation = dialog.Conversations[0];
                 if (conversation != null)
                 {
-                    ConversationManager.Instance.StartConversation(conversation);
+					_conversationManager.StartConversation(conversation);
                 }
             }
         }

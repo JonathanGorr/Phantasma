@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FlamingSkullAI : MonoBehaviour {
+public class FlamingSkullAI : Entity {
 	
 	public Transform _player;
 
@@ -12,16 +12,10 @@ public class FlamingSkullAI : MonoBehaviour {
 		chaseRange,
 		attackRange,
 		distance,
-		walkSpeed = 2f,
-		runSpeed = 4f,
 		attackSpeed = 6f,
-		speed,
 		attackRepeatTime = 4f,
 		knockBackDistance = 220f;
 
-	private Transform myTransform;
-	private Animator _anim;
-	
 	public AudioClip _chatteringTeeth;
 	public AudioClip _attack;
 
@@ -30,22 +24,12 @@ public class FlamingSkullAI : MonoBehaviour {
 	private Vector2 faceLeft;
 	private Vector2 faceRight;
 
-	private Health _health;
+	private Color debugColor;
 
-	//gizmos
-	[SerializeField]
-	[Range( 0, 5f )]
-	public float size;
-	private Color color;
-	public Color green;
-	public Color yellow;
-	public Color red;
-
-	void Awake()
+	void Start()
 	{
 		_anim = GetComponent<Animator> ();
 		_player = GameObject.Find("_Player").transform;
-		_health = GetComponent<Health> ();
 		
 		//cache transform, dont call every frame 
 		myTransform = transform;
@@ -57,7 +41,21 @@ public class FlamingSkullAI : MonoBehaviour {
 		targetPosition = _player.position;
 
 		GetComponent<AudioSource>().clip = _chatteringTeeth;
-		GetComponent<AudioSource>().Play ();
+		GetComponent<AudioSource>().Play();
+	}
+
+	public override void OnHurt()
+	{
+		//TODO: on hit, turn into a rolling, deactivated physics ball that is temporarily invincible?
+		if(left){
+			GetComponent<Rigidbody2D>().AddForce(Vector3.right * knockBackDistance);
+			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
+		}
+		else if(!left)
+		{
+			GetComponent<Rigidbody2D>().AddForce(-Vector3.right * knockBackDistance);
+			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
+		}
 	}
 
 	void FixedUpdate()
@@ -105,20 +103,14 @@ public class FlamingSkullAI : MonoBehaviour {
 			{
 				//play idle anim
 				speed = 0;
-				color = green;
+				debugColor = Color.green;
 			}
 
 			//if player is within attack range, run the attack method
 			if (distance < attackRange && Time.time > 0 && !attacking)
 			{
-				color = red;
+				debugColor = Color.red;
 				StartCoroutine(AttackPlayer());
-			}
-
-			if(_health.enemyHurt)
-			{
-				_health.enemyHurt = false;
-				//Knockback();
 			}
 		}
 	}
@@ -126,7 +118,7 @@ public class FlamingSkullAI : MonoBehaviour {
 	void LookAt()
 	{
 		//yellow color
-		color = yellow;
+		debugColor = Color.yellow;
 		
 		//flip
 		if(left)
@@ -142,29 +134,13 @@ public class FlamingSkullAI : MonoBehaviour {
 	
 	void ChasePlayer(float modifiedSpeed)
 	{
-		color = red;
+		debugColor = Color.red;
 		speed = runSpeed;
 	}
 
 	void AttackSound()
 	{
-		GetComponent<AudioSource>().PlayOneShot (_attack);
-	}
-
-	void Knockback()
-	{
-		if(left){
-			GetComponent<Rigidbody2D>().AddForce(Vector3.right * knockBackDistance);
-			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
-		}
-		else if(!left)
-		{
-			GetComponent<Rigidbody2D>().AddForce(-Vector3.right * knockBackDistance);
-			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
-		}
-		print ("knocked back");
-		
-		_health.enemyHurt = false;
+		GetComponent<AudioSource>().PlayOneShot(_attack);
 	}
 
 	//stop, telegraph attack, attack, then return to follow sequence
@@ -185,7 +161,7 @@ public class FlamingSkullAI : MonoBehaviour {
 
 	void OnDrawGizmos()
 	{
-		Gizmos.color = color;
-		Gizmos.DrawCube(transform.position,new Vector2(size,size));
+		Gizmos.color = debugColor;
+		Gizmos.DrawWireSphere(transform.position, chaseRange);
 	}
 }

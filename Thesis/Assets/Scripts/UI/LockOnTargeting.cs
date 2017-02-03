@@ -6,17 +6,16 @@ public class LockOnTargeting : MonoBehaviour {
 
 	//create a list of all enemies found
 	public List<Transform> targets;
-	public Transform selectedTarget;
+	public Transform target;
 	private Transform myTransform;
 	public bool selecting = false;
-	public GameObject prefab;
 	private Vector2 selectedEnemyPosition;
 	private int index;
-	private FollowEntity _follow;
 	private bool instantiate = true;
 	private Transform cam;
 	private Transform player;
 	private Vector2 center;
+	public GameObject lockOnIconPrefab;
 	public bool on;
 
 	void Awake()
@@ -24,7 +23,7 @@ public class LockOnTargeting : MonoBehaviour {
 		//initialize
 		targets = new List<Transform>();
 		//have nothing targeted at script start
-		selectedTarget = null;
+				target = null;
 		//cache transform if used often
 		myTransform = transform;
 		//start adding immediately
@@ -50,12 +49,12 @@ public class LockOnTargeting : MonoBehaviour {
 		{
 			if(Input.GetAxis("360_RightStickHorizontal") > 0.9f)
 			{
-				TargetEnemy(1);
+				target = TargetEnemy(1);
 				print("index moves up");
 			}
 			else if(Input.GetAxis("360_RightStickHorizontal") < -0.9)
 			{
-				TargetEnemy(-1);
+				target = TargetEnemy(-1);
 				print("index moves down");
 			}
 		}
@@ -63,23 +62,20 @@ public class LockOnTargeting : MonoBehaviour {
 	
 	void FixedUpdate()
 	{
-		if(selectedTarget != null)
+		if(target != null)
 		{
 			if(instantiate == true)
 			{
 				//make a retical, set it to invisible by default
-				Instantiate(prefab, selectedTarget.transform.position, selectedTarget.transform.rotation);
-				_follow = prefab.GetComponent<FollowEntity> ();
+				Instantiate(lockOnIconPrefab, target.transform.position, target.transform.rotation);
 
 				//set to false when one is made
 				instantiate = false;
 			}
 
-			center = ((selectedTarget.position - player.transform.position)/2.0f) + selectedTarget.position;
+				center = ((target.position - player.transform.position)/2.0f) + target.position;
 			cam.transform.LookAt(center);
 		}
-		//else
-			//print("there is no selected target");
 	}
 
 	//add all enemies(tag) to list
@@ -107,19 +103,19 @@ public class LockOnTargeting : MonoBehaviour {
      		});
 	}
 
-	private void TargetEnemy(int direction)
+	private Transform TargetEnemy(int direction)
 	{
 		//if there are no selected targets, sort them by distance
 		//and set the selectedTarget as the closest[0]
-		if(selectedTarget == null)
+		if(target == null)
 		{
 			SortTargetsByDistance();
-			selectedTarget = targets[0];
+			return targets[0];
 		}
 		else
 		{
 			//gives us the index of the current target selected
-			index = targets.IndexOf(selectedTarget);
+			index = targets.IndexOf(target);
 
 			if(direction == 1)
 			{
@@ -141,14 +137,7 @@ public class LockOnTargeting : MonoBehaviour {
 			}
 			*/
 			//DeselectTarget();
-			selectedTarget = targets[index];
+			return targets[index];
 		}
-		//show the lock on sprite
-		SelectTarget();
-	}
-
-	private void SelectTarget()
-	{
-		_follow.target = selectedTarget;
 	}
 }

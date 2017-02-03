@@ -27,7 +27,6 @@ public class CharacterController2D : MonoBehaviour
 		public bool movingDownSlope;
 		public float slopeAngle;
 		
-		
 		public bool hasCollision()
 		{
 			return below || right || left || above;

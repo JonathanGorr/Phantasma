@@ -9,7 +9,7 @@ public class Explode : MonoBehaviour {
 	private int totalSpawned;
 	private int playerBlood;
 
-	void Awake()
+	void Start()
 	{
 		playerBlood = GameObject.Find("_LevelManager").GetComponent<Evolution>().blood;
 	}

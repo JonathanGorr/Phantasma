@@ -2,71 +2,87 @@
 using System.Collections;
 
 public class SFX : MonoBehaviour {
-	
-	public AudioClip[] swing;
-	public AudioClip[] yell;
-	public AudioClip[] hurt;
-	public AudioClip[] jump;
-	public AudioClip[] collapse;
+
+	public GameObject fxPrefab;
+
+	[Header("Player")]
+	public AudioClip[] playerYell;
+	public AudioClip[] playerHurt;
+	public AudioClip[] playerJump;
+	public AudioClip[] playerDied;
+	public AudioClip[] sheathes;
+	[Header("Enemy")]
+	public AudioClip[] enemyHurt;
+	public AudioClip[] enemyDied;
+	[Header("Weapon Sounds")]
+	public AudioClip[] swings;
 	public AudioClip[] bowDraw;
 	public AudioClip[] bowShoot;
+	[Header("Collision")]
+	public AudioClip[] shieldCollide;
+	public AudioClip[] weaponCollide;
 
-	private Health _health;
-
-	void Awake()
+	public void PlayUI(string command)
 	{
-		_health = GetComponent<Health> ();
+		
 	}
 
-	void Update()
+	public void PlayFX(string command, Vector3 position)
 	{
-		if(_health.playerHurt || _health.enemyHurt)
+		AudioClip clip = null;
+		float pitch = 1;
+
+		switch(command)
 		{
-			GetComponent<AudioSource>().pitch = 1f;
-			GetComponent<AudioSource>().clip = hurt[Random.Range (0, hurt.Length)];
-			GetComponent<AudioSource>().Play();
+			case "player_Hurt":
+				clip = playerHurt[Random.Range(0, playerHurt.Length)];
+				break;
+			case "enemy_Hurt":
+				clip = enemyHurt[Random.Range(0, enemyHurt.Length)];
+				break;
+			case "player_Died":
+				clip = playerDied[Random.Range(0, playerDied.Length)];
+				break;
+			case "enemy_Died":
+				clip = enemyDied[Random.Range(0, enemyDied.Length)];
+				break;
+			case "swing_Heavy":
+				clip = swings[Random.Range(0, swings.Length)];
+				break;
+			case "swing_Light":
+				clip = swings[Random.Range(0, swings.Length)];
+				pitch = 2f;
+				break;
+			case "jump":
+				clip = playerJump[Random.Range(0, playerJump.Length)];
+				break;
+			case "bow_Draw":
+				clip = bowDraw[Random.Range(0, bowDraw.Length)];
+				break;
+			case "bow_Shoot":
+				clip = bowShoot[Random.Range(0, bowShoot.Length)];
+				break;
+			case "shield_hit":
+				clip = shieldCollide[Random.Range(0, shieldCollide.Length)];
+				break;
+			case "weapon_hit":
+				clip = weaponCollide[Random.Range(0, weaponCollide.Length)];
+				break;
+			case "sheathe":
+				clip = sheathes[Random.Range(0, sheathes.Length)];
+				break;
+			default:
+				print(command + " was not a recognized SFX command");
+				break;
 		}
-	}
 
-	public void DeathSound()
-	{
-		GetComponent<AudioSource>().pitch = 1f;
-		GetComponent<AudioSource>().clip = collapse[Random.Range (0, collapse.Length)];
-		GetComponent<AudioSource>().Play();
-	}
+		if(clip == null) return;
 
-	public void SwingSoundLight()
-	{
-		GetComponent<AudioSource>().pitch = 2f;
-		GetComponent<AudioSource>().clip = swing[Random.Range (0, swing.Length)];
-		GetComponent<AudioSource>().Play();
-	}
-
-	public void SwingSoundHeavy()
-	{
-		GetComponent<AudioSource>().pitch = 1f;
-		GetComponent<AudioSource>().clip = swing[Random.Range (0, swing.Length)];
-		GetComponent<AudioSource>().Play();
-	}
-
-	public void JumpSound()
-	{
-		GetComponent<AudioSource>().pitch = 1f;
-		GetComponent<AudioSource>().clip = jump[Random.Range (0, jump.Length)];
-		GetComponent<AudioSource>().Play();
-	}
-
-	public void BowDraw()
-	{
-		GetComponent<AudioSource>().pitch = 1f;
-		GetComponent<AudioSource>().clip = bowDraw[Random.Range (0, bowDraw.Length)];
-		GetComponent<AudioSource>().Play();
-	}
-
-	public void BowShoot()
-	{
-		GetComponent<AudioSource>().pitch = 1f;
-		GetComponent<AudioSource>().clip = bowShoot[Random.Range (0, bowShoot.Length)];
-		GetComponent<AudioSource>().Play();
+		GameObject go = Instantiate(fxPrefab, position, Quaternion.identity);
+		go.name = clip.name;
+		AudioSource asrc = go.GetComponent<AudioSource>();
+		asrc.pitch = pitch;
+		asrc.clip = clip;
+		asrc.Play();
 	}
 }

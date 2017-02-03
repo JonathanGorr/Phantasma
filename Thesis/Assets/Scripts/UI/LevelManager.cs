@@ -1,96 +1,101 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.EventSystems;
-using UnityEngine.Events;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
 	[HideInInspector]
-	public static int bloodCount;
+	public bool paused = false;
+	public int bloodCount;
 	public float timeLeft = 30f;
 	public bool exhibition;
 
-	[HideInInspector] public bool inMenu, canTransition;
+	[HideInInspector] public bool inMenu = false, inInitialize = true, canTransition;
 
-	[SerializeField, HideInInspector]
-	public GameObject _pauseScreen, _controlScreen, _hud, _dialog;
+	public GameObject _pauseScreen;
+	public GameObject  _controlScreen;
+	public GameObject  _hud;
+	public GameObject  _dialog;
 	private GameObject restartButton;
 
 	//components
 	private Health _player;
+	private Fading _fader;
 	private PlayerPreferences _prefs;
 	private Evolution _evo;
 	private Animator cameraAnim;
 	private PlayerInput _input;
 
 	[HideInInspector]
-	public bool paused;
 	private bool controlOn;
 
 	private GameObject eventSystem;
 	private EventSystem es;
 
-	void Awake()
+	void Start()
 	{
+		DontDestroyOnLoad(this.gameObject);
+		SceneManager.sceneLoaded += OnSceneLoaded;
 		Application.targetFrameRate = 60;
 		AudioListener.volume = 1f;
 
-		//components
+		_fader = GetComponent<Fading>();
 		_input = GetComponent<PlayerInput> ();
-		_dialog = GameObject.Find("Dialog");
 		cameraAnim = Camera.main.GetComponent<Animator> ();
-		_hud = GameObject.Find ("Hud");
+		_prefs = GetComponent<PlayerPreferences>();
+		_evo = GetComponent<Evolution>();
+		cameraAnim = Camera.main.GetComponent<Animator> ();
 		_prefs = GetComponent<PlayerPreferences>();
 		_evo = GetComponent<Evolution>();
 		_player = GameObject.Find("_Player").GetComponent<Health>();
-		_pauseScreen = GameObject.Find ("PauseMenu");
-		_controlScreen = GameObject.Find ("ControlScreen");
 		eventSystem = GameObject.Find ("EventSystem");
 		restartButton = GameObject.Find ("RestartButton");
-
+		_hud.SetActive(false);
 		//turn them off if existing
-		if(_pauseScreen)
-			_pauseScreen.SetActive (false);
-		if(_controlScreen)
-			_controlScreen.SetActive (false);
+		_pauseScreen.SetActive (false);
+		_controlScreen.SetActive (false);
+	}
 
-		if (Application.loadedLevelName == "Menu")
-			inMenu = true;
-		else
-			inMenu = false;
-
-		if(_hud)
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		if(scene.name == "Menu")
 		{
-			if(inMenu)
-			{
-				Cursor.visible = true;
-				_hud.SetActive(false);
-			}
-			else
-			{
-				Cursor.visible = false;
-				_hud.SetActive(true);
-			}
+			inMenu = true;
+			inInitialize = false;
+			Cursor.visible = true;
+		}
+		else if(scene.name == "Initialize")
+		{
+			inInitialize = true;
+			inMenu = false;
+			Cursor.visible = false;
+		}
+		else
+		{
+			_fader.BeginFade (-1);
+			inInitialize = false;
+			inMenu = false;
+			Cursor.visible = false;
+			_hud.SetActive(true);
 		}
 	}
 
 	void Update()
 	{
-		//if no buttons are pressed, count down from timeLeft
-		if(!inMenu)
-		{
-			if(exhibition)
-			{
-				if (!_input._anyKeyDown)
-					timeLeft -= Time.deltaTime; 
-				else
-					timeLeft = 30;
+		if(inMenu) return;
+		if(inInitialize) return;
 
-				//return to menu if x seconds passed
-				if (timeLeft <= 0)
-					ReturnToMenu ();
-			}
+		if(exhibition)
+		{
+			if (!_input._anyKeyDown)
+				timeLeft -= Time.deltaTime; 
+			else
+				timeLeft = 30;
+
+			//return to menu if x seconds passed
+			if (timeLeft <= 0)
+				ReturnToMenu ();
 		}
 
 		if(!_player.dead)
@@ -98,7 +103,7 @@ public class LevelManager : MonoBehaviour {
 			if(!inMenu)
 			{
 				//pause
-				if(_input._pause)
+				if(paused)
 				{
 					//toggle
 					paused = !paused;
@@ -112,9 +117,8 @@ public class LevelManager : MonoBehaviour {
 						Resume();
 					}
 				}
-
 				//cannot open control menu when paused
-				if(!paused)
+				else
 				{
 					//control
 					if(Input.GetButtonDown("360_BackButton") && !inMenu)
@@ -191,53 +195,53 @@ public class LevelManager : MonoBehaviour {
 		StartCoroutine (Restart());
 	}
 
-public IEnumerator NewGame()
+	public IEnumerator NewGame()
 	{
 		Time.timeScale = 1;
 		//load level
 		paused = false;
-		float fadeTime = GameObject.Find ("_LevelManager").GetComponent<Fading> ().BeginFade (1);
+		float fadeTime = GetComponent<Fading> ().BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
-		Application.LoadLevel(1);
+		SceneManager.LoadScene(2);
 	}
 
-public IEnumerator GoToMenu()
+	public IEnumerator GoToMenu()
 	{
 		Time.timeScale = 1;
 		//load level
 		paused = false;
-		float fadeTime = GameObject.Find ("_LevelManager").GetComponent<Fading> ().BeginFade (1);
+		float fadeTime = _fader.BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
 		if(_prefs != null)
-			_prefs.SaveStats (_player.transform.position.x, _player.transform.position.y, _evo.blood, _player.GetComponent<Health>().health);
-		Application.LoadLevel(0);
+			_prefs.SaveStats (_player.transform.position, _evo.blood, _player.GetComponent<Health>().health);
+		SceneManager.LoadScene(0);
 	}
 
-public IEnumerator Continue()
+	public IEnumerator Continue()
 	{
 		Time.timeScale = 1;
 		//load level
 		paused = false;
-		float fadeTime = GameObject.Find ("_LevelManager").GetComponent<Fading> ().BeginFade (1);
+		float fadeTime = _fader.BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
-		Application.LoadLevel(1);
+		SceneManager.LoadScene(2);
 	}
 
-public IEnumerator Quit()
+	public IEnumerator Quit()
 	{
 		Time.timeScale = 1;
 		paused = false;
-		float fadeTime = GameObject.Find ("_LevelManager").GetComponent<Fading> ().BeginFade (1);
+		float fadeTime = _fader.BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
 		Application.Quit ();
 	}
 
-public IEnumerator Restart()
+	public IEnumerator Restart()
 	{
 		Time.timeScale = 1;
 		//if player is not dead, save their stats
 		paused = false;
-		float fadeTime = GameObject.Find ("_LevelManager").GetComponent<Fading> ().BeginFade (1);
+		float fadeTime = _fader.BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
 
 		//player is not dead, set position to last checkpoint
@@ -245,16 +249,17 @@ public IEnumerator Restart()
 		{
 			//if a checkpoint was never met, set respawn to respawn
 			if(PlayerPrefs.GetFloat("playerX") == 0 && PlayerPrefs.GetFloat("playerY") == 0)
-				_prefs.SaveStats(_prefs._spawn.position.x, _prefs._spawn.position.y, _evo.blood, _player.GetComponent<Health>().health);
+				_prefs.SaveStats(_prefs._spawn.position, _evo.blood, _player.GetComponent<Health>().health);
 				//else if a checkpoint was hit, set the respawn location to that
 			else
-				_prefs.SaveStats (PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), _evo.blood, _player.GetComponent<Health>().health);
+				_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0), _evo.blood, _player.GetComponent<Health>().health);
 		}
 		//else, set their health to max and remove their blood, set location to prefs location
 		else
 		{
-			_prefs.SaveStats (PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"), 0, _player.GetComponent<Health>().maxHealth);
+			_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"),0), 0, _player.GetComponent<Health>().maxHealth);
 		}
-		Application.LoadLevel(Application.loadedLevel);
+
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 }

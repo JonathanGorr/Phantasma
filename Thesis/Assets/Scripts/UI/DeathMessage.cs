@@ -9,7 +9,7 @@ public class DeathMessage : MonoBehaviour {
 	public float delay = 3f;
 	private LevelManager _manager;
 
-	void Awake()
+	void Start()
 	{
 		_health = GameObject.Find("_Player").GetComponent<Health>();
 		_manager = GetComponent<LevelManager> ();
@@ -33,7 +33,7 @@ public class DeathMessage : MonoBehaviour {
 
 	public IEnumerator Restart()
 	{
-		Camera.main.GetComponent<Camera2DFollow> ().enabled = false;
+		Camera.main.GetComponent<CameraController>().enabled = false;
 		deathMessage.SetActive (true);
 		yield return new WaitForSeconds(delay);
 		deathMessage.SetActive (false);

@@ -1,8 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2008
 
-Project("{85210CA5-7B5B-2982-CA05-FE6F9EFFDB41}") = "Thesis", "Assembly-CSharp-firstpass.csproj", "{139C9E39-A4F7-7572-0A26-5C79D9A4F105}"
-EndProject
 Project("{85210CA5-7B5B-2982-CA05-FE6F9EFFDB41}") = "Thesis", "Assembly-CSharp.csproj", "{2A924A7C-E451-ED1A-4566-45E45C19CFEC}"
 EndProject
 Project("{85210CA5-7B5B-2982-CA05-FE6F9EFFDB41}") = "Thesis", "Assembly-CSharp-Editor.csproj", "{63ADABFA-9F14-6FEA-79D4-CDB853DBF49F}"
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{139C9E39-A4F7-7572-0A26-5C79D9A4F105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{139C9E39-A4F7-7572-0A26-5C79D9A4F105}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{139C9E39-A4F7-7572-0A26-5C79D9A4F105}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{139C9E39-A4F7-7572-0A26-5C79D9A4F105}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A924A7C-E451-ED1A-4566-45E45C19CFEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A924A7C-E451-ED1A-4566-45E45C19CFEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A924A7C-E451-ED1A-4566-45E45C19CFEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,5 +41,4 @@ Global
 		$3.inheritsScope = text/plain
 		$3.scope = text/plain
 	EndGlobalSection
-
 EndGlobal

@@ -3,24 +3,24 @@ using System.Collections;
 
 public class BossFight : MonoBehaviour {
 
-	private GameObject _bossHealthBar;
+	private BossHealthBar _bossHealthBar;
 	private GameObject _victoryScreen;
 	private MusicFader _mFader;
 
 	void Awake()
 	{
 		_mFader = GameObject.Find ("Music").GetComponent<MusicFader>();
-		_bossHealthBar = GameObject.Find ("BossHealthBar");
-		_bossHealthBar.SetActive (false);
+		_bossHealthBar = GameObject.Find("_LevelManager").transform.Find("UI/BossHealthBar").GetComponent<BossHealthBar>();
+		_bossHealthBar.gameObject.SetActive (false);
 	}
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if(other.tag == "Player")
 		{
-			_mFader.Fade(_mFader.bossTheme);
-			_bossHealthBar.SetActive(true);
-			_bossHealthBar.GetComponent<BossHealthBar>().bossFight = true;
+			_mFader.FadeTo(_mFader.bossTheme);
+			_bossHealthBar.gameObject.SetActive(true);
+			_bossHealthBar.bossFight = true;
 		}
 	}
 
@@ -28,9 +28,9 @@ public class BossFight : MonoBehaviour {
 	{
 		if(other.tag == "Player")
 		{
-			_mFader.Fade(_mFader.forestTheme);
-			_bossHealthBar.SetActive(false);
-			_bossHealthBar.GetComponent<BossHealthBar>().bossFight = false;
+			_mFader.FadeTo(_mFader.forestTheme);
+			_bossHealthBar.gameObject.SetActive(false);
+			_bossHealthBar.bossFight = false;
 		}
 	}
 }

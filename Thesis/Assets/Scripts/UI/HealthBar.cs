@@ -9,24 +9,20 @@ public class HealthBar : MonoBehaviour {
 	private Health _health;
 	private bool inMenu;
 
-	// Use this for initialization
-	void Awake() {
-		_health = GameObject.Find ("_Player").GetComponent<Health> ();
+	void Start()
+	{
+		_health = GameObject.Find("_Player").GetComponent<Health> ();
 		_healthBar = GameObject.Find ("HealthBar");
 		_slider = _healthBar.GetComponent<Slider> ();
 		_slider.minValue = 0;
 		inMenu = GameObject.Find ("_LevelManager").GetComponent<LevelManager>().inMenu;
 
-		if(inMenu)
-		{
-			_healthBar.SetActive(false);
-		}
-		else
-			_healthBar.SetActive(true);
+		_healthBar.SetActive(!inMenu);
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () 
+	{
 		_slider.maxValue = _health.maxHealth;
 		_slider.value = _health.health;
 	}

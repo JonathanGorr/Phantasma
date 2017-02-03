@@ -21,15 +21,14 @@ public class BossHealthBar : MonoBehaviour {
 	private Animator _gameOver;
 	
 	// Use this for initialization
-	void Awake() {
+	void Start() {
+		_manager = GetComponentInParent<LevelManager>();
+		if(_manager.inMenu || _manager.inInitialize) return;
 
 		//health
 		boss = GameObject.Find ("Boss");
+		_health = boss.GetComponent<Health>();
 
-		if(boss)
-			_health = boss.GetComponent<Health>();
-
-		_manager = GetComponentInParent<LevelManager>();
 		_input = GetComponentInParent<PlayerInput> ();
 		_prefs = GetComponentInParent<PlayerPreferences>();
 		_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
@@ -50,6 +49,7 @@ public class BossHealthBar : MonoBehaviour {
 	
 	void FixedUpdate()
 	{
+		if(!_slider || !_health) return;
 		_slider.maxValue = _health.maxHealth;
 		_slider.value = _health.health;
 

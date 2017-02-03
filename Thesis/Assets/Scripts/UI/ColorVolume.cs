@@ -5,7 +5,7 @@ public class ColorVolume : MonoBehaviour {
 
 	private DayNightSystem _cycle;
 
-	void Awake()
+	void Start()
 	{
 		_cycle = GameObject.Find ("_LevelManager").GetComponent<DayNightSystem>();
 	}

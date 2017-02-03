@@ -1,85 +1,95 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
+/// <summary>
+/// Music fader.
+/// bg_music Plays a constant background song
+/// event_music fades in a different dialog or event-specific, temporary theme to be later faded out
+/// </summary>
 
 public class MusicFader : MonoBehaviour {
 
-	private float fadeSpeed = 0f;
-	public float transitionSpeed = 2f, safeDistance = 6f;
-	
-	private AudioClip track1, track2;
+	[Tooltip("Press J to start transition")] public bool debug;
 
-	public AudioClip
-		menuTheme,
-		forestTheme,
-		battleTheme,
-		motherTheme,
-		fatherTheme,
-		victoryTheme,
-		bossTheme;
+	[Header("Audio Sources")]
+	public AudioSource bg_Music;
+	public AudioSource event_Music;
+
+	[Header("Settings")]
+	public bool resetEventMusicOnTransitionEnd = false;
+	public float fadeSpeed = 1;
+	bool done = false;
+	bool transitioning = false;
+	float t = 0;
+
+	[Header("Themes")]
+	public AudioClip menuTheme;
+	public AudioClip forestTheme;
+	public AudioClip battleTheme;
+	public AudioClip motherTheme;
+	public AudioClip fatherTheme;
+	public AudioClip victoryTheme;
+	public AudioClip bossTheme;
 
 	void Awake()
 	{
-		if(Application.loadedLevelName == "Menu")
-			track1 = menuTheme;
-		else
-			track1 = forestTheme;
-
-		GetComponent<AudioSource>().clip = track1;
-		GetComponent<AudioSource>().Play();
+		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
 
-	public void Fade(AudioClip music)
+	void Update()
 	{
-		track2 = music;
-		FadeOut ();
-	}
-
-	public void CheckIfSafe()
-	{
-		/*
-		GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-		
-		foreach(GameObject enemy in enemies)
+		if(debug)
 		{
-			float distance = Vector3.Distance(enemy.transform.position, player.position);
-
-			if(distance < safeDistance)
-				Fade(forestTheme);
-		}
-		*/
-	}
-
-	void FixedUpdate()
-	{
-		// Update the fade.
-		if (fadeSpeed < 0)
-		{
-			GetComponent<AudioSource>().volume = Mathf.Max(GetComponent<AudioSource>().volume + fadeSpeed * Time.fixedDeltaTime * transitionSpeed, 0);
-			// Done fading out.
-			if(GetComponent<AudioSource>().volume == 0)
+			if(Input.GetKeyDown(KeyCode.J))
 			{
-				GetComponent<AudioSource>().clip = track2;
-				GetComponent<AudioSource>().Play();
-				FadeIn();
+				FadeTo(battleTheme);
 			}
 		}
-		else if (fadeSpeed > 0)
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		if(bg_Music.isPlaying) 
+		bg_Music.Stop();
+
+		switch(scene.name)
 		{
-			GetComponent<AudioSource>().volume = Mathf.Min(GetComponent<AudioSource>().volume + fadeSpeed * Time.deltaTime * transitionSpeed, 0.5f);
-			// Done fading in.
-			if(GetComponent<AudioSource>().volume == 0.5f)
-				fadeSpeed = 0;
+		case "Menu":
+		bg_Music.clip = menuTheme;
+		break;
+		case "Start":
+		bg_Music.clip = forestTheme;
+		break;
 		}
+
+		bg_Music.Play();
 	}
-	
-	void FadeIn(){
-		if (GetComponent<AudioSource>().volume < 0.5f)
-			fadeSpeed = 1;
+
+	public void FadeTo(AudioClip music)
+	{
+		if(event_Music.clip != music) event_Music.clip = music;
+		if(!event_Music.isPlaying) event_Music.Play();
+		if(transitioning) StopCoroutine("CrossFade");
+		StartCoroutine("CrossFade");
 	}
-	
-	void FadeOut(){
-		if(GetComponent<AudioSource>().volume > 0)
-			fadeSpeed = -1;
+
+	IEnumerator CrossFade()
+	{
+		transitioning = true;
+		done = !done; //toggle
+		while((done && t < 1) || (!done && t > 0)) //while not 1...
+		{
+			t += (done ? Time.deltaTime : -Time.deltaTime) * fadeSpeed; //add time to 1
+
+			bg_Music.volume = 1f - t;
+			event_Music.volume = t;
+
+			yield return null;
+		}
+		t = Mathf.Clamp(t, 0, 1);
+		if(!done && resetEventMusicOnTransitionEnd) event_Music.Stop();
+		transitioning = false;
 	}
 }
 

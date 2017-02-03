@@ -5,30 +5,29 @@ using UnityEngine.UI;
 //require audiosource to play sound
 //[RequireComponent(typeof (AudioSource))]
 
-public class ConversationManager : Singleton<ConversationManager> {
-    protected ConversationManager() { } // guarantee this will be always a singleton only - can't use the constructor!
+public class ConversationManager : MonoBehaviour {
 
     //Is there a converastion going on
 	[HideInInspector]
     public bool talking;
 
-    //The current line of text being displayed
-    ConversationEntry currentConversationLine;
-
 	//the dialog object
 	[SerializeField, HideInInspector]
 	public GameObject _DialogBox;
 	private MusicFader _fader;
-	private Text _dialog;
-	private Text _name;
-	private Image _portrait;
 	private AudioClip _sound;
 	private AudioClip _bgMusic;
 	private float conversationSpeed = .1f;
 	private bool submit;
 	private PlayerInput _input;
 
-	void Awake()
+	[Header("UI References")]
+	public CanvasGroup _dialogBoxCG;
+	public Text _dialog;
+	public Text _name;
+	public Image _portrait;
+
+	void Start()
 	{
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
 		_DialogBox = GameObject.Find ("Dialog");
@@ -36,37 +35,9 @@ public class ConversationManager : Singleton<ConversationManager> {
 
 		if(_DialogBox)
 		{
-			_dialog = GameObject.Find("DialogText").GetComponent<Text>();
-			_name = GameObject.Find ("CharacterName").GetComponent<Text>();
-			_portrait = GameObject.Find("SpeakerPortrait").GetComponent<Image>();
-
 			//these should be blank if no conversation exists
 			_dialog.text = null;
 			_name.text = null;
-		}
-	}
-
-	void Update()
-	{
-		if(_dialog)
-		{
-			//toggle dialog on conversation
-			if(talking)
-			{
-				//assign current string of dialog to screen
-				_dialog.text = currentConversationLine.ConversationText;
-				_name.text = currentConversationLine.SpeakingCharacterName;
-				_portrait.sprite = currentConversationLine.DisplayPic;
-				_sound = currentConversationLine.sentenceSound;
-			}
-
-			//hide if not talking
-			else
-			{
-				_dialog.text = null;
-				_name.text = null;
-				_DialogBox.SetActive (false);
-			}
 		}
 	}
 
@@ -80,7 +51,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 		if(_fader)
 		{
 			//fade in
-			_fader.Fade(music);
+			_fader.FadeTo(music);
 
 			//loop in here until finished talking,
 			while(talking)
@@ -88,7 +59,7 @@ public class ConversationManager : Singleton<ConversationManager> {
 				yield return null;
 			}
 			//fade out
-			_fader.Fade(_fader.forestTheme);
+			_fader.FadeTo(_fader.forestTheme);
 		}
 	}
 
@@ -104,7 +75,6 @@ public class ConversationManager : Singleton<ConversationManager> {
         //Start displaying the supplied conversation
         if (!talking)
         {
-			_DialogBox.SetActive (true);
             StartCoroutine(DisplayConversation(conversation));
         }
     }
@@ -118,15 +88,26 @@ public class ConversationManager : Singleton<ConversationManager> {
 
     IEnumerator DisplayConversation(Conversation conversation)
     {
+		_dialogBoxCG.alpha = 1;
         talking = true;
         foreach (var conversationLine in conversation.ConversationLines)
         {
-            currentConversationLine = conversationLine;
+			//assign current string of dialog to screen
+			_dialog.text = conversationLine.ConversationText;
+			_name.text = conversationLine.SpeakingCharacterName;
+			_portrait.sprite = conversationLine.DisplayPic;
+			_sound = conversationLine.sentenceSound;
+
 			StartCoroutine(PlaySound(_sound));
 			//wait for button press to resume
 			yield return StartCoroutine(WaitForButton());
 			yield return new WaitForSeconds(conversationSpeed);
         }
+
+		_dialogBoxCG.alpha = 0;
+		_dialog.text = null;
+		_name.text = null;
+
         talking = false;
         yield return null;
     }

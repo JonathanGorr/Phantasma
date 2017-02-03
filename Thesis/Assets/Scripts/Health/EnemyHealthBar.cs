@@ -47,8 +47,7 @@ public class EnemyHealthBar : MonoBehaviour {
 	void OnGUI()
 	{
 		//shrink the healthbar relative to damage
-		var percent = ((double)_health.health /
-		               (double)_health.maxHealth);
+		var percent = ((double)_health.health / (double)_health.maxHealth);
 
 		//draw the textures
 		GUI.DrawTexture (new Rect (left, top, barWidth * scale, barHeight * scale), backgroundTexture);

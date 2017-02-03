@@ -7,7 +7,7 @@ public class MotherMet : MonoBehaviour {
 	private Transform _target;
 	public float convoDistance = 2;
 
-	void Awake()
+	void Start()
 	{
 		_target = GameObject.Find ("_Player").transform;
 		_prefs = GameObject.Find("_LevelManager").GetComponent<PlayerPreferences>();

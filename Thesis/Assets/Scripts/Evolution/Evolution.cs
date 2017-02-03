@@ -80,8 +80,7 @@ public class Evolution : MonoBehaviour {
 	{
 		_evoMenu = GameObject.Find ("EvolutionMenu");
 		_manager = GetComponent<LevelManager>();
-		if(!_manager.inMenu)
-			bloodCounter = GameObject.Find("BloodCounter").GetComponent<Text>();
+		if(!_manager.inMenu && !_manager.inInitialize) bloodCounter = GameObject.Find("BloodCounter").GetComponent<Text>();
 	}
 
 	void FixedUpdate()

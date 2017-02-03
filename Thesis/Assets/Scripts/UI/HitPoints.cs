@@ -5,46 +5,33 @@ using System.Linq;
 
 public class HitPoints : MonoBehaviour {
 
-	//the next position to instantiate a point prefab(at the next harmed entity)
-	private Vector2 nextPosition;
-
 	//change the UI canvas transform
 	public Canvas prefab;
-
 	//access the UI text component
 	public Text text;
-
 	//assign colors
-	public Color red = new Color (1, 0, 0);
-	public Color green = new Color (0, 1, 0);
-
-	//how much damage to print
-	private float damage;
+	public Color damageColor = new Color (1, 0, 0);
+	public Color healColor = new Color (0, 1, 0);
 
 	//offset points from entity center
 	public Vector3 offset = new Vector3(0f, 1.5f, 0f);
 	
-	private Vector2 random;
+	Vector3 RandomSpawn() //returns a random spawn location
+	{
+	 	return new Vector3(Random.Range(-0.6f,0.6f), 0, 0);
+	}
 
 	public void TakeDamage(int value)
 	{
-		//pick a new location
-		random = new Vector2(Random.Range(-0.6f,0.6f), 0);
-
-		nextPosition = transform.position + offset;
-		text.color = Color.red;
+		text.color = damageColor;
 		text.text = "-" + value.ToString();
-		Instantiate(prefab, nextPosition + random, transform.rotation);
+		Instantiate(prefab, transform.position + offset + RandomSpawn(), transform.rotation);
 	}
 
 	public void Heal(int value)
 	{
-		//pick a new location
-		random = new Vector2(Random.Range(-0.6f,0.6f), 0);
-
-		nextPosition = transform.position + offset;
-		text.color = Color.green;
+		text.color = healColor;
 		text.text = "+" + value.ToString();
-		Instantiate(prefab, nextPosition + random, transform.rotation);
+		Instantiate(prefab, transform.position + offset + RandomSpawn(), transform.rotation);
 	}
 }

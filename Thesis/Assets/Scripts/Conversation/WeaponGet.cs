@@ -3,7 +3,7 @@ using System.Collections;
 
 public class WeaponGet : MonoBehaviour {
 
-	private WeaponSwitcher _switcher;
+		private WeaponController _switcher;
 	private FollowEntity _spirit;
 	private PlayerPreferences _prefs;
 	private Transform _target;
@@ -11,9 +11,9 @@ public class WeaponGet : MonoBehaviour {
 	private bool done;
 
 	// Use this for initialization
-	void Awake () {
+	void Start () {
 		_target = GameObject.Find ("_Player").transform;
-		_switcher = GameObject.Find ("_LevelManager").GetComponent<WeaponSwitcher>();
+		_switcher = GameObject.Find ("_LevelManager").GetComponent<WeaponController>();
 		_spirit = GameObject.Find ("Father").GetComponent<FollowEntity>();
 		_prefs = GameObject.Find("_LevelManager").GetComponent<PlayerPreferences>();
 	}
