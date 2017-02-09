@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BloodConverter : MonoBehaviour {
+public class BloodConverter : WaitForPlayer {
 
 	private Health _health;
 	private Evolution _evo;
@@ -9,15 +9,20 @@ public class BloodConverter : MonoBehaviour {
 	public AudioClip _healClip;
 	private PlayerInput _input;
 
-	void Start()
+	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
-		_health = GameObject.Find("_Player").GetComponent<Health>();
 		_evo = GameObject.Find("_LevelManager").GetComponent<Evolution>();
 		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
+
+		while(_manager.Player == null) yield return null;
+
+		_health = _manager.Player.GetComponent<Health>();
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
+		if(!_health) return;
+
 		//if health is not max, and we have at least 1 blood, convert
 		if(_health.health < _health.maxHealth && _evo.blood > 0)
 		{

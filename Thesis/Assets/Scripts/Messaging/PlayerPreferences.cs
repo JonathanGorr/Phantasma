@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class PlayerPreferences : MonoBehaviour {
+public class PlayerPreferences : WaitForPlayer {
 
 	public class Checkpoint
 	{
@@ -11,14 +11,10 @@ public class PlayerPreferences : MonoBehaviour {
 		public GameObject checkpoint;
 	}
 
-	private Player _player;
-	private Evolution _evo;
-	private Health _health;
-	private LevelManager _manager;
+	public Evolution _evo;
 	private FollowEntity _skull;
 	public GameObject[] dialog;
 	public GameObject[] checkpoints;
-	public Transform _spawn;
 	private GameObject _motherTalkBlock;
 
 	public bool
@@ -30,41 +26,73 @@ public class PlayerPreferences : MonoBehaviour {
 		bowLesson,
 		puzzle;
 
-	void Start()
+	private Player _player;
+	public Player Player
 	{
-		_manager = GetComponent<LevelManager>();
-
-		if(_manager.inMenu) return;
-		if(_manager.inInitialize) return;
-
-		//assign all the loaded variables saved in prefs
-		_player = GameObject.Find("_Player").GetComponent<Player>();
-		_spawn = GameObject.FindWithTag("Respawn").transform;
-		_evo = GameObject.Find("_LevelManager").GetComponent<Evolution>();
-		_skull = GameObject.Find("Father").GetComponent<FollowEntity>();
-		_health = _player.GetComponent<Health>();
-		_motherTalkBlock = GameObject.Find("MomTalkBlock");
-
-		//update story after all references gathered
-		UpdateStory();
-		  
-		//blood
-		_evo.blood = PlayerPrefs.GetInt("Blood");
-
-		//if a game has been created, load health
-		if(PlayerPrefs.GetInt("GameCreated") == 1)
+		get
 		{
-			//location
-			_player.transform.position = new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0);
-			_health.health = PlayerPrefs.GetInt("Health");
+			if(!_player)
+			{
+				if(_manager.Player)
+				{
+					_player = _manager.Player;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			return _player;
 		}
-		//else if a new game has just been created, set health to max
-		else
+	}
+	private Transform _spawn;
+	public Transform spawn
+	{
+		get 
+		{ 
+		if(!_spawn) _spawn = GameObject.FindWithTag("Respawn").transform;
+			return _spawn;
+		}
+	}
+
+	public override IEnumerator Initialize(Scene scene)
+	{
+		//wait for the levelmanager to create a player for me
+		while(Player == null) yield return null;
+
+		if(scene.name == "Initialize")
 		{
-			_health.health = _health.maxHealth;
-			//location
-			_player.transform.position = _spawn.position;
-			GameCreated();
+			
+		}
+		if(scene.name == "Menu")
+		{
+			//assign all the loaded variables saved in prefs
+			_evo = _manager.GetComponent<Evolution>();
+		}
+		else if(scene.name == "Start")
+		{
+			_motherTalkBlock = GameObject.Find("MomTalkBlock");
+			_skull = GameObject.Find("Father").GetComponent<FollowEntity>();
+			_evo.blood = PlayerPrefs.GetInt("Blood");
+
+			//update story after all references gathered
+			UpdateStory();
+
+			//if a game has been created, load health
+			if(PlayerPrefs.GetInt("GameCreated") == 1 && PlayerPrefs.GetFloat("PlayerX")!= 0)
+			{
+				print("game already created");
+				//location
+				Player.transform.position = new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0);
+				Player._health.health = PlayerPrefs.GetInt("Health");
+			}
+			//else if a new game has just been created, set health to max
+			else
+			{
+				Player._health.health = Player._health.maxHealth;
+				Player.transform.position = spawn.position;
+				GameCreated();
+			}
 		}
 	}
 
@@ -76,7 +104,8 @@ public class PlayerPreferences : MonoBehaviour {
 	//If the player talks to the father, the mother object is destroyed
 	public void UpdateStory()
 	{
-		if(_manager.inMenu) return;
+		return;
+		if(currentSceneName != "Start") return;
 
 		//wheres mom dialog and checkpoint
 		dialog[3].SetActive(false);
@@ -170,15 +199,15 @@ public class PlayerPreferences : MonoBehaviour {
 
 	void Update()
 	{
-		if(_manager.inMenu) return;
-		if(_manager.inInitialize) return;
+		if(currentSceneName != "Start") return;
+		if(!Player) return;
 
-		if(_player)
+		if(Player)
 		{
 			if(Input.GetKeyDown(KeyCode.O))
 			{
 				print("Data Saved.");
-				SaveStats(_player.transform.position, _evo.blood, _health.health);
+				SaveStats(Player.transform.position, _evo.blood, Player._health.health);
 			}
 			else if(Input.GetKeyDown(KeyCode.P)) 
 			{
@@ -190,8 +219,11 @@ public class PlayerPreferences : MonoBehaviour {
 
 	void OnApplicationQuit()
 	{
-		if(_manager.inMenu || _manager.inInitialize) return;
-		 	SaveStats(_player.transform.position, _evo.blood, _player._health.health);
+		if(currentSceneName != "Start") return;
+		if(Player)
+		{
+			SaveStats(Player.transform.position, _evo.blood, Player._health.health);
+		}
 	}
 
 	public void SaveStats(Vector3 pos, int blood, int health)

@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BossHealthBar : MonoBehaviour {
-	
+
+	private LevelManager _manager;
 	private Slider _slider;
 	private GameObject boss;
 	private Health _health;
-	private bool inMenu;
 	private GameObject _victoryScreen;
-	private LevelManager _manager;
 	private PlayerPreferences _prefs;
 	private PlayerInput _input;
 	
@@ -19,32 +19,37 @@ public class BossHealthBar : MonoBehaviour {
 	
 	private Animator _victoryAnim;
 	private Animator _gameOver;
-	
-	// Use this for initialization
-	void Start() {
-		_manager = GetComponentInParent<LevelManager>();
-		if(_manager.inMenu || _manager.inInitialize) return;
 
-		//health
-		boss = GameObject.Find ("Boss");
-		_health = boss.GetComponent<Health>();
+	void Awake()
+	{
+		SceneManager.sceneLoaded += OnSceneLoaded;
+	}
 
-		_input = GetComponentInParent<PlayerInput> ();
-		_prefs = GetComponentInParent<PlayerPreferences>();
-		_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
-		//victory Screen
-		_victoryScreen = GameObject.Find("VictoryScreen");
-		_victoryAnim = _victoryScreen.GetComponent<Animator>();
-		//bar
-		_slider = GetComponent<Slider> ();
-		_slider.minValue = 0;
-		//in menu?
-		inMenu = GameObject.Find ("_LevelManager").GetComponent<LevelManager>().inMenu;
-		
-		if (inMenu)
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
+
+		if(scene.name == "Menu")
+		{
 			gameObject.SetActive (false);
-
-		_gameOver.SetInteger("AnimState", 0);
+		}
+		else if(scene.name == "Start")
+		{
+			//health
+			boss = GameObject.Find ("Boss");
+			_health = boss.GetComponent<Health>();
+			_input = GetComponentInParent<PlayerInput> ();
+			_prefs = GetComponentInParent<PlayerPreferences>();
+			_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
+			//victory Screen
+			_victoryScreen = GameObject.Find("VictoryScreen");
+			_victoryAnim = _victoryScreen.GetComponent<Animator>();
+			//bar
+			_slider = GetComponent<Slider> ();
+			_slider.minValue = 0;
+			gameObject.SetActive (true);
+			_gameOver.SetInteger("AnimState", 0);
+		}
 	}
 	
 	void FixedUpdate()

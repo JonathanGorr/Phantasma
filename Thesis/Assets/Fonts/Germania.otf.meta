@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 30aa1cf347b6b184b8c7382848490ee2
+timeCreated: 1486261339
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Germania
+  fontNames:
+  - Germania
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

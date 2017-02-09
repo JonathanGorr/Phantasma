@@ -7,167 +7,156 @@ public class LevelManager : MonoBehaviour {
 
 	[HideInInspector]
 	public bool paused = false;
-	public int bloodCount;
-	public float timeLeft = 30f;
-	public bool exhibition;
 
-	[HideInInspector] public bool inMenu = false, inInitialize = true, canTransition;
-
-	public GameObject _pauseScreen;
-	public GameObject  _controlScreen;
-	public GameObject  _hud;
-	public GameObject  _dialog;
-	private GameObject restartButton;
+	[HideInInspector] public bool canTransition;
+	private string currentSceneName;
 
 	//components
-	private Health _player;
-	private Fading _fader;
-	private PlayerPreferences _prefs;
-	private Evolution _evo;
-	private Animator cameraAnim;
-	private PlayerInput _input;
+	private Multiplayer.Avatar avatar;
+	public Fading _fader;
+	public Multiplayer _mp;
+	public PlayerPreferences _prefs;
+	public Evolution _evo;
+	public PlayerInput _input;
+	public UI ui;
+	public EventSystem es;
+	public SFX _sfx;
+
+	public delegate void OnPause();
+	public static event OnPause pause;
+	public delegate void UnPause();
+	public static event UnPause unPause;
 
 	[HideInInspector]
 	private bool controlOn;
 
-	private GameObject eventSystem;
-	private EventSystem es;
-
-	void Start()
+	public Multiplayer.Avatar Avatar
 	{
-		DontDestroyOnLoad(this.gameObject);
-		SceneManager.sceneLoaded += OnSceneLoaded;
-		Application.targetFrameRate = 60;
-		AudioListener.volume = 1f;
+		get
+		{
+			if(avatar == null)
+			{
+				avatar = _mp.CreatePlayer();
+			}
+			return avatar;
+		}
+	}
 
-		_fader = GetComponent<Fading>();
-		_input = GetComponent<PlayerInput> ();
-		cameraAnim = Camera.main.GetComponent<Animator> ();
-		_prefs = GetComponent<PlayerPreferences>();
-		_evo = GetComponent<Evolution>();
-		cameraAnim = Camera.main.GetComponent<Animator> ();
-		_prefs = GetComponent<PlayerPreferences>();
-		_evo = GetComponent<Evolution>();
-		_player = GameObject.Find("_Player").GetComponent<Health>();
-		eventSystem = GameObject.Find ("EventSystem");
-		restartButton = GameObject.Find ("RestartButton");
-		_hud.SetActive(false);
-		//turn them off if existing
-		_pauseScreen.SetActive (false);
-		_controlScreen.SetActive (false);
+	public Player Player
+	{
+		get
+		{
+			return Avatar.Player;
+		}
+	}
+
+	void Awake()
+	{
+		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
-		if(scene.name == "Menu")
+		Application.targetFrameRate = 60;
+		currentSceneName = scene.name;
+
+		if(scene.name == "Initialize")
 		{
-			inMenu = true;
-			inInitialize = false;
-			Cursor.visible = true;
-		}
-		else if(scene.name == "Initialize")
-		{
-			inInitialize = true;
-			inMenu = false;
 			Cursor.visible = false;
+		}
+		else if(scene.name == "Menu")
+		{
+			Cursor.visible = true;
 		}
 		else
 		{
 			_fader.BeginFade (-1);
-			inInitialize = false;
-			inMenu = false;
 			Cursor.visible = false;
-			_hud.SetActive(true);
 		}
 	}
 
 	void Update()
 	{
-		if(inMenu) return;
-		if(inInitialize) return;
+		if(currentSceneName != "Start") return;
 
-		if(exhibition)
+		if(paused)
 		{
-			if (!_input._anyKeyDown)
-				timeLeft -= Time.deltaTime; 
-			else
-				timeLeft = 30;
-
-			//return to menu if x seconds passed
-			if (timeLeft <= 0)
-				ReturnToMenu ();
-		}
-
-		if(!_player.dead)
-		{
-			if(!inMenu)
+			if(_input._roll)
 			{
-				//pause
-				if(paused)
-				{
-					//toggle
-					paused = !paused;
-
-					if(paused)
-					{
-						Pause();
-					}
-					else
-					{
-						Resume();
-					}
-				}
-				//cannot open control menu when paused
-				else
-				{
-					//control
-					if(Input.GetButtonDown("360_BackButton") && !inMenu)
-					{
-						//toggle
-						controlOn = !controlOn;
-
-						if(controlOn)
-						{
-							_controlScreen.SetActive (true);
-						}
-						else
-						{
-							_controlScreen.SetActive (false);
-						}
-
-						_controlScreen.SetActive (controlOn);
-					}
-				}
+				Resume();
 			}
+		}
+		//pause
+		if(_input._pause)
+		{
+			//toggle
+			paused = !paused;
 
-			//else if in menu
-			else if(_input._anyKeyDown) cameraAnim.SetTrigger("Skip");
+			if(paused)
+			{
+				Pause();
+			}
+			else
+			{
+				Resume();
+			}
+		}
+		//cannot open control menu when paused
+		else if(_input._select)
+		{
+			//toggle
+			controlOn = !controlOn;
+
+			if(controlOn)
+			{
+				ui.Reveal(ui._controlScreen);
+			}
+			else
+			{
+				ui.Hide(ui._controlScreen);
+			}
 		}
 	}
 
-	private void Pause()
+	public void Pause()
 	{
-		//actually pause the game
-		AudioListener.volume = .1f;
-		_pauseScreen.SetActive (true);
-		//set this button as the active selection
-		eventSystem.GetComponent<EventSystem>().SetSelectedGameObject(restartButton);
-		Cursor.visible = true;
-		Time.timeScale = 0;
+		StartCoroutine(IEPause());
 	}
-	
+	private IEnumerator IEPause()
+	{
+		yield return new WaitForEndOfFrame();
+		if(pause != null) pause();
+		ui.ClearUpdates();
+		if(controlOn) UI.TurnOff(ui._controlScreen);
+		ui.Reveal(ui._pauseScreen);
+		//set this button as the active selection
+		if(!_input._controller) Cursor.visible = true;
+		paused = true;
+
+		//play sound then wait until sound finished to set volume
+		_sfx.PlayUI("pause");
+		while(_sfx.asrc.isPlaying) 
+		{
+			yield return null;
+		}
+		AudioListener.volume = .25f;
+	}
 	public void Resume()
 	{
-		//resume if not paused
-		AudioListener.volume = 1f;
-		_pauseScreen.SetActive (false);
-		Time.timeScale = 1;
-		Cursor.visible = false;
+		StartCoroutine(IEResume());
 	}
-
-	public void AddBlood(int blood)
+	public IEnumerator IEResume()
 	{
-		bloodCount += blood;
+		yield return new WaitForEndOfFrame();
+		if(unPause != null) unPause();
+		//resume if not paused
+		_sfx.PlayUI("pause");
+		AudioListener.volume = 1f;
+		if(controlOn)UI.TurnOn(ui._controlScreen);
+		ui.Hide(ui._pauseScreen);
+		if(!_input._controller) Cursor.visible = false;
+		paused = false;
+		yield return null;
 	}
 
 	public void StartNewGame ()
@@ -198,7 +187,7 @@ public class LevelManager : MonoBehaviour {
 	public IEnumerator NewGame()
 	{
 		Time.timeScale = 1;
-		//load level
+		_prefs.EraseAll();
 		paused = false;
 		float fadeTime = GetComponent<Fading> ().BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
@@ -212,8 +201,7 @@ public class LevelManager : MonoBehaviour {
 		paused = false;
 		float fadeTime = _fader.BeginFade (1);
 		yield return new WaitForSeconds (fadeTime);
-		if(_prefs != null)
-			_prefs.SaveStats (_player.transform.position, _evo.blood, _player.GetComponent<Health>().health);
+		if(_prefs != null) _prefs.SaveStats (Player.transform.position, _evo.blood, Player.GetComponent<Health>().health);
 		SceneManager.LoadScene(0);
 	}
 
@@ -245,19 +233,19 @@ public class LevelManager : MonoBehaviour {
 		yield return new WaitForSeconds (fadeTime);
 
 		//player is not dead, set position to last checkpoint
-		if(_prefs && !_player.dead)
+		if(_prefs && !Player._health.dead)
 		{
 			//if a checkpoint was never met, set respawn to respawn
 			if(PlayerPrefs.GetFloat("playerX") == 0 && PlayerPrefs.GetFloat("playerY") == 0)
-				_prefs.SaveStats(_prefs._spawn.position, _evo.blood, _player.GetComponent<Health>().health);
+				_prefs.SaveStats(_prefs.spawn.position, _evo.blood, Player.GetComponent<Health>().health);
 				//else if a checkpoint was hit, set the respawn location to that
 			else
-				_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0), _evo.blood, _player.GetComponent<Health>().health);
+				_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0), _evo.blood, Player.GetComponent<Health>().health);
 		}
 		//else, set their health to max and remove their blood, set location to prefs location
 		else
 		{
-			_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"),0), 0, _player.GetComponent<Health>().maxHealth);
+			_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"),0), 0, Player.GetComponent<Health>().maxHealth);
 		}
 
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);

@@ -41,31 +41,44 @@ public class Player : Entity
 	public float jumpDelay = 0.3f;
 	public float blockAttackDelay = 0.5f;
 
-	//combocounter
-	private int comboPoints = 0;
+	[Header("Stamina")]
+	public float maxStamina = 10f;
+	[SerializeField] private float stamina;
+
+	[Header("Combo Counter")]
 	public float timeLeft;
+	[SerializeField] private int comboPoints = 0;
 
 	//flashing
 	private Flash _flash;
+	[Header("Flash")]
 	public int flashes = 6;
 	public float flashDuration = 0.05f;
 	public bool disable;
 	private SpriteRenderer[] _sprites;
+
+	LevelManager Manager
+	{
+		get {
+			if(!_manager) _manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
+			return _manager;
+		}
+	}
 	
 	void Start()
 	{
+		stamina = maxStamina;
 		//delegate initialization
 		SetSpeed(walkSpeed);
+		Manager.ui.UpdateHealthBar(_health.health, _health.maxHealth);
+		Manager.ui.UpdateStaminaBar(stamina, maxStamina);
 		
 		//import components
-		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-		_convoManager = _manager.GetComponentInChildren<ConversationManager>();
-		_input = _manager.GetComponent<PlayerInput> ();
+		_convoManager = Manager.GetComponentInChildren<ConversationManager>();
+		_input = Manager.GetComponent<PlayerInput> ();
 		_flash = GetComponent<Flash>();
 		_sprites = GetComponentsInChildren<SpriteRenderer>();
-		_sfx = _manager.GetComponent<SFX>();
-		_cam = Camera.main.GetComponent<CameraController>();
-		DontDestroyOnLoad(this.gameObject);
+		_sfx = Manager.GetComponent<SFX>();
 
 		_cam = Camera.main.GetComponent<CameraController>();
 		_cam.RegisterMe(myTransform);
@@ -81,6 +94,8 @@ public class Player : Entity
 
 	public override void OnHurt()
 	{
+		_manager.ui.UpdateHealthBar(_health.health, _health.maxHealth);
+
 		//knockback
 		if(!_input._blocking)
 		{
@@ -95,6 +110,8 @@ public class Player : Entity
 				_velocity.x = -Mathf.Sqrt(maxDistance);
 			}
 		}
+
+		_sfx.PlayFX("player_Hurt", myTransform.position);
 
 		//start the flashing when hurt
 		StartCoroutine(_flash.FlashSprites(_sprites, flashes, flashDuration, disable));
@@ -177,7 +194,6 @@ public class Player : Entity
 			
 			if( _controller.isGrounded)
 				_anim.SetInteger("AnimState", 1);
-
 		}
 
 		//else if pushing right on the keyboard...
@@ -213,6 +229,7 @@ public class Player : Entity
 		if(!_ready) return;
 		if(!_controller.isGrounded) return;
 		if(_convoManager.talking) return;
+		if(_manager.paused) return;
 
 		//if roll pressed and can roll...
 		if(_input._roll && _switcher.weapon.canRoll){ Roll(); }
@@ -232,7 +249,6 @@ public class Player : Entity
 
 	void Jump()
 	{
-		combatState = CombatState.Jumping;
 		//cannot jump for x seconds
 		StartCoroutine(Ready(jumpDelay));
 		_sfx.PlayFX("jump", myTransform.position);
@@ -247,6 +263,7 @@ public class Player : Entity
 
 	void Roll()
 	{
+		if(_switcher.IsWeapon(Weapons.Spear)) return;
 		if(combatState == CombatState.Blocking) return;
 
 		combatState = CombatState.Rolling;
@@ -273,6 +290,12 @@ public class Player : Entity
 		//if moving but not blocking, don't attack
 		if(Mathf.Abs(normalizedHorizontalSpeed) > .1f && combatState != CombatState.Blocking) return;
 
+		//TODO:
+		if(Mathf.Abs(normalizedHorizontalSpeed) > .8f && combatState != CombatState.Blocking)
+		{
+			//perform a sliding thrust if running at full speed!
+		}
+
 		if(combatState == CombatState.Blocking)
 		{
 			_anim.SetTrigger("BlockingAttack");
@@ -290,7 +313,6 @@ public class Player : Entity
 	void StrongAttack()
 	{
 		if(Mathf.Abs(normalizedHorizontalSpeed) > .1f && combatState != CombatState.Blocking) return;
-		if(_input._jump) return;
 
 		SetSpeed (blockSpeed);
 		_anim.SetTrigger("StrongAttack");
@@ -299,6 +321,8 @@ public class Player : Entity
 
 	void BackStep()
 	{
+		if(Mathf.Abs(normalizedHorizontalSpeed) > .1f) return;
+
 		combatState = CombatState.BackStepping;
 		//cannot roll for x seconds
 		StartCoroutine(Ready(backStepDelay));
@@ -324,7 +348,9 @@ public class Player : Entity
 		Movement();
 
 		//Falling
-		_anim.SetBool("Falling", !_controller.isGrounded && combatState != CombatState.Rolling && combatState != CombatState.BackStepping);
+		bool falling = !_controller.isGrounded && combatState != CombatState.Rolling && combatState != CombatState.BackStepping;
+		if(falling) combatState = CombatState.Jumping;
+		_anim.SetBool("Falling", falling);
 
 		//foot dust
 		if(_controller.isGrounded && Mathf.Abs(normalizedHorizontalSpeed) < 0.1f)

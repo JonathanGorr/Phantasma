@@ -9,12 +9,13 @@ public class Entity : MonoBehaviour {
 	///
 
 	[Header("Entity")]
+	public string title;
+	public string description;
+
 	public Transform myTransform;
 	public Animator _anim;
 	public ParticleSystem _footDust;
 	public CharacterController2D _controller;
-	public string entityName;//what is the name of the entity?
-	public string description; //some information to tell the player
 	public CombatState combatState;
 
 	[Header("Speeds")]

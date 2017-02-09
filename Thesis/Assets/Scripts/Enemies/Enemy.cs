@@ -17,9 +17,7 @@ public class Enemy : Entity {
 	public void DropBlood()
 	{
 		var pos = gameObject.transform.position;
-#pragma warning disable 0219
-		GameObject clone = Instantiate (deathInstance, new Vector3(pos.x + deathInstanceOffset.x, pos.y + deathInstanceOffset.y, 
-        				   pos.z), Quaternion.identity) as GameObject;
-#pragma warning restore 0219
+		Instantiate (deathInstance, new Vector3(pos.x + deathInstanceOffset.x, pos.y + deathInstanceOffset.y, 
+        				   pos.z), Quaternion.identity);
 	}
 }

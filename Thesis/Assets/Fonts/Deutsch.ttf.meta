@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 6d108d2d2dd4a094f896459e2981904f
+timeCreated: 1486260421
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Deutsch Gothic
+  fontNames:
+  - Deutsch Gothic
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

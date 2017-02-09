@@ -23,7 +23,8 @@ public class Checkpoint : MonoBehaviour {
 	public float distance = 2;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		_target = GameObject.Find ("_Player").transform;
 		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
 		_prefs = _manager.GetComponent<PlayerPreferences>();
@@ -32,15 +33,13 @@ public class Checkpoint : MonoBehaviour {
 		_playerHealth = _playerGO.GetComponent<Health>();
 
 		//if not in menu, find the checkpoint and its animated text
-		if(!_manager.inMenu)
-		{
-			_anim = GameObject.Find("CheckpointReached").GetComponent<Animator>();
-		}
+		_anim = GameObject.Find("CheckpointReached").GetComponent<Animator>();
 	}
 
 	//when the player enters the checkpoint, his location(checkpoint) is saved to the prefs
 	void Update()
 	{
+		if(!_target) return;
 		float d = Vector3.Distance (transform.position, _target.position);
 
 		if(!visited)

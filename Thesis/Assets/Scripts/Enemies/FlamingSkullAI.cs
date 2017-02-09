@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FlamingSkullAI : Entity {
 	
-	public Transform _player;
+	public Transform target;
 
 	private Vector3 targetPosition;
 
@@ -29,7 +29,6 @@ public class FlamingSkullAI : Entity {
 	void Start()
 	{
 		_anim = GetComponent<Animator> ();
-		_player = GameObject.Find("_Player").transform;
 		
 		//cache transform, dont call every frame 
 		myTransform = transform;
@@ -37,8 +36,6 @@ public class FlamingSkullAI : Entity {
 		//flipping
 		faceLeft = new Vector2(transform.localScale.x, transform.localScale.y);
 		faceRight = new Vector2(-transform.localScale.x, transform.localScale.y);
-
-		targetPosition = _player.position;
 
 		GetComponent<AudioSource>().clip = _chatteringTeeth;
 		GetComponent<AudioSource>().Play();
@@ -60,58 +57,57 @@ public class FlamingSkullAI : Entity {
 
 	void FixedUpdate()
 	{
-		if(_player != null)
+		if(!target) return;
+
+		//variable distance between the player and the enemy
+		distance = Vector2.Distance(target.position, transform.position);
+
+		//only update player position when chasing, not attacking
+		if(!attacking)
 		{
-			//variable distance between the player and the enemy
-			distance = Vector2.Distance(_player.position, transform.position);
+			//update target position
+			targetPosition = target.position;
+		}
 
-			//only update player position when chasing, not attacking
-			if(!attacking)
-			{
-				//update target position
-				targetPosition = _player.position;
-			}
+		//movement
+		myTransform.position = Vector2.MoveTowards(myTransform.position, targetPosition, speed * Time.fixedDeltaTime);
 
-			//movement
-			myTransform.position = Vector2.MoveTowards(myTransform.position, targetPosition, speed * Time.fixedDeltaTime);
+		//player location
+		//player is on the right side
+		if(target.position.x < myTransform.position.x)
+		{
+			left = true;
+		}
+		//if the player is left
+		else if(target.position.x > myTransform.position.x)
+		{
+			left = false;
+		}
 
-			//player location
-			//player is on the right side
-			if(_player.position.x < myTransform.position.x)
-			{
-				left = true;
-			}
-			//if the player is left
-			else if(_player.position.x > myTransform.position.x)
-			{
-				left = false;
-			}
+		//if distance is within lookatdistance, run the method
+		if(distance < lookAtDistance && !attacking)
+		{
+			LookAt();
+		}
+		if(distance < chaseRange && !attacking)
+		{
+			LookAt();
+			ChasePlayer(runSpeed);
+		}
 
-			//if distance is within lookatdistance, run the method
-			if(distance < lookAtDistance && !attacking)
-			{
-				LookAt();
-			}
-			if(distance < chaseRange && !attacking)
-			{
-				LookAt();
-				ChasePlayer(runSpeed);
-			}
+		//if player is not within the lookatdistance, show green
+		if(distance > lookAtDistance && !attacking)
+		{
+			//play idle anim
+			speed = 0;
+			debugColor = Color.green;
+		}
 
-			//if player is not within the lookatdistance, show green
-			if(distance > lookAtDistance && !attacking)
-			{
-				//play idle anim
-				speed = 0;
-				debugColor = Color.green;
-			}
-
-			//if player is within attack range, run the attack method
-			if (distance < attackRange && Time.time > 0 && !attacking)
-			{
-				debugColor = Color.red;
-				StartCoroutine(AttackPlayer());
-			}
+		//if player is within attack range, run the attack method
+		if (distance < attackRange && Time.time > 0 && !attacking)
+		{
+			debugColor = Color.red;
+			StartCoroutine(AttackPlayer());
 		}
 	}
 

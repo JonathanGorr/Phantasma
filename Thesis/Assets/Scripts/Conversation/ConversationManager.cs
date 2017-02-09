@@ -80,9 +80,9 @@ public class ConversationManager : MonoBehaviour {
     }
 
 	//while the button is not pressed, stuck in a loop
-	IEnumerator WaitForButton()
+	IEnumerator WaitForButton(bool key)
 	{
-		while (!_input._submit)
+		while (!key)
 			yield return null;
 	}
 
@@ -100,7 +100,7 @@ public class ConversationManager : MonoBehaviour {
 
 			StartCoroutine(PlaySound(_sound));
 			//wait for button press to resume
-			yield return StartCoroutine(WaitForButton());
+			yield return StartCoroutine(WaitForButton(_input._jump));
 			yield return new WaitForSeconds(conversationSpeed);
         }
 

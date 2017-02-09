@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Evolution : MonoBehaviour {
+public class Evolution : WaitForPlayer {
 
 	/*this class stores the functionality of evolution;
 	what weapons and health upgrades are unlocked
@@ -69,18 +69,19 @@ public class Evolution : MonoBehaviour {
 	[SerializeField, HideInInspector]
 	public GameObject _evoMenu;
 
-	private LevelManager _manager;
-
 	[HideInInspector]
 	public int blood;
 	
 	private bool open;
 
-	void Awake()
+	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
-		_evoMenu = GameObject.Find ("EvolutionMenu");
-		_manager = GetComponent<LevelManager>();
-		if(!_manager.inMenu && !_manager.inInitialize) bloodCounter = GameObject.Find("BloodCounter").GetComponent<Text>();
+		if(_manager.Player == null) yield return null;
+		if(scene.name == "Start")
+		{
+			bloodCounter = GameObject.Find("BloodCounter").GetComponent<Text>();
+			_evoMenu = GameObject.Find ("EvolutionMenu");
+		}
 	}
 
 	void FixedUpdate()

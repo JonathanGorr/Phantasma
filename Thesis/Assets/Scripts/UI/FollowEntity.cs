@@ -27,8 +27,9 @@ public class FollowEntity : Entity {
 	private float t;
 
 	// Use this for initialization
-	void Awake () 
+	public override void Awake () 
 	{
+		base.Awake();
 		//flipping
 		faceLeft = new Vector2(transform.localScale.x, transform.localScale.y);
 		faceRight = new Vector2(-transform.localScale.x, transform.localScale.y);

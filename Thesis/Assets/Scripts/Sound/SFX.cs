@@ -22,9 +22,81 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] shieldCollide;
 	public AudioClip[] weaponCollide;
 
+	public AudioSource asrc;
+	[Header("UI")]
+	public AudioClip[] potions;
+	public AudioClip[] foods;
+	public AudioClip[] armors;
+	public AudioClip[] weapons;
+	[Header("Jingles")]
+	public AudioClip newQuest;
+	public AudioClip finishQuest;
+	public AudioClip failQuest;
+	[Header("Buttons")]
+	public AudioClip scroll;
+	public AudioClip back;
+	public AudioClip select;
+
+	public AudioClip[] page_flips;
+
 	public void PlayUI(string command)
 	{
-		
+		AudioClip clip = null;
+
+		switch(command)
+		{
+			//UI
+			case "scroll":
+			clip = scroll;
+			break;
+			case "select":
+			clip = select;
+			break;
+			case "back":
+			clip = back;
+			break;
+			case "pause":
+			clip = page_flips[Random.Range(0, page_flips.Length)];
+			break;
+
+			//Quests
+			case "questUpdate":
+			clip = newQuest;
+			break;
+			case "questCompleted":
+			clip  = finishQuest;
+			break;
+			case "questFailed":
+			clip = failQuest;
+			break;
+
+			//Items
+			case "potion":
+			clip = potions[Random.Range(0, potions.Length)];
+			break;
+			case "bread":
+			clip = foods[Random.Range(0, foods.Length)];
+			break;
+			case "armor":
+			clip = armors[Random.Range(0, armors.Length)];
+			break;
+			case "weapon":
+			clip = weapons[Random.Range(0, weapons.Length)];
+			break;
+
+			default:
+			print(command + " was not recognized");
+			break;
+		}
+
+		if(clip == null) return;
+		asrc.clip = clip;
+		asrc.Play();
+	}
+
+	public void SetVolume(float v)
+	{
+		asrc.volume = v;
 	}
 
 	public void PlayFX(string command, Vector3 position)

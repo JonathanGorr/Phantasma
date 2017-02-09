@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 811dcd6a6bc0da745875e2bfdbf79e90
+timeCreated: 1486411821
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Head
@@ -15,12 +17,12 @@ TextureImporter:
     21300020: ShieldArm
     21300022: HandLeft
     21300024: ElbowGuardLeft
-  serializedVersion: 2
+  serializedVersion: 4
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
+    sRGBTexture: 1
     linearTexture: 0
-    correctGamma: 0
     fadeOut: 0
     borderMipMap: 0
     mipMapFadeDistanceStart: 1
@@ -28,11 +30,12 @@ TextureImporter:
   bumpmap:
     convertToNormalMap: 0
     externalNormalMap: 0
-    heightScale: .25
+    heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
   grayScaleToAlpha: 0
-  generateCubemap: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
   seamlessCubemap: 0
   textureFormat: -1
   maxTextureSize: 256
@@ -48,15 +51,47 @@ TextureImporter:
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
-  spritePivot: {x: .5, y: .5}
+  spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
+  alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationDetail: -1
   textureType: 8
-  buildTargetSettings: []
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 256
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 256
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 256
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: Head
+    - serializedVersion: 2
+      name: Head
       rect:
         serializedVersion: 2
         x: 113
@@ -64,9 +99,12 @@ TextureImporter:
         width: 79
         height: 92
       alignment: 9
-      pivot: {x: .272338092, y: .130068243}
+      pivot: {x: 0.2723381, y: 0.13006824}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: ArmUpper
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: ArmUpper
       rect:
         serializedVersion: 2
         x: 200
@@ -74,9 +112,12 @@ TextureImporter:
         width: 45
         height: 49
       alignment: 9
-      pivot: {x: .475404859, y: .708934546}
+      pivot: {x: 0.47540486, y: 0.70893455}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: Body
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Body
       rect:
         serializedVersion: 2
         x: 14
@@ -84,9 +125,12 @@ TextureImporter:
         width: 89
         height: 89
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: LegUpper
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: LegUpper
       rect:
         serializedVersion: 2
         x: 10
@@ -94,9 +138,12 @@ TextureImporter:
         width: 43
         height: 63
       alignment: 9
-      pivot: {x: .499999821, y: .794264972}
+      pivot: {x: 0.49999982, y: 0.794265}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: LegCalf
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: LegCalf
       rect:
         serializedVersion: 2
         x: 66
@@ -104,9 +151,12 @@ TextureImporter:
         width: 41
         height: 69
       alignment: 9
-      pivot: {x: .43251279, y: .84887886}
+      pivot: {x: 0.4325128, y: 0.84887886}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: LegGuard
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: LegGuard
       rect:
         serializedVersion: 2
         x: 111
@@ -114,9 +164,12 @@ TextureImporter:
         width: 39
         height: 51
       alignment: 9
-      pivot: {x: .131070644, y: .543403625}
+      pivot: {x: 0.13107064, y: 0.5434036}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: Foot
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Foot
       rect:
         serializedVersion: 2
         x: 112
@@ -124,9 +177,12 @@ TextureImporter:
         width: 45
         height: 21
       alignment: 9
-      pivot: {x: .192558795, y: .28918311}
+      pivot: {x: 0.1925588, y: 0.2891831}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: ElbowGuard
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: ElbowGuard
       rect:
         serializedVersion: 2
         x: 157
@@ -134,9 +190,12 @@ TextureImporter:
         width: 37
         height: 35
       alignment: 9
-      pivot: {x: .731827199, y: .666018248}
+      pivot: {x: 0.7318272, y: 0.66601825}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: Arm
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Arm
       rect:
         serializedVersion: 2
         x: 205
@@ -144,9 +203,12 @@ TextureImporter:
         width: 33
         height: 39
       alignment: 9
-      pivot: {x: .458075792, y: .833455384}
+      pivot: {x: 0.4580758, y: 0.8334554}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: Hand
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hand
       rect:
         serializedVersion: 2
         x: 206
@@ -154,9 +216,12 @@ TextureImporter:
         width: 29
         height: 33
       alignment: 9
-      pivot: {x: .509541452, y: .835390508}
+      pivot: {x: 0.50954145, y: 0.8353905}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: ShieldArm
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: ShieldArm
       rect:
         serializedVersion: 2
         x: 164
@@ -164,9 +229,12 @@ TextureImporter:
         width: 73
         height: 90
       alignment: 9
-      pivot: {x: .132334247, y: .773622632}
+      pivot: {x: 0.13233425, y: 0.77362263}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: HandLeft
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: HandLeft
       rect:
         serializedVersion: 2
         x: 80
@@ -174,9 +242,12 @@ TextureImporter:
         width: 27
         height: 32
       alignment: 9
-      pivot: {x: .4386594, y: .308735371}
+      pivot: {x: 0.4386594, y: 0.30873537}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: ElbowGuardLeft
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: ElbowGuardLeft
       rect:
         serializedVersion: 2
         x: 25
@@ -184,7 +255,12 @@ TextureImporter:
         width: 29
         height: 29
       alignment: 9
-      pivot: {x: .547705948, y: .833944917}
+      pivot: {x: 0.54770595, y: 0.8339449}
       border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
   spritePackingTag: 
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

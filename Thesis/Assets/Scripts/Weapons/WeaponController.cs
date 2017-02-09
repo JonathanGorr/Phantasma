@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WeaponController : MonoBehaviour {
 
 	public bool debug = false;
 	bool switching = false;
+	string currentSceneName;
 	private LevelManager _manager;
 	private PlayerInput _input;
 	private SFX _sfx;
@@ -29,6 +31,17 @@ public class WeaponController : MonoBehaviour {
 	private int nrWeapons;
 	public float delay = 0.1f;
 
+	void Awake()
+	{
+		SceneManager.sceneLoaded += OnSceneLoaded;
+		currentSceneName = SceneManager.GetActiveScene().name;
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		currentSceneName = scene.name;
+	}
+
 	void Start() 
 	{
 		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
@@ -36,6 +49,11 @@ public class WeaponController : MonoBehaviour {
 		_input =  _manager.GetComponent<PlayerInput>();
 		_prefs =  _manager.GetComponent<PlayerPreferences>();
 		StartCoroutine(SwitchWeapon(Weapons.Empty));
+	}
+
+	void OnDisable()
+	{
+		//SceneManager.sceneLoaded -= OnSceneLoaded;
 	}
 
 	public bool IsWeapon(Weapons w)//returns the weapon enum of the current Weapon
@@ -56,10 +74,9 @@ public class WeaponController : MonoBehaviour {
 	void Update()
 	{
 		//return if items not received yet
-		if(_manager.inMenu || _manager.inInitialize) return;
+		if(currentSceneName != "Start") return;
 		if(!_prefs.itemsGet && !debug) return;
 		if(_manager.paused) return;
-		if(_manager.inMenu) return;
 		if(switching) return;
 
 		//DPAD 360 Controller

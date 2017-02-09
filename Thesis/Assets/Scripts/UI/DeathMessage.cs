@@ -2,24 +2,25 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class DeathMessage : MonoBehaviour {
+public class DeathMessage : WaitForPlayer {
 
 	private GameObject deathMessage;
 	private Health _health;
 	public float delay = 3f;
-	private LevelManager _manager;
 
-	void Start()
+	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
-		_health = GameObject.Find("_Player").GetComponent<Health>();
-		_manager = GetComponent<LevelManager> ();
-		deathMessage = GameObject.Find ("DeathMessage");
+		while(_manager.Player == null) yield return null;
 
+		_health = _manager.Player.GetComponent<Health>();
+		deathMessage = GameObject.Find ("DeathMessage");
 		if(deathMessage) deathMessage.SetActive (false);
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
+		if(!_health) return;
+
 		if(_health.dead)
 		{
 			StartCoroutine(Restart());

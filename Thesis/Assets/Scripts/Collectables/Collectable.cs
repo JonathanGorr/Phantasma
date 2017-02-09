@@ -1,15 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Collectable : MonoBehaviour {
-
-	void Awake()
-	{
-	}
-
+public class Collectable : MonoBehaviour 
+{
 	void OnTriggerEnter2D(Collider2D target)
 	{
-		if(target.gameObject.tag == "Player")
+		if(target.CompareTag("Player"))
 		{
 			Destroy(gameObject);
 		}

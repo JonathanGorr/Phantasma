@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Camera2 D follow.
@@ -8,13 +9,13 @@ using System.Collections.Generic;
 
 public class CameraController : MonoBehaviour {
 
+	public Camera m_Camera;
 	[Header("Target Averaging")]
 	public float m_DampTime = 0.2f;
 	public float m_ScreenEdgeBuffer = 4f;
 	public float m_MinSize = 6.5f;
 	/*[HideInInspector]*/ public List<Transform> m_Targets = new List<Transform>();
 
-	private Camera m_Camera;
 	private float m_ZoomSpeed;
 	private Vector3 m_MoveVelocity;
 	private Vector3 m_DesiredPosition;
@@ -22,7 +23,15 @@ public class CameraController : MonoBehaviour {
 	// Use this for initialization
 	void Awake () 
 	{
-		m_Camera = GetComponent<Camera>();
+		SceneManager.sceneLoaded += OnSceneLoaded;
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		if(scene.name == "Start")
+		{
+			SetStartPositionAndSize();
+		}
 	}
 
 	//used by targets to register themselves to this camera
@@ -114,7 +123,6 @@ public class CameraController : MonoBehaviour {
 
 	void SetStartPositionAndSize()
 	{
-		FindAveragePosition();
-		transform.position = m_DesiredPosition;
+		transform.position = FindAveragePosition() + new Vector3(0, 30, 0);
 	}
 }

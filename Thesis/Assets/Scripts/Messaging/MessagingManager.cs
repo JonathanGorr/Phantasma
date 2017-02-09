@@ -8,7 +8,6 @@ public class MessagingManager
     // public property for manager
     private List<Action> subscribers = new List<Action>();
     private List<Action<bool>> uiEventSubscribers = new List<Action<bool>>();
-    private List<Action<InventoryItem>> inventorySubscribers = new List<Action<InventoryItem>>();
 
 	void Awake()
 	{
@@ -88,42 +87,6 @@ public class MessagingManager
         if (uiEventSubscribers != null)
         {
             uiEventSubscribers.Clear();
-        }
-    }
-
-    // Subscribe method for Inventory manager
-    public void SubscribeInventoryEvent(Action<InventoryItem> subscriber)
-    {
-        if (inventorySubscribers != null)
-        {
-            inventorySubscribers.Add(subscriber);
-        }
-    }
-
-    // Broadcast method for Inventory manager
-    public void BroadcastInventoryEvent(InventoryItem itemInUse)
-    {
-        foreach (var subscriber in inventorySubscribers)
-        {
-            subscriber(itemInUse);
-        }
-    }
-
-    // Unsubscribe method for Inventory manager
-    public void UnSubscribeInventoryEvent(Action<InventoryItem> subscriber)
-    {
-        if (inventorySubscribers != null)
-        {
-            inventorySubscribers.Remove(subscriber);
-        }
-    }
-
-    // Clear subscribers method for Inventory manager
-    public void ClearAllInventoryEventSubscribers()
-    {
-        if (inventorySubscribers != null)
-        {
-            inventorySubscribers.Clear();
         }
     }
 

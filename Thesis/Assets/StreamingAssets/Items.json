@@ -1,0 +1,33 @@
+[
+	{
+		"id": 0,
+		"title": "Steel Gloves",
+		"description": "Gloves made from the mightiest steel in Elmsreach.",
+		"value": 6,
+		"stats":
+		{
+			"power": 1,
+			"defense": 4,
+			"vitality":2
+		},
+		"stackable": false,
+		"rarity": "common",
+		"slug": "envelope"
+	},
+	
+	{
+		"id": 1,
+		"title": "Axe BodySpray",
+		"description": "Used to repel mature women.",
+		"value": 0,
+		"stats":
+		{
+			"power": 10,
+			"defense": 10,
+			"vitality":0
+		},
+		"stackable": true,
+		"rarity": "common",
+		"slug": "axe"
+	}
+]

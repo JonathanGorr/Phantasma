@@ -48,6 +48,12 @@ public class MusicFader : MonoBehaviour {
 		}
 	}
 
+	public void SetVolume(float v)
+	{
+		bg_Music.volume = v;
+		event_Music.volume = v;
+	}
+
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
 		if(bg_Music.isPlaying) 

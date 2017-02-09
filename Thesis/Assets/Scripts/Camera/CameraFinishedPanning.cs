@@ -7,7 +7,6 @@ public class CameraFinishedPanning : MonoBehaviour {
 	public Animator _anim;
 	PlayerInput _input;
 	GameObject _eventSystem;
-	GameObject title;
 	private bool done = false;
 
 	void Awake()
@@ -19,12 +18,15 @@ public class CameraFinishedPanning : MonoBehaviour {
 	{
 		if(scene.name == "Menu")
 		{
+			_anim.enabled = true;
 			_input = GameObject.Find("_LevelManager").GetComponent<PlayerInput>();
 			_eventSystem = GameObject.Find ("EventSystem");
-			title = GameObject.Find("Title");
-			title.SetActive(false);
 			if (_eventSystem) _eventSystem.SetActive (false);
 			_anim.SetTrigger("Pan");
+		}
+		else
+		{
+			_anim.enabled = false;
 		}
 	}
 
@@ -43,7 +45,6 @@ public class CameraFinishedPanning : MonoBehaviour {
 
 	public void EnableControl()
 	{
-		title.SetActive(true);
 		_eventSystem.SetActive (true);
 		done = true;
 	}

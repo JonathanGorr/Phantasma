@@ -2,7 +2,7 @@
 using System.Collections;
 
 public enum EnemyState { Patrol, Chase, Return }
-public class EnemyAI : Entity
+public class EnemyAI : Enemy
 {
 	[Header("Enemy AI")]
 	public bool attacking;

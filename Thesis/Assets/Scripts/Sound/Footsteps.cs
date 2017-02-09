@@ -7,19 +7,14 @@ public class Footsteps : MonoBehaviour {
 	public AudioClip[] feetWood;
 	public AudioClip[] feetStone;
 
-	private CharacterController2D _controller;
+	public CharacterController2D _controller;
 
 	private bool step = true;
 	public float audioStepLengthWalk = 0.45f;
 	public float audioStepLengthRun = 0.25f;
-
-	void Start()
-	{
-		_controller = GameObject.Find("_Player").GetComponent<CharacterController2D>();
-	}
 	
-	void OnTriggerEnter2D (Collider2D col) {
-		
+	void OnTriggerEnter2D (Collider2D col) 
+	{
 		if (	_controller.isGrounded 
 		    && _controller.velocity.magnitude < 7 
 		    && _controller.velocity.magnitude > 0.1 
