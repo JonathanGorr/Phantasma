@@ -1,33 +1,146 @@
 [
 	{
 		"id": 0,
-		"title": "Steel Gloves",
-		"description": "Gloves made from the mightiest steel in Elmsreach.",
-		"value": 6,
+		"title": "Blood",
+		"description": "Use it to heal.",
+		"value": 1,
+		"slots": false,
+		"equipment": false,
 		"stats":
 		{
-			"power": 1,
-			"defense": 4,
-			"vitality":2
+			"power": 0,
+			"defense": 0,
+			"vitality":1
 		},
-		"stackable": false,
+		"stackable": true,
 		"rarity": "common",
-		"slug": "envelope"
+		"slug": "blood"
 	},
 	
 	{
 		"id": 1,
-		"title": "Axe BodySpray",
-		"description": "Used to repel mature women.",
-		"value": 0,
+		"title": "Copper",
+		"description": "Pretty penny.",
+		"value": 1,
+		"slots": false,
+		"equipment": false,
 		"stats":
 		{
-			"power": 10,
-			"defense": 10,
-			"vitality":0
+			"power": 1,
+			"defense": 1,
+			"vitality": 1
 		},
 		"stackable": true,
 		"rarity": "common",
-		"slug": "axe"
+		"slug": "coin"
+	},
+	
+	{
+		"id": 2,
+		"title": "Silver",
+		"description": "Shiny!",
+		"value": 10,
+		"slots": false,
+		"equipment": false,
+		"stats":
+		{
+			"power": 3,
+			"defense": 3,
+			"vitality": 3
+		},
+		"stackable": true,
+		"rarity": "uncommon",
+		"slug": "coin"
+	},
+	
+	{
+		"id": 3,
+		"title": "Gold",
+		"description": "Young money mula baby.",
+		"value": 30,
+		"slots": false,
+		"equipment": false,
+		"stats":
+		{
+			"power": 5,
+			"defense": 5,
+			"vitality": 5
+		},
+		"stackable": true,
+		"rarity": "rare",
+		"slug": "coin"
+	},
+	
+	{
+		"id": 4,
+		"title": "Scroll",
+		"description": "A quest.",
+		"value": 1,
+		"slots": false,
+		"equipment": false,
+		"stats":
+		{
+			"power": 0,
+			"defense": 0,
+			"vitality": 0
+		},
+		"stackable": false,
+		"rarity": "uncommon",
+		"slug": "scroll"
+	},
+	
+	{
+		"id": 5,
+		"title": "Shield",
+		"description": "Use it to defend against attacks.",
+		"value": 6,
+		"slots": true,
+		"equipment": true,
+		"stats":
+		{
+			"power": 0,
+			"defense": 8,
+			"vitality":4
+		},
+		"stackable": false,
+		"rarity": "common",
+		"slug": "shield"
+	},
+	
+	{
+		"id": 6,
+		"title": "Red Potion",
+		"description": "You can probably guess what it do.",
+		"value": 0,
+		"slots": true,
+		"equipment": false,
+		"stats":
+		{
+			"power": 0,
+			"defense": 0,
+			"vitality":10
+		},
+		"stackable": true,
+		"rarity": "common",
+		"slug": "potionRed"
+	},
+	
+	{
+		"id": 7,
+		"title": "Father",
+		"description": "Follows you eternally.",
+		"value": 0,
+		"slots": false,
+		"equipment": false,
+		"stats":
+		{
+			"power": 10,
+			"defense": 0,
+			"vitality":0
+		},
+		"stackable": false,
+		"rarity": "rare",
+		"slug": "father"
 	}
+
 ]

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: ac7ac756bbf7a7142bef6567fb123a1f
-timeCreated: 1486485652
+timeCreated: 1487028057
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -21,7 +21,7 @@ TextureImporter:
     21300028: tombstone
     21300030: house
     21300032: banner
-    21300034: houseFrame
+    21300034: roof
     21300036: ground02
     21300038: grassfront2
     21300040: blood
@@ -52,6 +52,18 @@ TextureImporter:
     21300090: Mother
     21300092: FatherPortrait
     21300094: Button
+    21300096: shelf
+    21300098: shelf_support
+    21300100: Shelf_rope
+    21300102: door
+    21300104: HouseSteps
+    21300106: Atlas_0
+    21300108: Atlas_1
+    21300110: Atlas_2
+    21300112: fire
+    21300114: stool
+    21300116: table
+    21300118: barrel
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -115,7 +127,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
   - buildTarget: Android
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     textureFormat: 12
     textureCompression: 1
     compressionQuality: 50
@@ -300,8 +312,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2021
-        height: 732
+        width: 2092
+        height: 710
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -321,13 +333,13 @@ TextureImporter:
       outline: []
       tessellationDetail: -1
     - serializedVersion: 2
-      name: houseFrame
+      name: roof
       rect:
         serializedVersion: 2
-        x: 2051
-        y: 0
-        width: 2045
-        height: 785
+        x: 0
+        y: 706
+        width: 2168
+        height: 415
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -601,8 +613,8 @@ TextureImporter:
         y: 3529
         width: 56
         height: 99
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.88116765}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -614,8 +626,8 @@ TextureImporter:
         y: 3528
         width: 24
         height: 105
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.86955684}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -627,8 +639,8 @@ TextureImporter:
         y: 3267
         width: 73
         height: 53
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -649,8 +661,8 @@ TextureImporter:
       name: Mother
       rect:
         serializedVersion: 2
-        x: 38
-        y: 754
+        x: 3620
+        y: 10
         width: 121
         height: 226
       alignment: 0
@@ -662,28 +674,171 @@ TextureImporter:
       name: FatherPortrait
       rect:
         serializedVersion: 2
-        x: 241
-        y: 785
-        width: 321
-        height: 417
+        x: 3793
+        y: 0
+        width: 303
+        height: 411
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
     - serializedVersion: 2
-      name: Button
+      name: shelf
       rect:
         serializedVersion: 2
-        x: 579
-        y: 808
-        width: 128
-        height: 128
+        x: 3450
+        y: 84
+        width: 143
+        height: 15
+      alignment: 5
+      pivot: {x: 1, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shelf_support
+      rect:
+        serializedVersion: 2
+        x: 3533
+        y: 1
+        width: 61
+        height: 61
+      alignment: 9
+      pivot: {x: 0.98981416, y: 0.13104849}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Shelf_rope
+      rect:
+        serializedVersion: 2
+        x: 3455
+        y: 102
+        width: 140
+        height: 165
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: door
+      rect:
+        serializedVersion: 2
+        x: 2180
+        y: 511
+        width: 116
+        height: 251
+      alignment: 5
+      pivot: {x: 1, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: HouseSteps
+      rect:
+        serializedVersion: 2
+        x: 2099
+        y: 19
+        width: 127
+        height: 69
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas_0
+      rect:
+        serializedVersion: 2
+        x: 2231
+        y: 19
+        width: 630
+        height: 47
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas_1
+      rect:
+        serializedVersion: 2
+        x: 2234
+        y: 80
+        width: 933
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas_2
+      rect:
+        serializedVersion: 2
+        x: 2235
+        y: 129
+        width: 438
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fire
+      rect:
+        serializedVersion: 2
+        x: 2232
+        y: 169
+        width: 87
+        height: 143
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: stool
+      rect:
+        serializedVersion: 2
+        x: 2364
+        y: 169
+        width: 88
+        height: 57
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: table
+      rect:
+        serializedVersion: 2
+        x: 2481
+        y: 170
+        width: 221
+        height: 138
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: barrel
+      rect:
+        serializedVersion: 2
+        x: 2832
+        y: 172
+        width: 93
+        height: 105
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
     outline: []
   spritePackingTag: 
   userData: 

@@ -11,6 +11,7 @@ public class EnemyAI : Enemy
 	private Vector2 _velocity;
 	[HideInInspector] public Player target;
 
+	[Header("Ranges")]
 	public float lookAtDistance = 10f;
 	public float chaseRange = 7f;
 	public float attackRange = 2f;
@@ -25,8 +26,6 @@ public class EnemyAI : Enemy
 	[Header("Local References")]
 	public SpriteRenderer rend;
 	public Rigidbody2D rbody;
-	public EnemyAttack _weapon;
-	public Health _health;
 
 	[HideInInspector] public bool canAttack = true;
 	[HideInInspector] public Vector3 moveDirection = Vector3.zero;

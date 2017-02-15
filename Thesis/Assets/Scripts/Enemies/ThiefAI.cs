@@ -52,7 +52,7 @@ public class ThiefAI : EnemyAI {
 				int closeAttack = Random.Range (2, 4);
 
 				_anim.SetTrigger("" + randomAttack);
-				_weapon.Attack(0);
+				//_weapon.Attack(0);
 
 				yield return new WaitForSeconds (attackDelay);
 				canAttack = true;

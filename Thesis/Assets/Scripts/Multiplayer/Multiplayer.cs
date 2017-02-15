@@ -46,13 +46,6 @@ public class Multiplayer : MonoBehaviour {
 		}
 	}
 
-	//customization
-	[Header("Color")]
-	public Color[] torsoPalette;
-	public Color[] pantsPalette;
-	public Color[] shoesPalette;
-	public Color[] armorPalette;
-
 	public GameObject playerPrefab;
 	[SerializeField] private int playerCount = 0;
 	public List<Avatar> players = new List<Avatar>();
@@ -68,6 +61,13 @@ public class Multiplayer : MonoBehaviour {
 		print("Player doesn't exist");
 		return null;
 	}
+
+	//customization
+	[Header("Color")]
+	public Color[] torsoPalette;
+	public Color[] pantsPalette;
+	public Color[] shoesPalette;
+	public Color[] armorPalette;
 
 	void Awake()
 	{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using CharacterController;
 
 public class WeaponController : MonoBehaviour {
 
@@ -25,7 +26,6 @@ public class WeaponController : MonoBehaviour {
 	public AnimatorOverrideController bowOverride;
 
 	public Weapon[] weapons; // push your prefabs
-	public AudioClip[] sheathClips;
 
 	[HideInInspector] public Weapon weapon;
 	private int nrWeapons;
@@ -47,6 +47,7 @@ public class WeaponController : MonoBehaviour {
 		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
 		_sfx   =  _manager.GetComponent<SFX>();
 		_input =  _manager.GetComponent<PlayerInput>();
+		_input.onPad += Switch;
 		_prefs =  _manager.GetComponent<PlayerPreferences>();
 		StartCoroutine(SwitchWeapon(Weapons.Empty));
 	}
@@ -62,7 +63,7 @@ public class WeaponController : MonoBehaviour {
 		else return false;
 	}
 
-	Weapon GetWeapon(Weapons w)
+	public Weapon GetWeapon(Weapons w)
 	{
 		for(int i=0;i<weapons.Length;i++)
 		{
@@ -71,7 +72,7 @@ public class WeaponController : MonoBehaviour {
 		return null;
 	}
 
-	void Update()
+	void Switch(PlayerInput.PADDirection direction)
 	{
 		//return if items not received yet
 		if(currentSceneName != "Start") return;
@@ -79,37 +80,20 @@ public class WeaponController : MonoBehaviour {
 		if(_manager.paused) return;
 		if(switching) return;
 
-		//DPAD 360 Controller
-		if(_input._controller)
+		switch(direction)
 		{
-			if(_input._DPadVertical == 1)
-			{
-				if(!IsWeapon(Weapons.Bow))
-				{
-					StartCoroutine(SwitchWeapon(Weapons.Bow));
-				}
-			}
-			else if(_input._DPadVertical == -1)
-			{
-				if(!IsWeapon(Weapons.Spear))
-				{
-					StartCoroutine(SwitchWeapon(Weapons.Spear));
-				}
-			}
-			else if(_input._DPadHorizontal == -1)
-			{
-				if(!IsWeapon(Weapons.Empty))
-				{
-					StartCoroutine(SwitchWeapon(Weapons.Empty));
-				}
-			}
-			else if(_input._DPadHorizontal == 1)
-			{
-				if(!IsWeapon(Weapons.SwordShield))
-				{
-					StartCoroutine(SwitchWeapon(Weapons.SwordShield));
-				}
-			}
+			case PlayerInput.PADDirection.left:
+				if(!IsWeapon(Weapons.Empty)) StartCoroutine(SwitchWeapon(Weapons.Empty));
+			break;
+			case PlayerInput.PADDirection.right:
+				if(!IsWeapon(Weapons.SwordShield)) StartCoroutine(SwitchWeapon(Weapons.SwordShield));
+			break;
+			case PlayerInput.PADDirection.up:
+				if(!IsWeapon(Weapons.Bow)) StartCoroutine(SwitchWeapon(Weapons.Bow));
+			break;
+			case PlayerInput.PADDirection.down:
+				if(!IsWeapon(Weapons.Spear)) StartCoroutine(SwitchWeapon(Weapons.Spear));
+			break;
 		}
 	}
 

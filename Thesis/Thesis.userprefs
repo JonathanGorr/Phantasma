@@ -1,23 +1,10 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Inventory\Inventory.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\PlayerInfo.cs">
     <Files>
-      <File FileName="Assets\Scripts\Inventory\ItemData.cs" Line="16" Column="21" NotebookId="1" />
-      <File FileName="Assets\ItemSlot.cs" Line="24" Column="5" NotebookId="1" />
-      <File FileName="Assets\PauseMenu.cs" Line="177" Column="6" NotebookId="1" />
-      <File FileName="Assets\InventoryInfo.cs" Line="37" Column="4" NotebookId="1" />
-      <File FileName="Assets\Scripts\Hero\PlayerInput.cs" Line="69" Column="40" NotebookId="1" />
-      <File FileName="Assets\Scripts\Inventory\Inventory.cs" Line="30" Column="39" NotebookId="1" />
-      <File FileName="Assets\Scripts\Weapons\WeaponController.cs" Line="61" Column="1" NotebookId="1" />
-      <File FileName="Assets\ObjectiveUI.cs" Line="44" Column="6" NotebookId="1" />
+      <File FileName="Assets\Scripts\Inventory\Inventory.cs" Line="30" Column="19" />
+      <File FileName="Assets\PlayerInfo.cs" Line="32" Column="3" />
     </Files>
-    <FloatingWindows>
-      <FloatingWindow WindowId="1" X="1777" Y="287" Width="1071" Height="1186">
-        <Files>
-          <File FileName="Assets\Scripts\Sound\MusicFader.cs" Line="88" Column="4" />
-        </Files>
-      </FloatingWindow>
-    </FloatingWindows>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

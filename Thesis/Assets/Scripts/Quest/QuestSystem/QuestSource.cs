@@ -23,8 +23,8 @@ public class QuestSource : MonoBehaviour {
 
 	//debug
 	private QuestManager _questManager;
-	public Quest questRef;
-	public QuestObjective objectiveRef;
+	/*public*/ Quest questRef;
+	/*public*/ QuestObjective objectiveRef;
 	private Collider2D myCollider;
 	public Objective objective;
 

@@ -12,7 +12,6 @@ public class Loader : MonoBehaviour {
 
 	public bool spawnLevelManager = true;
 
-	public GameObject playerPrefab;
 	public GameObject levelManagerPrefab;
 
 	void Awake()

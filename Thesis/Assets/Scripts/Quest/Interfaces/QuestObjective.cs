@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using Inventory;
 
 namespace QuestSystem
 {
 	[System.Serializable]
 	public class QuestObjective : ScriptableObject, IQuestObjective
 	{
+		ItemDatabase _dataBase;
 		[Header("Quest Objective")]
 		private Quest quest;
 		private ObjectiveUI objUI; //a reference to it's UI for updating
@@ -14,7 +16,7 @@ namespace QuestSystem
 		public bool isActive;
 		public bool isComplete;
 		public bool isBonus;
-		public Item[] rewards;
+		public string[] rewards;
 
 		public virtual Quest Quest
 		{
@@ -26,6 +28,12 @@ namespace QuestSystem
 		{
 			get { return objUI; }
 			set { objUI = value; }
+		}
+
+		public virtual ItemDatabase DataBase
+		{
+			get { return _dataBase; }
+			set { _dataBase = value; }
 		}
 
 		public virtual string Key

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using QuestSystem;
+using Inventory;
 
 /// <summary>
 /// PlayerInfo:
-/// This class is used to interact with the quest and multiplayer system
+/// This class is used to interact with the quest and multiplayer system and inventory system
 /// It contains information like:
 /// 1. player location( zone and v2 )
 /// 2. Id for lookup
@@ -13,9 +14,11 @@ using QuestSystem;
 
 public class PlayerInfo : MonoBehaviour {
 
+	private Inventory.Inventory _inventory;
 	private QuestSystem.QuestManager _questManager;
 	private UI _ui;
 	private SFX _sfx;
+	private Evolution _evo;
 
 	[Header("Costume Colors")]
 	public SpriteRenderer[] torso;
@@ -30,11 +33,37 @@ public class PlayerInfo : MonoBehaviour {
 		get { return location; }
 	}
 
-	void Start()
+	void OnEnable()
 	{
-		_sfx = GameObject.Find("_LevelManager").GetComponent<SFX>();
-		_questManager = _sfx.GetComponent<QuestManager>();
-		_ui = _sfx.transform.Find("UI").GetComponent<UI>();
+		if(!_inventory) 	_inventory = (Inventory.Inventory)GameObject.FindObjectOfType( typeof(Inventory.Inventory)); //GameObject.Find("Inventory").GetComponent<Inventory.Inventory>();
+		if(!_sfx) 			_sfx = GameObject.Find("_LevelManager").GetComponent<SFX>();
+		if(!_evo) 			_evo = _sfx.GetComponent<Evolution>();
+		if(!_questManager) 	_questManager = _sfx.GetComponent<QuestManager>();
+		if(!_ui) 			_ui = _sfx.transform.Find("UI").GetComponent<UI>();
+	}
+
+	public void AddItem(int id)
+	{
+		//get item
+		Item item = _inventory.database.FetchItem(id);
+		if(item.Slots) //these items take up slots in inventory
+		{
+			_inventory.AddItem(item.ID);
+		}
+		else //these items don't take up space in the inventory
+		{
+			switch(item.Slug)
+			{
+				case "coin":
+				_inventory.AddCoins(item.Value);
+				break;
+				case "blood":
+				_evo.AddBlood(item.Value);
+				break;
+			}
+		}
+
+		_sfx.PlayFX(item.Slug + "_pickup", transform.position);
 	}
 
 	//used to add new objective to a player's quest( objective should not(?) give player the associated quest...
@@ -59,7 +88,6 @@ public class PlayerInfo : MonoBehaviour {
 	{
 		//check if objective is active before adding
 		if(!_questManager.GetQuest(obj.questKey).IsActive) { print("quest inactive for this player"); return; }
-
 		_questManager.GetQuestObjective(obj.questKey, obj.objectiveKey).SetComplete();
 	}
 }

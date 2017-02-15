@@ -4,17 +4,8 @@ using UnityEngine;
 
 public class BossAI : EnemyAI {
 
-	//weps
-	private EnemyAttack _bossWeapon1;
-	private EnemyAttack _bossWeapon2;
-
 	public override void Awake ()
 	{
-		//boss weapon animators
-		_bossWeapon1 = GameObject.Find("BossSwordLeft").GetComponent<EnemyAttack>();
-		_bossWeapon2 = GameObject.Find("BossSwordRight").GetComponent<EnemyAttack>();
-		if(!_bossWeapon1 || !_bossWeapon2) print("Boss Weapon not found");
-
 		base.Awake ();
 	}
 
@@ -63,15 +54,11 @@ public class BossAI : EnemyAI {
 				if(Distance() < tooCloseRange)
 				{
 					_anim.SetTrigger("" + closeAttack);
-					_bossWeapon1.Attack(closeAttack);
-					_bossWeapon2.Attack(closeAttack);
 				}
 				else
 				{
 					//else random if more than one anim exists
 					_anim.SetTrigger("1");
-					_bossWeapon1.Attack(1);
-					_bossWeapon2.Attack(1);
 				}
 
 				if(_health.health < 50)

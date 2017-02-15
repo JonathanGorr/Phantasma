@@ -20,12 +20,14 @@ public class Item {
 	public string Slug { get; set; }
 	public Sprite Sprite { get; set; }
 	public ItemType Type { get; set; }
+	public bool Slots { get; set; }
 
-	public Item(int id, string title, string description, int value, int power, int defense, int vitality, bool stackable, string rarity, string slug )
+	public Item(int id, string title, string description, int value, bool slots, int power, int defense, int vitality, bool stackable, string rarity, string slug )
 	{
 		this.ID = id;
 		this.Title = title;
 		this.Value = value;
+		this.Slots = slots;
 		this.Description = description;
 		this.Defense = defense;
 		this.Power = power;

@@ -16,16 +16,16 @@ public class CameraZooming : MonoBehaviour {
 	Camera cam;
 
 	//components
+	private LevelManager _manager;
 	private WeaponController _switcher;
 	private PlayerInput _input;
-	private Bow _shoot;
 
 	void Start()
 	{
 		cam = GetComponent<Camera>();
-		_shoot = GameObject.Find ("_Player").GetComponent<Bow> ();
-		_input = GameObject.Find ("_LevelManager").GetComponent<PlayerInput> ();
-		_switcher = GameObject.Find ("_Player").GetComponent<WeaponController>();
+		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
+		_input = _manager.GetComponent<PlayerInput> ();
+		_switcher = _manager.Player.GetComponent<WeaponController>();
 	}
 
 	void FixedUpdate()
@@ -34,31 +34,13 @@ public class CameraZooming : MonoBehaviour {
 
 		cam.fieldOfView = distance;
 
-		if(!_input._aiming && zoomable)
-		{
-			distance = Mathf.Clamp(distance -
-		       Input.GetAxis("360_RightStickVertical") * zoomSpeed,
-		       distanceMin,
-		       distanceMax);
-		}
-
 		//if aiming, and the bow is selected
-		if(_input._aiming)
+		if(_input.L1Down && !_manager.paused)
 		{
-			if(_input._controller)
-			{
-				cam.transform.position = new Vector3
-					(cam.transform.position.x + _input._axisHorizontal * sensitivity,
-	        		cam.transform.position.y + _input._axisVertical * sensitivity / 2,
-	            	cam.transform.position.z);
-			}
-			else
-			{
-				cam.transform.position = new Vector3
-				(cam.transform.position.x + _shoot.ray.direction.x * sensitivity,
-				 cam.transform.position.y + _shoot.ray.direction.y * sensitivity,
-				 cam.transform.position.z);
-			}
+			cam.transform.position = new Vector3
+				(cam.transform.position.x + _input.RAnalog.x * sensitivity,
+        		cam.transform.position.y + _input.RAnalog.y * sensitivity / 2,
+            	cam.transform.position.z);
 		}
 	}
 }

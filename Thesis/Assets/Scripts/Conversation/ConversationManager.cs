@@ -100,7 +100,7 @@ public class ConversationManager : MonoBehaviour {
 
 			StartCoroutine(PlaySound(_sound));
 			//wait for button press to resume
-			yield return StartCoroutine(WaitForButton(_input._jump));
+			yield return StartCoroutine(WaitForButton(Input.GetButtonDown("360_AButton")));
 			yield return new WaitForSeconds(conversationSpeed);
         }
 

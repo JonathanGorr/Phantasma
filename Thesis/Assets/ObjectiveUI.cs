@@ -27,6 +27,8 @@ namespace QuestSystem
 			description.text = qo.Description;
 			completeToggle.isOn = qo.isComplete;
 
+			if(qo.rewards.Length == 0) return;
+
 			//add rewards if not already
 			if(rewardGroup.childCount < qo.rewards.Length)
 			{
@@ -45,7 +47,8 @@ namespace QuestSystem
 					RectTransform r = Instantiate(rewardUIPrefab, rewardGroup) as RectTransform;
 					r.localScale = Vector3.one;
 					//assign this UI image the inventory sprite for this reward
-					r.Find("Item").GetComponent<Image>().sprite = Resources.Load<Sprite>("InventorySprites/" + qo.rewards[i].SpriteID);
+					r.Find("Item").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" 
+					+ qo.rewards[i]);
 				}
 			}
 		}

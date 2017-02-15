@@ -9,54 +9,62 @@ namespace Inventory
 
 		public LevelManager _manager;
 		public InventoryInfo _info;
-		public PlayerInput _input;
 		public PauseMenu _menu;
 		public RectTransform inventoryPanel;
 		public ItemDatabase database;
 		public RectTransform itemPrefab;
 		public RectTransform slotPrefab;
-
-		public Text coins;
-
+		bool inInventory = false;
+		public Text coinText;
 		bool infoShown = false;
+		int coins;
+
+		public int Coins
+		{
+			get { return coins; }
+			set { coins = value; }
+		}
+
+		public void AddCoins(int count)
+		{
+			coins += count;
+			UpdateCoins();
+		}
+
+		public void UpdateCoins()
+		{
+			coinText.text = coins.ToString();
+		}
 
 		int slotAmount = 20;
 		[HideInInspector] public List<RectTransform> slots = new List<RectTransform>();
 		[HideInInspector] public List<Item> items = new List<Item>();
 
-		void Awake()
-		{
-			LevelManager.unPause += HideInfo;
-			_input.onLeftTrigger += ToggleInfo;
-		}
-
 		void Start()
 		{
+			//create slots
 			if(slots.Count == 0)
 			{
 				//add slots
 				for(int i=0; i<slotAmount;i++)
 				{
 					items.Add(new Item()); // creates a new, empty item for this slot
-					RectTransform slot = Instantiate(slotPrefab, inventoryPanel);
-					slot.localScale = Vector3.one;
-					slot.name = "Slot " + i;
-					slots.Add(slot);
-					slots[i].GetComponent<ItemSlot>().id = i;
+					RectTransform rt = Instantiate(slotPrefab, inventoryPanel);
+					rt.localScale = Vector3.one;
+					rt.name = "Slot " + i;
+					slots.Add(rt);
+					ItemSlot slot = slots[i].GetComponent<ItemSlot>();
+					slot.ID = i;
+					slot.Inventory = this;
 				}
 			}
 
-			AddItem(0);
-			AddItem(1);
-			AddItem(1);
-			AddItem(1);
-			AddItem(1);
-			UpdateCoins(155);
-		}
-
-		public void UpdateCoins(int v)
-		{
-			coins.text = v.ToString();
+			AddItem(5);
+			AddItem(6);
+			AddItem(7);
+			AddItem(5);
+			AddItem(4);
+			UpdateCoins();
 		}
 
 		void Update()
@@ -65,19 +73,9 @@ namespace Inventory
 			if(_menu.currentTab != Tabs.Inventory) return;
 		}
 
-		void ToggleInfo()
-		{
-			_info.Toggle();
-		}
-
-		void HideInfo()
-		{
-			if(_info.Shown) _info.Toggle();
-		}
-
 		public void AddItem(int id)
 		{
-			Item itemToAdd = database.FetchItemByID(id);
+			Item itemToAdd = database.FetchItem(id);
 
 			//stack if present already
 			if(itemToAdd.Stackable && IsInInventory(itemToAdd))
@@ -89,7 +87,7 @@ namespace Inventory
 						ItemData data = slots[i].transform.GetChild(0).GetComponent<ItemData>();
 						data.amount ++;
 						data.UpdateCount();
-						break;//don't continue
+						break; //don't continue
 					}
 				}
 			}
@@ -106,6 +104,7 @@ namespace Inventory
 						itemObj.GetComponent<Image>().sprite = itemToAdd.Sprite;
 						itemObj.name = itemToAdd.Title;
 						ItemData data = itemObj.GetComponent<ItemData>();
+						data.amount = 1;
 						data.slot = i;
 						data.Item = itemToAdd;
 						data.UpdateCount();

@@ -12,29 +12,22 @@ public class SwordShield : Weapon {
 	public override void Update()
 	{
 		base.Update();
-		//set blocking bool
-		if(_entity.combatState == CombatState.Blocking) 
-		{
-			_entity._anim.SetBool("Blocking", true);
-		}
-		else 
-			_entity._anim.SetBool("Blocking", false);
+		if(!_entity._controller.isGrounded) return;
 
 		//Blocking and Strong Attack
-		if(_entity._controller.isGrounded)
+		if(_entity.combatState == CombatState.Blocking)
 		{
-			if(_entity.combatState == CombatState.Blocking)
-			{
-				_entity.SetSpeed (_entity.blockSpeed);
-			}
-			else if(_entity.combatState == CombatState.Attacking)
-			{
-				_entity.SetSpeed (_entity.blockSpeed);
-			}
-			else
-			{
-				_entity.SetSpeed (_entity.walkSpeed);
-			}
+			_entity._anim.SetBool("Blocking", true);
+			_entity.SetSpeed (_entity.blockSpeed);
+		}
+		else if(_entity.combatState == CombatState.Attacking)
+		{
+			_entity.SetSpeed (_entity.blockSpeed);
+		}
+		else
+		{
+			_entity._anim.SetBool("Blocking", false);
+			_entity.SetSpeed (_entity.walkSpeed);
 		}
 	}
 }

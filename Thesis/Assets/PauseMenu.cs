@@ -11,11 +11,14 @@ public class PauseMenu : MonoBehaviour {
 	public EventSystem _eventSystem;
 	public LevelManager _manager;
 	public UI _ui;
+	public PlayerInput _input;
+
+	[HideInInspector] public bool canMove = true;
+
+	[Header("UI")]
 	public CanvasGroup cg;
 	public RectTransform myRect;
-	public PlayerInput _input;
 	public float moveSpeed = .5f;
-	[HideInInspector] public bool canMove = true;
 
 	[Header("Selection Box")]
 	public RectTransform selectionBox;
@@ -30,7 +33,7 @@ public class PauseMenu : MonoBehaviour {
 	public Button quit;
 
 	[Header("Tabs")]
-	public Tabs currentTab = Tabs.Options;
+	public Tabs currentTab = Tabs.Inventory;
 	[Header(" ")]
 	public Button inventory;
 	public CanvasGroup inventoryCG;
@@ -41,6 +44,9 @@ public class PauseMenu : MonoBehaviour {
 	public Button options;
 	public CanvasGroup optionsCG;
 
+	int tabLength;
+
+	//currently selected GO
 	RectTransform Current
 	{
 		get 
@@ -62,7 +68,11 @@ public class PauseMenu : MonoBehaviour {
 			}
 			return currentlySelected;
 		}
-		set { currentlySelected = value.GetComponent<RectTransform>(); }
+		set 
+		{
+			_eventSystem.SetSelectedGameObject(value.gameObject);
+		 	currentlySelected = value;
+		}
 	}
 
 	GameObject Default
@@ -77,11 +87,15 @@ public class PauseMenu : MonoBehaviour {
 		LevelManager.pause += OnPause;
 		LevelManager.unPause += OnResume;
 		PauseMenuUI.selected += OnSelected;
-		Reset();
+		_input.onL1 += TabLeft;
+		_input.onR1 += TabRight;
+		//gets length of tabs
+		tabLength = System.Enum.GetValues(typeof(Tabs)).Length;
 	}
 
 	void Start()
 	{
+		StartCoroutine(Reset());
 		_eventSystem.firstSelectedGameObject = Default;
 	}
 
@@ -90,6 +104,8 @@ public class PauseMenu : MonoBehaviour {
 		LevelManager.pause -= OnPause;
 		LevelManager.unPause -= OnResume;
 		PauseMenuUI.selected -= OnSelected;
+		_input.onL1 -= TabLeft;
+		_input.onR1 -= TabRight;
 	}
 
 	//sets the current selected uI object to options, resets tab open
@@ -99,9 +115,43 @@ public class PauseMenu : MonoBehaviour {
 		while(cg.alpha > 0) yield return null;
 		_eventSystem.SetSelectedGameObject(Default);
 		Current = _eventSystem.currentSelectedGameObject.GetComponent<RectTransform>();
-		selectionBox.position = Current.position;
-		selectionBox.sizeDelta = Current.sizeDelta;
 		SetTab((int)Tabs.Inventory);
+		MoveBoxToTab();
+	}
+
+	void TabLeft()
+	{
+		if((int)currentTab == 0) return;
+		currentTab = (Tabs)(currentTab - 1);
+		SetTab((int)currentTab);
+		MoveBoxToTab();
+	}
+
+	void TabRight()
+	{
+		if((int)currentTab == tabLength - 1) return;
+		currentTab = (Tabs)currentTab + 1;
+		SetTab((int)currentTab);
+		MoveBoxToTab();
+	}
+
+	void MoveBoxToTab()
+	{
+		switch(currentTab)
+		{
+			case Tabs.Inventory:
+				Current = inventory.GetComponent<RectTransform>();
+				StartCoroutine(MoveBox());
+			break;
+			case Tabs.Quests:
+				Current = quests.GetComponent<RectTransform>();
+				StartCoroutine(MoveBox());
+			break;
+			case Tabs.Options:
+				Current = options.GetComponent<RectTransform>();
+				StartCoroutine(MoveBox());
+			break;
+		}
 	}
 
 	//called when paused
@@ -173,9 +223,9 @@ public class PauseMenu : MonoBehaviour {
 		{
 			if(currentTab != Tabs.Quests)
 			{
-				if(Mathf.Abs(_input._axisHorizontal) > 0.1f || Mathf.Abs(_input._axisVertical) > 0.1f)
+				if(Mathf.Abs(_input.RAnalog.x) > 0.1f || Mathf.Abs(_input.RAnalog.y) > 0.1f)
 				{
-					myRect.position = ClampToRect(screenRect, myRect) + (new Vector2(_input._axisHorizontal, _input._axisVertical) * moveSpeed);
+					myRect.position = ClampToRect(screenRect, myRect) + (_input.RAnalog * moveSpeed);
 					selectionBox.position = Current.position;
 				}
 			}

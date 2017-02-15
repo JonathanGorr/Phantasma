@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using CharacterController;
 
 public class Footsteps : MonoBehaviour {
 

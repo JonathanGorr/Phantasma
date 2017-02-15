@@ -25,8 +25,8 @@ namespace Inventory
 
 		public void UpdateCount()
 		{
-			circle.color = amount <= 0 ? Color.clear: Color.white;
-			text.text = amount <= 0 ? "" : amount.ToString();
+			circle.color = amount <= 1 ? Color.clear: Color.white;
+			text.text = amount <= 1 ? "" : amount.ToString();
 		}
 
 		public void OnBeginDrag(PointerEventData eventData)

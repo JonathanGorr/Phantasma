@@ -3,31 +3,45 @@ using System.Collections;
 
 public class FadeOutSprite : MonoBehaviour {
 
-	private SpriteRenderer spriteRenderer;
-	private Color start;
-	private Color end;
-	public float delay = -5f;
+	public bool fadeOnSpawn = true;
+	private Renderer rend;
+	bool fading = false;
 
-	void Start ()
+	private float fadeTime = 3;
+	public float FadeTime
 	{
-		spriteRenderer = GetComponent<SpriteRenderer> ();
-		start = spriteRenderer.color;
-		//rgba
-		end = new Color (start.r, start.g, start.b, 0.0f);
+		set { fadeTime = value; }
+	}
+	private float delay = 3;
+	public float Delay
+	{
+		set { delay = value; }
 	}
 
-	void Update()
+	void OnEnable ()
 	{
-		//tell time
-		delay += Time.deltaTime;
+		rend = GetComponent<Renderer>();
+		if(fadeOnSpawn) Fade();
+	}
 
-		//fade sprite out over time
-		GetComponent<Renderer>().material.color = Color.Lerp (start, end, delay/2);
+	public void Fade()
+	{	
+		if(fading) return;
+		fading = true;
+		StartCoroutine(FadeOut());
+	}
 
-		//destroy object if not visible
-		if(GetComponent<Renderer>().material.color.a <= 0.0)
+	IEnumerator FadeOut()
+	{
+		yield return new WaitForSeconds(delay);
+		float t = 0;
+		while(t < fadeTime)
 		{
-			Destroy(gameObject);
+			t += Time.deltaTime/fadeTime;
+			rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, Mathf.Lerp(1, 0, t));
+			yield return null;
 		}
+
+		Destroy(this.gameObject);
 	}
 }

@@ -11,6 +11,7 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] playerJump;
 	public AudioClip[] playerDied;
 	public AudioClip[] sheathes;
+	public AudioClip[] slide;
 	[Header("Enemy")]
 	public AudioClip[] enemyHurt;
 	public AudioClip[] enemyDied;
@@ -19,8 +20,19 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] bowDraw;
 	public AudioClip[] bowShoot;
 	[Header("Collision")]
-	public AudioClip[] shieldCollide;
+	public AudioClip[] block;
 	public AudioClip[] weaponCollide;
+	public AudioClip[] arrowImpact_Wood;
+	public AudioClip[] arrowImpact_Flesh;
+	[Header("Status")]
+	public AudioClip heal;
+	[Header("Environment")]
+	public AudioClip[] potSmashes;
+	[Header("Money")]
+	public AudioClip coinBounces;
+	public AudioClip buy;
+	public AudioClip[] coinDrops;
+	public AudioClip[] coinCollects;
 
 	public AudioSource asrc;
 	[Header("UI")]
@@ -128,20 +140,61 @@ public class SFX : MonoBehaviour {
 			case "jump":
 				clip = playerJump[Random.Range(0, playerJump.Length)];
 				break;
-			case "bow_Draw":
+
+			//arrow
+			case "draw_arrow":
 				clip = bowDraw[Random.Range(0, bowDraw.Length)];
 				break;
-			case "bow_Shoot":
+			case "fire_arrow":
 				clip = bowShoot[Random.Range(0, bowShoot.Length)];
 				break;
-			case "shield_hit":
-				clip = shieldCollide[Random.Range(0, shieldCollide.Length)];
+			case "arrow_Enemy":
+				clip = arrowImpact_Flesh[Random.Range(0, arrowImpact_Flesh.Length)];
 				break;
-			case "weapon_hit":
+			case "arrow_Player":
+				clip = arrowImpact_Flesh[Random.Range(0, arrowImpact_Flesh.Length)];
+				break;
+			case "arrow_Wood":
+				clip = arrowImpact_Wood[Random.Range(0, arrowImpact_Wood.Length)];
+				break;
+			case "arrow_Stone":
+				clip = block[Random.Range(0, block.Length)];
+				break;
+			case "arrow_Untagged":
+				clip = arrowImpact_Wood[Random.Range(0, arrowImpact_Wood.Length)];
+				break;
+
+			//environment
+			case "smash":
+				clip = potSmashes[Random.Range(0, potSmashes.Length)];
+				break;
+			case "coin_bounce":
+				clip = coinBounces;
+				break;
+			case "buy":
+				clip = buy;
+				break;
+			case "coin_drop":
+				clip = coinDrops[Random.Range(0, coinDrops.Length)];
+				break;
+			case "coin_pickup":
+				clip = coinCollects[Random.Range(0, coinCollects.Length)];
+				break;
+
+			case "block":
+				clip = block[Random.Range(0, block.Length)];
+				break;
+			case "weapons_collide":
 				clip = weaponCollide[Random.Range(0, weaponCollide.Length)];
 				break;
 			case "sheathe":
 				clip = sheathes[Random.Range(0, sheathes.Length)];
+				break;
+			case "slide":
+				clip = slide[Random.Range(0, slide.Length)];
+				break;
+			case "heal":
+				clip = heal;
 				break;
 			default:
 				print(command + " was not a recognized SFX command");

@@ -6,21 +6,20 @@ using UnityEngine.UI;
 public class PauseMenuSlider : PauseMenuUI {
 
 	public PauseMenu _menu;
-	public LevelManager _manager;
 	public PlayerInput _input;
-	public bool selected = false;
 	public Slider slider;
+	public bool isSelected = false;
 	public float speed = .1f;
 
 	void Update()
 	{
 		if(!_manager.paused) return;
-		if(!selected) return;
+		if(!isSelected) return;
 
 		//move the slider value with horizontal axis
-		if(Mathf.Abs(_input._axisHorizontal) > 0.1f)
+		if(Mathf.Abs(_input.RAnalog.x) > 0.1f)
 		{
-			slider.value += _input._axisHorizontal * speed;
+			slider.value += _input.RAnalog.x * speed;
 		}
 	}
 
@@ -28,12 +27,12 @@ public class PauseMenuSlider : PauseMenuUI {
 	{
 		base.OnSelect(eventData);
 		_menu.canMove = false;
-		selected = true;
+		isSelected = true;
 	}
 
 	public override void OnDeselect(UnityEngine.EventSystems.BaseEventData eventData)
 	{
 		_menu.canMove = true;
-		selected = false;
+		isSelected = false;
 	}
 }

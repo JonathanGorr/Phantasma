@@ -40,6 +40,16 @@ public class UI : MonoBehaviour {
 
 	public float fadeSpeed = 4;
 
+	public Slider MyHealthBar
+	{
+		get { return _healthBar; }
+	}
+
+	public Slider MyStaminaBar
+	{
+		get { return _staminaBar; }
+	}
+
 	//the quest objective list
 	//public List<QuestSystem.QuestUI> questUIList = new List<QuestSystem.QuestUI>();
 	public List<QuestSystem.ObjectiveUI> objectiveUIList = new List<QuestSystem.ObjectiveUI>();
@@ -68,20 +78,10 @@ public class UI : MonoBehaviour {
 	{
 		if(_manager.paused)
 		{
-			_questScrollBar.value += _input._axisVertical * questScrollSpeed;
+			_questScrollBar.value += _input.RAnalog.y * questScrollSpeed;
 		}
 	}
 
-	public void UpdateHealthBar(int health, int maxHealth)
-	{
-		_healthBar.maxValue = maxHealth;
-		_healthBar.value = health;
-	}
-	public void UpdateStaminaBar(float stamina, float maxStamina)
-	{
-		_staminaBar.maxValue = maxStamina;
-		_staminaBar.value = stamina;
-	}
 	public static void TurnOff(CanvasGroup cg)
 	{
 		cg.alpha = 0;

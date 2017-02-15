@@ -53,6 +53,8 @@ public class LevelManager : MonoBehaviour {
 	void Awake()
 	{
 		SceneManager.sceneLoaded += OnSceneLoaded;
+		_input.onStart += Pause;
+		_input.onSelect += ControlWindow;
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
@@ -75,52 +77,21 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
-	void Update()
+	public void ControlWindow()
 	{
-		if(currentSceneName != "Start") return;
-
-		if(paused)
-		{
-			if(_input._roll)
-			{
-				Resume();
-			}
-		}
-		//pause
-		if(_input._pause)
-		{
-			//toggle
-			paused = !paused;
-
-			if(paused)
-			{
-				Pause();
-			}
-			else
-			{
-				Resume();
-			}
-		}
-		//cannot open control menu when paused
-		else if(_input._select)
-		{
-			//toggle
-			controlOn = !controlOn;
-
-			if(controlOn)
-			{
-				ui.Reveal(ui._controlScreen);
-			}
-			else
-			{
-				ui.Hide(ui._controlScreen);
-			}
-		}
+		print("show");
+		//toggle
+		controlOn = !controlOn;
+		if(controlOn)ui.Reveal(ui._controlScreen);
+		else ui.Hide(ui._controlScreen);
 	}
 
 	public void Pause()
 	{
-		StartCoroutine(IEPause());
+		if(_input.L1Down) return;
+		paused = !paused;
+		if(paused) StartCoroutine(IEPause());
+		else StartCoroutine(IEResume());
 	}
 	private IEnumerator IEPause()
 	{

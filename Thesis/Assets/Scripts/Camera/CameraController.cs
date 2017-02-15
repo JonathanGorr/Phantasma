@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour {
 	public float m_DampTime = 0.2f;
 	public float m_ScreenEdgeBuffer = 4f;
 	public float m_MinSize = 6.5f;
+	public float height = 30f;
 	/*[HideInInspector]*/ public List<Transform> m_Targets = new List<Transform>();
 
 	private float m_ZoomSpeed;
@@ -86,6 +87,7 @@ public class CameraController : MonoBehaviour {
 		}
 		//don't chnage camera z
 		averagePos.z = transform.position.z;
+		averagePos.y += height;
 		return averagePos;
 	}
 
@@ -123,6 +125,6 @@ public class CameraController : MonoBehaviour {
 
 	void SetStartPositionAndSize()
 	{
-		transform.position = FindAveragePosition() + new Vector3(0, 30, 0);
+		transform.position = FindAveragePosition() + new Vector3(0, height, 0);
 	}
 }

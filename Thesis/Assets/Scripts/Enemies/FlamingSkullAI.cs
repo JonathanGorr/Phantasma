@@ -26,8 +26,10 @@ public class FlamingSkullAI : Entity {
 
 	private Color debugColor;
 
-	void Start()
+	public override void Start()
 	{
+		base.Start();
+
 		_anim = GetComponent<Animator> ();
 		
 		//cache transform, dont call every frame 

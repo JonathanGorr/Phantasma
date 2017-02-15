@@ -7,8 +7,12 @@ namespace Inventory
 {
 	public class InventoryInfo : MonoBehaviour {
 
-		private bool shown = false;
+		public PlayerInput _input;
+		private LevelManager _manager;
+		bool canShow = false;
+		bool shown = false;
 		bool moving = false;
+		private Item item;
 		public CanvasGroup cg;
 		public RectTransform myRect;
 		public Text title;
@@ -16,19 +20,77 @@ namespace Inventory
 		public Text power;
 		public Text defense;
 		public Text vitality;
-		public Text rarity;
 		public float moveSpeed = 8;
 		float t;
+
+		public bool CanShow
+		{
+			get { return canShow; }
+			set { canShow = value; }
+		}
 
 		public bool Shown
 		{
 			get { return shown; }
 		}
 
+		void Awake()
+		{
+			_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
+			_input.onLeftTrigger += Toggle;
+			LevelManager.pause += CannotShow;
+			LevelManager.unPause += HideInfo;
+		}
+
+		void CannotShow() { canShow = false; }
+
 		public void Toggle()
 		{
+			//not shown and can't be shown so don't
+			if(!_manager.paused)  return;
+			if(!canShow && !shown) return;
 			if(moving) StopCoroutine("Move");
 			StartCoroutine("Move");
+		}
+
+		void HideInfo()
+		{
+			if(!shown) return;
+			if(moving) StopCoroutine("Move");
+			StartCoroutine("Move");
+		}
+
+		Color RarityColor(Item.ItemRarity rarity)
+		{
+			switch(rarity)
+			{
+				case Item.ItemRarity.common:
+				return Color.black;
+				break;
+				case Item.ItemRarity.uncommon:
+				return Color.yellow;
+				break;
+				case Item.ItemRarity.rare:
+				return new Color(1,0,1);
+				break;
+				case Item.ItemRarity.legendary:
+				return Color.red;
+				break;
+				default:
+				return Color.black;
+				break;
+			}
+		}
+
+		public void SetInfo(Item i)
+		{
+			item = i;
+			title.text = item.Title;
+			title.color = RarityColor(i.Rarity);
+			description.text = item.Description;
+			power.text = item.Power.ToString();
+			defense.text = item.Defense.ToString();
+			vitality.text = item.Vitality.ToString();
 		}
 
 		// moves info panel behind and to the side of the main
@@ -75,11 +137,6 @@ namespace Inventory
 		public string Vitality
 		{
 			set { vitality.text = value; }
-		}
-
-		public string Rarity
-		{
-			set { rarity.text = value; }
 		}
 	}
 }

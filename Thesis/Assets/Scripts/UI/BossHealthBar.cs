@@ -12,6 +12,7 @@ public class BossHealthBar : MonoBehaviour {
 	private GameObject _victoryScreen;
 	private PlayerPreferences _prefs;
 	private PlayerInput _input;
+	bool returnToMenu = false;
 	
 	[HideInInspector]
 	public bool bossFight = false;
@@ -49,6 +50,7 @@ public class BossHealthBar : MonoBehaviour {
 			_slider.minValue = 0;
 			gameObject.SetActive (true);
 			_gameOver.SetInteger("AnimState", 0);
+			_input.onRightTrigger += CanReturn;
 		}
 	}
 	
@@ -77,7 +79,7 @@ public class BossHealthBar : MonoBehaviour {
 		//say thanks
 		_gameOver.SetInteger("AnimState", 1);
 
-		yield return StartCoroutine(WaitForButton());
+		while(!returnToMenu) yield return null;
 
 		//hide thanks
 		_gameOver.SetInteger("AnimState", 0);
@@ -86,11 +88,9 @@ public class BossHealthBar : MonoBehaviour {
 		_prefs.EraseAll();
 		_manager.ReturnToMenu();
 	}
-	
-	//while the button is not pressed, stuck in a loop
-	IEnumerator WaitForButton()
+
+	void CanReturn()
 	{
-		while (!_input._strongAttack)
-			yield return null;
+		returnToMenu = true;
 	}
 }

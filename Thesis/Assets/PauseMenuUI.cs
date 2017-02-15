@@ -5,11 +5,19 @@ using UnityEngine.EventSystems;
 
 public class PauseMenuUI : UIHandler, ISelectHandler {
 
+	public LevelManager _manager;
 	public delegate void Selected();
 	public static event Selected selected;
 
+	public override void Start()
+	{
+		base.Start();
+		if(!_manager) _manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
+	}
+
 	public override void OnSelect(BaseEventData eventData)
 	{
+		if(!_manager.paused) return;
 		base.OnSelect(eventData);
 		if(selected != null) selected();
 	}

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using CharacterController;
 
 /// <summary>
 /// this script just captures the OnTrigger* messages and passes them on to the CharacterController2D
@@ -8,7 +8,6 @@ using System.Collections;
 public class CC2DTriggerHelper : MonoBehaviour
 {
 	private CharacterController2D _parentCharacterController;
-
 
 	public void setParentCharacterController( CharacterController2D parentCharacterController )
 	{

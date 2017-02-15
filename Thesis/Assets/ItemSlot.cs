@@ -5,14 +5,49 @@ using UnityEngine.EventSystems;
 
 namespace Inventory
 {
-	public class ItemSlot : MonoBehaviour, IDropHandler 
+	public class ItemSlot : MonoBehaviour, IDropHandler, ISelectHandler, IDeselectHandler
 	{
-		[HideInInspector] public int id;
+		private int id;
 		private Inventory inv;
+		private InventoryInfo info;
+
+		public int ID
+		{
+			get { return id; }
+			set { id = value; }
+		}
+
+		public Inventory Inventory
+		{
+			get { return inv; }
+			set { inv = value; }
+		}
 
 		void Start()
 		{
-			inv = GameObject.Find("Inventory").GetComponent<Inventory>();
+			info = GameObject.Find("InfoPanel").GetComponent<InventoryInfo>();
+		}
+
+		public void OnSelect(BaseEventData eventData)
+		{
+			//if this slot is empty, and the info panel is being shown, hide it
+			if(Inventory == null) print("null");
+			if(Inventory.items[id].ID == -1)
+			{
+				//can't show because no item
+				info.CanShow = false;
+				info.SetInfo(new Item());
+				info.Toggle();
+				return;
+			}
+
+			info.CanShow = true;
+			info.SetInfo(eventData.selectedObject.transform.GetChild(0).GetComponent<ItemData>().Item);
+		}
+
+		public void OnDeselect(BaseEventData eventData)
+		{
+			info.SetInfo(new Item());
 		}
 
 		public void OnDrop(PointerEventData eventData)
@@ -20,21 +55,21 @@ namespace Inventory
 			ItemData droppedItem = eventData.pointerDrag.GetComponent<ItemData>();
 
 			//if this slot is empty...
-			if(inv.items[id].ID == -1)
+			if(Inventory.items[id].ID == -1)
 			{
 				//on item move, replace former slot item with empty one
-				inv.items[droppedItem.slot] = new Item();
+				Inventory.items[droppedItem.slot] = new Item();
 				//set being dragged item slot to this slot
-				inv.items[id] = droppedItem.Item;
+				Inventory.items[id] = droppedItem.Item;
 				droppedItem.slot = id;
 			}
 			//swap items if slot already occupied
-			else
+			else if(droppedItem.slot != id)
 			{
 				//get my object and set it to the dragged item's last slot
 				Transform item =  this.transform.GetChild(0);
 				item.GetComponent<ItemData>().slot = droppedItem.slot;
-				item.transform.SetParent(inv.slots[droppedItem.slot].transform);
+				item.transform.SetParent(Inventory.slots[droppedItem.slot].transform);
 				item.localPosition = Vector2.zero;
 
 				//set the dragged item's slot to this
@@ -43,8 +78,8 @@ namespace Inventory
 				droppedItem.transform.localPosition = Vector2.zero;
 
 				//swap location of items in inventory list
-				inv.items[droppedItem.slot] = item.GetComponent<ItemData>().Item;
-				inv.items[id] = droppedItem.Item;
+				Inventory.items[droppedItem.slot] = item.GetComponent<ItemData>().Item;
+				Inventory.items[id] = droppedItem.Item;
 			}
 		}
 	}
