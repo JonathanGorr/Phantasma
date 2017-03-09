@@ -49,14 +49,18 @@ public class DayNightSystem : MonoBehaviour {
 	{
 		inAVolume = true;
 		nextColor = CastleColor;
+		#if UNITY_EDITOR
 		print ("in castle");
+		#endif
 	}
 
 	public void Cemetary()
 	{
 		inAVolume = true;
 		nextColor = CemetaryColor;
+		#if UNITY_EDITOR
 		print ("in cemetary");
+		#endif
 	}
 
 	public void Outside()

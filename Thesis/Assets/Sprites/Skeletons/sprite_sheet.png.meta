@@ -1,0 +1,392 @@
+fileFormatVersion: 2
+guid: f6ff196c9f1a8f541b76261f0eced49d
+timeCreated: 1487587093
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: sprite_sheet_shield
+    21300002: sprite_sheet_helmet
+    21300004: sprite_sheet_head
+    21300006: sprite_sheet_sword
+    21300008: sprite_sheet_ribcage
+    21300010: sprite_sheet_pelvis
+    21300012: sprite_sheet_rhand
+    21300014: sprite_sheet_belt
+    21300016: sprite_sheet_lhand
+    21300018: sprite_sheet_lfoot
+    21300020: sprite_sheet_lcalf
+    21300022: sprite_sheet_rcalf
+    21300024: sprite_sheet_larm
+    21300026: sprite_sheet_lleg
+    21300028: sprite_sheet_rarm
+    21300030: sprite_sheet_rleg
+    21300032: sprite_sheet_rshoe
+    21300034: sprite_sheet_lshoe
+    21300036: sprite_sheet_lforearm
+    21300038: sprite_sheet_rforearm
+    21300040: sprite_sheet_lfist
+    21300042: sprite_sheet_rfoot
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 336
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 256
+    textureFormat: 12
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 1
+    allowsAlphaSplitting: 0
+    overridden: 1
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: sprite_sheet_shield
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 428
+        width: 307
+        height: 301
+      alignment: 9
+      pivot: {x: 0.79337555, y: 0.48018384}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_helmet
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 389
+        width: 278
+        height: 340
+      alignment: 9
+      pivot: {x: 0.5429111, y: 0.46491376}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_head
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 462
+        width: 254
+        height: 267
+      alignment: 9
+      pivot: {x: 0.3262264, y: 0.28554052}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_sword
+      rect:
+        serializedVersion: 2
+        x: 875
+        y: 323
+        width: 134
+        height: 406
+      alignment: 9
+      pivot: {x: 0.41987768, y: 0.18707606}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_ribcage
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 179
+        width: 237
+        height: 237
+      alignment: 9
+      pivot: {x: 0.44463184, y: 0.10487321}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_pelvis
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 225
+        width: 234
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rhand
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 257
+        width: 88
+        height: 119
+      alignment: 9
+      pivot: {x: 0.43899813, y: 0.80073893}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_belt
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 219
+        width: 226
+        height: 231
+      alignment: 9
+      pivot: {x: 0.49736038, y: 0.75562805}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lhand
+      rect:
+        serializedVersion: 2
+        x: 847
+        y: 189
+        width: 88
+        height: 122
+      alignment: 9
+      pivot: {x: 0.58133626, y: 0.7835658}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lfoot
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 175
+        width: 88
+        height: 38
+      alignment: 9
+      pivot: {x: 0.14754313, y: 0.782537}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lcalf
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 79
+        width: 70
+        height: 134
+      alignment: 9
+      pivot: {x: 0.4829581, y: 0.7759765}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rcalf
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 83
+        width: 70
+        height: 130
+      alignment: 9
+      pivot: {x: 0.5681667, y: 0.71105725}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_larm
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 97
+        width: 66
+        height: 148
+      alignment: 9
+      pivot: {x: 0.5542242, y: 0.81435335}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lleg
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 85
+        width: 65
+        height: 122
+      alignment: 9
+      pivot: {x: 0.49082312, y: 0.7786764}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rarm
+      rect:
+        serializedVersion: 2
+        x: 669
+        y: 59
+        width: 64
+        height: 148
+      alignment: 9
+      pivot: {x: 0.434762, y: 0.8224138}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rleg
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 85
+        width: 64
+        height: 122
+      alignment: 9
+      pivot: {x: 0.5279598, y: 0.739564}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rshoe
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 73
+        width: 79
+        height: 94
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lshoe
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 73
+        width: 82
+        height: 94
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lforearm
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 26
+        width: 70
+        height: 137
+      alignment: 9
+      pivot: {x: 0.4233113, y: 0.8178249}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rforearm
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 26
+        width: 71
+        height: 136
+      alignment: 9
+      pivot: {x: 0.6008107, y: 0.8245476}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_lfist
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 67
+        height: 61
+      alignment: 9
+      pivot: {x: 0.08158377, y: 0.49999982}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sprite_sheet_rfoot
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 27
+        width: 66
+        height: 34
+      alignment: 9
+      pivot: {x: 0.48192516, y: 0.9034925}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

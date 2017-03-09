@@ -10,7 +10,8 @@ using System.Collections;
 [RequireComponent(typeof(Explodable))]
 public class Destructable : MonoBehaviour {
 
-	private SFX _sfx;
+	public Health health;
+	public Animator anim;
 	public Explodable _explodable;
 	public Rigidbody2D[] dependents;
 	public ParticleSystem particles;
@@ -19,15 +20,37 @@ public class Destructable : MonoBehaviour {
 	[Header("Reward")]
 	public Treasure treasure;
 
-	void Start()
-	{
-		_sfx = GameObject.Find("_LevelManager").GetComponent<SFX>();
-	}
-
 	[Header("Explosion Parms")]
+	public string damageSFX = "pot";
+	public string shatterSFX = "pot";
 	public float force = 50;
 	public float radius = 5;
 	public float upliftModifer = 5;
+
+	public SpriteRenderer damageSprite;
+
+	void Awake()
+	{
+		health.onHurt += Damage;
+		health.onDeath += Destroy;
+	}
+
+	void OnDisable()
+	{
+		health.onHurt -= Damage;
+	}
+
+	void Damage(Entity e)
+	{
+		anim.SetTrigger("Damage");
+		if(damageSprite) damageSprite.material.color = Color.Lerp(Color.clear, Color.white, (float)health.maxHealth/(float)health.health); 
+		SFX.Instance.PlayFX("damage_" + damageSFX, transform.position);
+	}
+
+	void Destroy()
+	{
+		Explode(transform.position);
+	}
 
 	public void Explode(Vector3 position)
 	{
@@ -35,7 +58,7 @@ public class Destructable : MonoBehaviour {
 
 		exploded = true;
 		if(treasure) treasure.Dispense();
-		_sfx.PlayFX("smash", position);
+		SFX.Instance.PlayFX("smash_" + shatterSFX, position);
 
 		//detach and play particles to death
 		particles.transform.SetParent(null);
@@ -49,8 +72,7 @@ public class Destructable : MonoBehaviour {
 			dependents[i].transform.SetParent(null);
 			dependents[i].isKinematic = false;
 			dependents[i].simulated = true;
-			if(dependents[i].GetComponent<FadeOutSprite>())
-				dependents[i].GetComponent<FadeOutSprite>().Fade();
+			if(dependents[i].GetComponent<FadeOutSprite>()) dependents[i].GetComponent<FadeOutSprite>().Fade();
 		}
 		_explodable.explode();
 		//StartCoroutine(waitAndExplode(position));

@@ -26,7 +26,7 @@ public class MessagingClientReceiver : MonoBehaviour
                 var conversation = dialog.Conversations[0];
                 if (conversation != null)
                 {
-					_conversationManager.StartConversation(conversation);
+					_conversationManager.StartConversation(transform, conversation);
                 }
             }
         }

@@ -1,0 +1,84 @@
+{
+    "items" : [
+        {
+            "id": 0,
+            "count" : 0,
+            "value": 1,
+            "slug": "blood",
+			"stackable": true,
+			"slots": false
+        },
+
+        {
+            "id": 1,
+            "count" : 0,
+            "value": 1,
+            "slug": "coin",
+			"stackable": true,
+			"slots": false
+        },
+
+        {
+            "id": 2,
+            "value": 10,
+            "slug": "coin",
+			"stackable": true,
+			"slots": false
+        },
+
+        {
+            "id": 3,
+            "value": 30,
+            "slug": "coin",
+			"stackable": true,
+			"slots": false
+        },
+
+        {
+            "id": 4,
+            "value": 0,
+            "slug": "scroll",
+			"stackable": false,
+			"slots": true
+        },
+
+        {
+            "id": 6,
+            "title": "Red Potion",
+            "description": "You can probably guess what it do.",
+            "value": 0,
+            "count": 0,
+            "slug": "potionRed",
+            "stats": [0,0,0],
+            "rarity": "common",
+            "stackable": true,
+            "slots": true
+        },
+
+        {
+            "id": 5,
+            "title": "Shield",
+            "description": "Use it to defend against attacks.",
+            "value": 6,
+            "count": 0,
+            "slots": true,
+            "stats": [0, 8, 4],
+			"stackable": false,
+            "rarity": "common",
+            "slug": "shield"
+        },
+
+        {
+            "id": 7,
+            "title": "Father",
+            "description": "Follows you eternally.",
+            "value": 0,
+            "count": 0,
+            "slots": true,
+            "stats":[10,0,0],
+            "stackable": false,
+            "rarity": "rare",
+            "slug": "father"
+        }
+    ]
+}

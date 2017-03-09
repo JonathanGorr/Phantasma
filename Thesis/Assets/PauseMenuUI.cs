@@ -17,7 +17,7 @@ public class PauseMenuUI : UIHandler, ISelectHandler {
 
 	public override void OnSelect(BaseEventData eventData)
 	{
-		if(!_manager.paused) return;
+		if(!PauseMenu.paused) return;
 		base.OnSelect(eventData);
 		if(selected != null) selected();
 	}

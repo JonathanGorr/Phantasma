@@ -5,13 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class BossHealthBar : MonoBehaviour {
 
-	private LevelManager _manager;
 	private Slider _slider;
 	private GameObject boss;
 	private Health _health;
 	private GameObject _victoryScreen;
-	private PlayerPreferences _prefs;
-	private PlayerInput _input;
 	bool returnToMenu = false;
 	
 	[HideInInspector]
@@ -19,7 +16,7 @@ public class BossHealthBar : MonoBehaviour {
 	private bool called;
 	
 	private Animator _victoryAnim;
-	private Animator _gameOver;
+	private CanvasGroup _gameOver;
 
 	void Awake()
 	{
@@ -28,29 +25,22 @@ public class BossHealthBar : MonoBehaviour {
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
-		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-
 		if(scene.name == "Menu")
 		{
 			gameObject.SetActive (false);
 		}
 		else if(scene.name == "Start")
 		{
+			print("start");
 			//health
 			boss = GameObject.Find ("Boss");
 			_health = boss.GetComponent<Health>();
-			_input = GetComponentInParent<PlayerInput> ();
-			_prefs = GetComponentInParent<PlayerPreferences>();
-			_gameOver = GameObject.Find("GameOver").GetComponent<Animator>();
+			_health.onDeath += Return;
+			_gameOver = GameObject.Find("GameOver").GetComponent<CanvasGroup>();
 			//victory Screen
 			_victoryScreen = GameObject.Find("VictoryScreen");
 			_victoryAnim = _victoryScreen.GetComponent<Animator>();
-			//bar
-			_slider = GetComponent<Slider> ();
-			_slider.minValue = 0;
 			gameObject.SetActive (true);
-			_gameOver.SetInteger("AnimState", 0);
-			_input.onRightTrigger += CanReturn;
 		}
 	}
 	
@@ -59,38 +49,32 @@ public class BossHealthBar : MonoBehaviour {
 		if(!_slider || !_health) return;
 		_slider.maxValue = _health.maxHealth;
 		_slider.value = _health.health;
+	}
 
-		//if boss is dead do stuff
-		if(_health.health <= 0 && !called)
-		{
-			_victoryAnim.SetTrigger("YouDefeated");
-			StartCoroutine(ReturnToMenu());
-		}
+	void Return()
+	{
+		_victoryAnim.SetTrigger("YouDefeated");
+		StartCoroutine(ReturnToMenu());
 	}
 
 	IEnumerator ReturnToMenu()
 	{
-		//stop update from calling this
-		called = true;
+		print("return to menu?");
 
 		//wait for victory anim to finish
 		yield return new WaitForSeconds (4f);
 
 		//say thanks
-		_gameOver.SetInteger("AnimState", 1);
+		Utilities.Instance.Reveal(_gameOver);
 
-		while(!returnToMenu) yield return null;
+		while(!PlayerInput.a) yield return null;
 
 		//hide thanks
-		_gameOver.SetInteger("AnimState", 0);
+		Utilities.Instance.Hide(_gameOver);
 
 		yield return new WaitForSeconds (1f);
-		_prefs.EraseAll();
-		_manager.ReturnToMenu();
-	}
+		PlayerPreferences.Instance.EraseAll();
 
-	void CanReturn()
-	{
-		returnToMenu = true;
+		LevelManager.Instance.ReturnToMenu();
 	}
 }

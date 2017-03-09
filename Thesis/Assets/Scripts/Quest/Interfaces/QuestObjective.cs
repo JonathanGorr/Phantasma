@@ -18,6 +18,12 @@ namespace QuestSystem
 		public bool isBonus;
 		public string[] rewards;
 
+		public delegate void OnComplete();
+		public event OnComplete onCompleted;
+
+		public delegate void OnActivated();
+		public event OnActivated onActivated;
+
 		public virtual Quest Quest
 		{
 			get { return quest; }
@@ -55,10 +61,11 @@ namespace QuestSystem
 
 		public virtual void Activate()
 		{
+			if(onActivated!=null) onActivated();
 			//gets a new objectiveUI if not already existing
-			if(!objUI) objUI = quest.QuestManager._ui.GetObjectiveUI();
-			quest.QuestManager._sfx.PlayUI("questUpdate");
-			quest.QuestManager._ui.QuestUpdate(1);
+			if(!objUI) objUI = UI.Instance.GetObjectiveUI();
+			SFX.Instance.PlayUI("questUpdate");
+			UI.Instance.QuestUpdate(1);
 			isActive = true;
 			UpdateUI();
 		}
@@ -75,9 +82,10 @@ namespace QuestSystem
 
 		public void SetComplete()
 		{
+			if(onCompleted!=null) onCompleted();
 			isComplete = true;
-			quest.QuestManager._sfx.PlayUI("questCompleted");
-			quest.QuestManager._ui.QuestUpdate(1);
+			SFX.Instance.PlayUI("questCompleted");
+			UI.Instance.QuestUpdate(1);
 			UpdateUI();
 		}
 

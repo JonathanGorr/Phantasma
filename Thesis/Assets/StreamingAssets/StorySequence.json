@@ -1,0 +1,16 @@
+{
+	"HasWeapons": false,
+	"HasFollower": false,
+	
+	"Level1":[
+		{
+		"MetMother": false,
+		"MetFather": false,
+		"SwordLesson": false,
+		"WheresMom": false,
+		"BowLesson": false,
+		"Puzzle": false,
+		"BossFight": false
+		}	
+	]
+}

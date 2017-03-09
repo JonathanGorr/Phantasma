@@ -32,7 +32,7 @@ namespace Inventory
 		{
 			//if this slot is empty, and the info panel is being shown, hide it
 			if(Inventory == null) print("null");
-			if(Inventory.items[id].ID == -1)
+			if(Inventory.items[id].id == -1)
 			{
 				//can't show because no item
 				info.CanShow = false;
@@ -55,7 +55,7 @@ namespace Inventory
 			ItemData droppedItem = eventData.pointerDrag.GetComponent<ItemData>();
 
 			//if this slot is empty...
-			if(Inventory.items[id].ID == -1)
+			if(Inventory.items[id].id == -1)
 			{
 				//on item move, replace former slot item with empty one
 				Inventory.items[droppedItem.slot] = new Item();

@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
 public enum Tabs { Inventory, Quests, Options }
 
 public class PauseMenu : MonoBehaviour {
 
+	public static bool paused = false;
+
 	[Header("References")]
 	public EventSystem _eventSystem;
-	public LevelManager _manager;
 	public UI _ui;
-	public PlayerInput _input;
 
 	[HideInInspector] public bool canMove = true;
 
@@ -45,6 +46,13 @@ public class PauseMenu : MonoBehaviour {
 	public CanvasGroup optionsCG;
 
 	int tabLength;
+
+	public delegate void OnPause();
+	public static event OnPause pause;
+	public delegate void UnPause();
+	public static event UnPause unPause;
+
+	string currentSceneName;
 
 	//currently selected GO
 	RectTransform Current
@@ -83,14 +91,24 @@ public class PauseMenu : MonoBehaviour {
 
 	void Awake()
 	{
+		SceneManager.sceneLoaded += OnSceneLoaded;
+
 		screenRect = new Rect(0,0, Screen.width, Screen.height);
-		LevelManager.pause += OnPause;
-		LevelManager.unPause += OnResume;
+
+		PlayerInput.onStart += Pause;
 		PauseMenuUI.selected += OnSelected;
-		_input.onL1 += TabLeft;
-		_input.onR1 += TabRight;
+		PlayerInput.onL1 += TabLeft;
+		PlayerInput.onR1 += TabRight;
+
+		LevelManager.onLevelChange += Resume;
+
 		//gets length of tabs
 		tabLength = System.Enum.GetValues(typeof(Tabs)).Length;
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode m)
+	{
+		currentSceneName = scene.name;
 	}
 
 	void Start()
@@ -101,11 +119,54 @@ public class PauseMenu : MonoBehaviour {
 
 	void OnDisable()
 	{
-		LevelManager.pause -= OnPause;
-		LevelManager.unPause -= OnResume;
+		PlayerInput.onStart -= Pause;
 		PauseMenuUI.selected -= OnSelected;
-		_input.onL1 -= TabLeft;
-		_input.onR1 -= TabRight;
+		PlayerInput.onL1 -= TabLeft;
+		PlayerInput.onR1 -= TabRight;
+	}
+
+	public void Pause()
+	{
+		if(currentSceneName == "Menu" || currentSceneName == "Initialize") return;
+		if(PlayerInput.Instance.L1Down) return;
+
+		paused = !paused;
+		if(paused) StartCoroutine(IEPause());
+		else StartCoroutine(IEResume());
+	}
+
+	private IEnumerator IEPause()
+	{
+		paused = true;
+		yield return new WaitForEndOfFrame();
+		if(pause != null) pause();
+		_ui.ClearUpdates();
+		Utilities.Instance.Reveal(cg);
+		//set this button as the active selection
+		if(PlayerInput.Instance.inputState == PlayerInput.InputState.MouseKeyboard) Cursor.visible = true;
+		//play sound then wait until sound finished to set volume
+		SFX.Instance.PlayUI("pause");
+		while(SFX.Instance.asrc.isPlaying) { yield return null; }
+		AudioListener.volume = .25f;
+	}
+
+	public void Resume()
+	{
+		if(!paused) return;
+		StartCoroutine(IEResume());
+	}
+
+	public IEnumerator IEResume()
+	{
+		paused = false;
+		yield return new WaitForEndOfFrame();
+		if(unPause != null) unPause();
+		//resume if not paused
+		SFX.Instance.PlayUI("pause");
+		AudioListener.volume = 1f;
+		Utilities.Instance.Hide(cg);
+		if(PlayerInput.Instance.inputState == PlayerInput.InputState.MouseKeyboard) Cursor.visible = false;
+		yield return null;
 	}
 
 	//sets the current selected uI object to options, resets tab open
@@ -154,11 +215,6 @@ public class PauseMenu : MonoBehaviour {
 		}
 	}
 
-	//called when paused
-	void OnPause()
-	{
-	}
-
 	public void SetTab(int tab)
 	{
 		//don't bother if not different tab
@@ -167,19 +223,19 @@ public class PauseMenu : MonoBehaviour {
 		switch(currentTab)
 		{
 			case Tabs.Inventory:
-			UI.TurnOn(inventoryCG);
-			UI.TurnOff(questsCG);
-			UI.TurnOff(optionsCG);
+			inventoryCG.TurnOn();
+			questsCG.TurnOff();
+			optionsCG.TurnOff();
 			break;
 			case Tabs.Quests:
-			UI.TurnOff(inventoryCG);
-			UI.TurnOn(questsCG);
-			UI.TurnOff(optionsCG);
+			inventoryCG.TurnOff();
+			questsCG.TurnOn();
+			optionsCG.TurnOff();
 			break;
 			case Tabs.Options:
-			UI.TurnOff(inventoryCG);
-			UI.TurnOff(questsCG);
-			UI.TurnOn(optionsCG);
+			inventoryCG.TurnOff();
+			questsCG.TurnOff();
+			optionsCG.TurnOn();
 			break;
 		}
 	}
@@ -216,16 +272,16 @@ public class PauseMenu : MonoBehaviour {
 
 	void Update()
 	{
-		if(!_manager.paused) return;
+		if(!PauseMenu.paused) return;
 
 		//move around window
 		if(canMove)
 		{
 			if(currentTab != Tabs.Quests)
 			{
-				if(Mathf.Abs(_input.RAnalog.x) > 0.1f || Mathf.Abs(_input.RAnalog.y) > 0.1f)
+				if(Mathf.Abs(PlayerInput.Instance.RAnalog.x) > 0.1f || Mathf.Abs(PlayerInput.Instance.RAnalog.y) > 0.1f)
 				{
-					myRect.position = ClampToRect(screenRect, myRect) + (_input.RAnalog * moveSpeed);
+					myRect.position = ClampToRect(screenRect, myRect) + (PlayerInput.Instance.RAnalog * moveSpeed);
 					selectionBox.position = Current.position;
 				}
 			}

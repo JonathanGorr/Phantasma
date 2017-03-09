@@ -4,7 +4,7 @@ using System.Collections;
 public class FadeOutSprite : MonoBehaviour {
 
 	public bool fadeOnSpawn = true;
-	private Renderer rend;
+	public Renderer rend;
 	bool fading = false;
 
 	private float fadeTime = 3;
@@ -12,15 +12,16 @@ public class FadeOutSprite : MonoBehaviour {
 	{
 		set { fadeTime = value; }
 	}
-	private float delay = 3;
+
+	public float fadeDelay = 3;
 	public float Delay
 	{
-		set { delay = value; }
+		set { fadeDelay = value; }
 	}
 
 	void OnEnable ()
 	{
-		rend = GetComponent<Renderer>();
+		if(!rend) rend = GetComponent<Renderer>();
 		if(fadeOnSpawn) Fade();
 	}
 
@@ -33,7 +34,7 @@ public class FadeOutSprite : MonoBehaviour {
 
 	IEnumerator FadeOut()
 	{
-		yield return new WaitForSeconds(delay);
+		yield return new WaitForSeconds(fadeDelay);
 		float t = 0;
 		while(t < fadeTime)
 		{

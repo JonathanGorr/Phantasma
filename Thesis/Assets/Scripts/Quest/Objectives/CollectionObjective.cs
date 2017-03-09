@@ -41,12 +41,12 @@ namespace QuestSystem
 		public override string Title
 		{
 			//i.e. Collect 5 bats.
-			get { return Quest.Title + " : " + verb + " " + collectionAmount + " " + itemToCollect.Title; }
+			get { return Quest.Title + " : " + verb + " " + collectionAmount + " " + itemToCollect.title; }
 		}
 
 		public override string Description
 		{
-			get { return currentAmount + "/" + collectionAmount + " " + itemToCollect.Title + " " + verb + "ed!"; }
+			get { return currentAmount + "/" + collectionAmount + " " + itemToCollect.title + " " + verb + "ed!"; }
 		}
 
 		public override string ToString()

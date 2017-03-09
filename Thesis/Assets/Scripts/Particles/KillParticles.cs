@@ -14,6 +14,6 @@ public class KillParticles : MonoBehaviour {
 	{
 		if(ps.isPlaying && !played) played = false;
 		if(!played) return;
-		if(!ps.IsAlive()) Destroy(gameObject);
+		if(!ps.IsAlive()) Destroy(this.gameObject);
 	}
 }

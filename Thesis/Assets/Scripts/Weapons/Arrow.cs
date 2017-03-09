@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Arrow : MonoBehaviour {
 
-	SFX _sfx;
+	public Entity myEntity;
 	public FadeOutSprite _fade;
 	public TrailRenderer trail;
 	public LayerMask pierceLayers;
@@ -12,14 +12,11 @@ public class Arrow : MonoBehaviour {
 	public SpriteRenderer rend;
 	public float stickDepth = .5f;
 	public float hitForce = 300;
+	public float staggerAmt = 1;
 	bool airborn = true;
 	int damage;
 	bool canDamage = true;
 
-	public SFX SFX
-	{
-		set { _sfx = value; }
-	}
 	public int Damage
 	{
 		set { damage = value; }
@@ -27,7 +24,6 @@ public class Arrow : MonoBehaviour {
 
 	void OnEnable()
 	{
-		if(!_sfx) _sfx = GameObject.Find("_LevelManager").GetComponent<SFX>();
 		trail.sortingLayerName = "Player";
 		trail.sortingOrder = -1;
 
@@ -46,30 +42,31 @@ public class Arrow : MonoBehaviour {
 
 			//deal damage
 			if(hits[i].transform.GetComponent<Health>())
-				hits[i].transform.GetComponent<Health>().TakeDamage(damage);
+				hits[i].transform.GetComponent<Health>().TakeDamage(myEntity, damage);
 
 			//adds a hit force to physics objects
 			if(hits[i].transform.GetComponent<Rigidbody2D>())
 				hits[i].transform.GetComponent<Rigidbody2D>().AddForceAtPosition(rbody.velocity.normalized * hitForce, hits[0].point);
 
-			//destroy pots
-			if(hits[i].transform.GetComponent<Destructable>())
-				hits[i].transform.GetComponent<Destructable>().Explode(hits[i].point);
-
 			if(hits[i].transform.GetComponent<PhysicsTrigger>())
 				hits[i].transform.GetComponent<PhysicsTrigger>().Collapse();
 
+			if(hits[i].collider.GetComponent<StaggerMeter>())
+				hits[i].collider.GetComponent<StaggerMeter>().AddStagger(staggerAmt);
+			
 			//stick if a stickobject
 			if(StaticMethods.IsInLayerMask(stickLayers, hits[i].collider.gameObject))
 			{
-				_sfx.PlayFX("arrow_" + hits[i].collider.tag, hits[i].point);
+				SFX.Instance.PlayFX("arrow_" + hits[i].collider.tag, hits[i].point);
 				canDamage = false;
 				airborn = false;
 				rbody.isKinematic = true;
-				transform.localScale = new Vector3(1/hits[i].transform.localScale.x, 1/hits[i].transform.localScale.y, 1);
+				transform.localScale = new Vector3(
+				1/(hits[i].transform.localScale.x < 0 ? -hits[i].transform.localScale.x : hits[i].transform.localScale.x),
+				1/hits[i].transform.localScale.y, 1);
 				transform.Translate(rbody.velocity.normalized * stickDepth);
 				transform.position = hits[i].point;
-				rbody.velocity = Vector2.zero;
+				rbody.velocity = Vector2.zero; //stop moving
 				transform.parent = hits[i].transform;
 				Destroy(trail);
 				_fade.Fade();

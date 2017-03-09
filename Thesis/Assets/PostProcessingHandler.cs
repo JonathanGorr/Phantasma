@@ -5,6 +5,8 @@ using UnityStandardAssets.ImageEffects;
 
 public class PostProcessingHandler : MonoBehaviour {
 
+	public static PostProcessingHandler Instance = null;
+
 	//vignette
 	public VignetteAndChromaticAberration vignette;
 	private float vignetting;
@@ -12,16 +14,17 @@ public class PostProcessingHandler : MonoBehaviour {
 
 	void Awake()
 	{
-		LevelManager.pause += ShowVignette;
-		LevelManager.unPause += HideVignette;
+		if(Instance == null) Instance = this;
+		PauseMenu.pause += ShowVignette;
+		PauseMenu.unPause += HideVignette;
 
 		vignetting = vignette.intensity;
 	}
 
 	void OnDisable()
 	{
-		LevelManager.pause -= ShowVignette;
-		LevelManager.unPause -= HideVignette;
+		PauseMenu.pause -= ShowVignette;
+		PauseMenu.unPause -= HideVignette;
 	}
 
 	public void Pause()

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class ItemSlotUI : MonoBehaviour {
 
-	public SFX _sfx;
 	public int stackLimit = 16;
 	public Text countText;
 	[SerializeField] private int count;
@@ -15,22 +14,20 @@ public class ItemSlotUI : MonoBehaviour {
 
 	void Awake()
 	{
-		count = Random.Range(0, 5);
-		if(count == 0) Destroy(icon.gameObject);
 		UpdateCount();
 	}
 
 	public void SetItem(Item item)
 	{
-		icon.sprite = Resources.Load<Sprite>("InventorySprites/" + item.SpriteID);
+		icon.sprite = Resources.Load<Sprite>("InventorySprites/" + item.slug);
 		count ++;
 		UpdateCount();
 	}
 
 	public void Consume()
 	{
-		
 		count --;
+
 		UpdateCount();
 	}
 

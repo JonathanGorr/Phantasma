@@ -14,9 +14,9 @@ public class ThiefAI : EnemyAI {
 		base.Move ();
 	}
 
-	public override void OnHurt ()
+	public override void OnHurt (Entity offender)
 	{
-		base.OnHurt ();
+		base.OnHurt (offender);
 	}
 
 	public override IEnumerator Patrol ()
@@ -28,7 +28,7 @@ public class ThiefAI : EnemyAI {
 
 			if(target)
 			{
-				target._cam.RegisterMe(myTransform);
+				cam.RegisterMe(myTransform);
 				_AIState = EnemyState.Chase;
 			}
 
@@ -43,26 +43,15 @@ public class ThiefAI : EnemyAI {
 		{
 			if (Distance() < attackRange)
 			{
-				canAttack = false;
 				speed = 0;
-
-				//choose random attack min max, result != max
-				int randomAttack = Random.Range(1, 3);
-				//choose 1 of 2 attacks that are close range
-				int closeAttack = Random.Range (2, 4);
-
-				_anim.SetTrigger("" + randomAttack);
-				//_weapon.Attack(0);
-
-				yield return new WaitForSeconds (attackDelay);
-				canAttack = true;
+				Attack();
 			}
 			yield return null;
 		}
 	}
 
-	public override IEnumerator Return ()
+	public override IEnumerator Search ()
 	{
-		return base.Return ();
+		return base.Search ();
 	}
 }

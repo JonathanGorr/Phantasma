@@ -38,12 +38,12 @@ TextureImporter:
     21300066: FireAtlas_33
     21300068: FireAtlas_34
     21300070: FireAtlas_35
-  serializedVersion: 2
+  serializedVersion: 4
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
+    sRGBTexture: 1
     linearTexture: 0
-    correctGamma: 0
     fadeOut: 0
     borderMipMap: 0
     mipMapFadeDistanceStart: 1
@@ -51,11 +51,12 @@ TextureImporter:
   bumpmap:
     convertToNormalMap: 0
     externalNormalMap: 0
-    heightScale: .25
+    heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
   grayScaleToAlpha: 0
-  generateCubemap: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
   seamlessCubemap: 0
   textureFormat: -1
   maxTextureSize: 1024
@@ -71,15 +72,47 @@ TextureImporter:
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
-  spritePivot: {x: .5, y: .5}
+  spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
+  alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationDetail: -1
   textureType: 8
-  buildTargetSettings: []
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 1024
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 256
+    textureFormat: 12
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 1
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: FireAtlas_0
+    - serializedVersion: 2
+      name: FireAtlas_0
       rect:
         serializedVersion: 2
         x: 0
@@ -87,9 +120,12 @@ TextureImporter:
         width: 341
         height: 341
       alignment: 7
-      pivot: {x: .5, y: 0}
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_1
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_1
       rect:
         serializedVersion: 2
         x: 341
@@ -99,7 +135,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_2
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_2
       rect:
         serializedVersion: 2
         x: 682
@@ -109,7 +148,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_3
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_3
       rect:
         serializedVersion: 2
         x: 1023
@@ -119,7 +161,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_4
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_4
       rect:
         serializedVersion: 2
         x: 1364
@@ -129,7 +174,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_5
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_5
       rect:
         serializedVersion: 2
         x: 1705
@@ -139,7 +187,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_6
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_6
       rect:
         serializedVersion: 2
         x: 0
@@ -149,7 +200,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_7
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_7
       rect:
         serializedVersion: 2
         x: 341
@@ -159,7 +213,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_8
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_8
       rect:
         serializedVersion: 2
         x: 682
@@ -169,7 +226,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_9
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_9
       rect:
         serializedVersion: 2
         x: 1023
@@ -179,7 +239,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_10
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_10
       rect:
         serializedVersion: 2
         x: 1364
@@ -189,7 +252,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_11
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_11
       rect:
         serializedVersion: 2
         x: 1705
@@ -199,7 +265,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_12
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_12
       rect:
         serializedVersion: 2
         x: 0
@@ -209,7 +278,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_13
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_13
       rect:
         serializedVersion: 2
         x: 341
@@ -219,7 +291,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_14
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_14
       rect:
         serializedVersion: 2
         x: 682
@@ -229,7 +304,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_15
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_15
       rect:
         serializedVersion: 2
         x: 1023
@@ -239,7 +317,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_16
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_16
       rect:
         serializedVersion: 2
         x: 1364
@@ -249,7 +330,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_17
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_17
       rect:
         serializedVersion: 2
         x: 1705
@@ -259,7 +343,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_18
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_18
       rect:
         serializedVersion: 2
         x: 0
@@ -269,7 +356,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_19
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_19
       rect:
         serializedVersion: 2
         x: 341
@@ -279,7 +369,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_20
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_20
       rect:
         serializedVersion: 2
         x: 682
@@ -289,7 +382,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_21
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_21
       rect:
         serializedVersion: 2
         x: 1023
@@ -299,7 +395,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_22
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_22
       rect:
         serializedVersion: 2
         x: 1364
@@ -309,7 +408,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_23
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_23
       rect:
         serializedVersion: 2
         x: 1705
@@ -319,7 +421,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_24
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_24
       rect:
         serializedVersion: 2
         x: 0
@@ -329,7 +434,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_25
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_25
       rect:
         serializedVersion: 2
         x: 341
@@ -339,7 +447,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_26
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_26
       rect:
         serializedVersion: 2
         x: 682
@@ -349,7 +460,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_27
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_27
       rect:
         serializedVersion: 2
         x: 1023
@@ -359,7 +473,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_28
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_28
       rect:
         serializedVersion: 2
         x: 1364
@@ -369,7 +486,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_29
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_29
       rect:
         serializedVersion: 2
         x: 1705
@@ -379,7 +499,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_30
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_30
       rect:
         serializedVersion: 2
         x: 0
@@ -389,7 +512,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_31
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_31
       rect:
         serializedVersion: 2
         x: 341
@@ -399,7 +525,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_32
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_32
       rect:
         serializedVersion: 2
         x: 682
@@ -409,7 +538,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_33
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_33
       rect:
         serializedVersion: 2
         x: 1023
@@ -419,7 +551,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_34
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_34
       rect:
         serializedVersion: 2
         x: 1364
@@ -429,7 +564,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: FireAtlas_35
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: FireAtlas_35
       rect:
         serializedVersion: 2
         x: 1705
@@ -439,5 +577,10 @@ TextureImporter:
       alignment: 7
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
   spritePackingTag: 
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

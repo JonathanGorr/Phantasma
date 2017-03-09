@@ -14,14 +14,7 @@ namespace Inventory
 		public Text text;
 		public Item Item { get; set; }
 		public int amount;
-		private Inventory inv;
-		private Transform originalParent;
 		Vector2 offset;
-
-		void Start()
-		{
-			inv = GameObject.Find("Inventory").GetComponent<Inventory>();
-		}
 
 		public void UpdateCount()
 		{
@@ -33,7 +26,6 @@ namespace Inventory
 		{
 			if(Item == null) return;
 			offset = eventData.position - new Vector2(this.transform.position.x, this.transform.position.y);
-			originalParent = this.transform.parent;
 			this.transform.SetParent(this.transform.parent.parent.parent);
 			this.transform.position = eventData.position - offset;
 			cg.blocksRaycasts = false;
@@ -48,8 +40,8 @@ namespace Inventory
 		public void OnEndDrag(PointerEventData eventData)
 		{
 			//grab the transform of the slot assigned to my item
-			this.transform.SetParent(inv.slots[slot].transform);
-			this.transform.position = inv.slots[slot].transform.position;
+			this.transform.SetParent(Inventory.Instance.slots[slot].transform);
+			this.transform.position = Inventory.Instance.slots[slot].transform.position;
 			cg.blocksRaycasts = true;
 		}
 	}

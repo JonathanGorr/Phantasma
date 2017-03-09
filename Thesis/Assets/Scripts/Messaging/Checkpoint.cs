@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Checkpoint.
+/// Triggers a conversation, progresses the story( and saves it ).
+/// Methods here can be used to deactivate the trigger as well as activate/deactivate colliders like doors
+/// </summary>
+
 public class Checkpoint : MonoBehaviour {
 
-	private PlayerPreferences _prefs;
-	private Animator _anim;
-	private LevelManager _manager;
-	private Evolution _evo;
-	private GameObject _playerGO;
-	private Health _playerHealth;
-	private Transform _target;
 	public bool
 		motherMet,
 		fatherMet,
@@ -18,78 +17,107 @@ public class Checkpoint : MonoBehaviour {
 		swordTut,
 		bowTut,
 		puzzle,
-		visited;
+		boss;
 
-	public float distance = 2;
+	public QuestCollider[] questColliders;
+	public Collider2D myTrigger;
 
-	// Use this for initialization
-	void Start () 
-	{
-		_target = GameObject.Find ("_Player").transform;
-		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
-		_prefs = _manager.GetComponent<PlayerPreferences>();
-		_playerGO = GameObject.Find("_Player");
-		_evo = _manager.GetComponent<Evolution>();
-		_playerHealth = _playerGO.GetComponent<Health>();
-
-		//if not in menu, find the checkpoint and its animated text
-		_anim = GameObject.Find("CheckpointReached").GetComponent<Animator>();
-	}
+	[HideInInspector] public ConversationComponent dialog;
+	[HideInInspector] public bool completed = false;
 
 	//when the player enters the checkpoint, his location(checkpoint) is saved to the prefs
-	void Update()
+	void OnTriggerEnter2D(Collider2D col)
 	{
-		if(!_target) return;
-		float d = Vector3.Distance (transform.position, _target.position);
+		if(!col.CompareTag("Player")) return;
+		if(completed) return;
+		completed = true;
 
-		if(!visited)
+		PlayerPreferences.Instance.SaveStats();
+		PlayerPreferences.Instance.SavePlayerPosition();
+		GameObject.Find("CheckpointReached").GetComponent<Animator>().SetTrigger("CheckpointReached");
+
+		//set bools in prefs accordingly
+		if(motherMet)
 		{
-			if(d < distance)
-			{
-				if(_prefs)
-				{
-					_prefs.SaveStats(transform.position, _evo.blood, _playerHealth.health);
-					_anim.SetTrigger("CheckpointReached");
-
-					//set bools in prefs accordingly
-					if(motherMet)
-					{
-						_prefs.MotherMet();
-					}
-					else if(fatherMet)
-					{
-						_prefs.FatherMet();
-					}
-					else if(itemsGet)
-					{
-						_prefs.ItemsGet();
-					}
-					else if(swordTut)
-					{
-						_prefs.SwordTutorialFinished();
-					}
-					else if(returnedHome)
-					{
-						_prefs.ReturnedHome();
-					}
-					else if(bowTut)
-					{
-						_prefs.BowTutorialFinished();
-					}
-					else if(puzzle)
-					{
-						_prefs.Puzzle();
-					}
-
-					visited = true;
-				}
-			}
+			PlayerPreferences.Instance.MotherMet();
 		}
+		if(fatherMet)
+		{
+			PlayerPreferences.Instance.FatherMet();
+		}
+		if(itemsGet)
+		{
+			PlayerPreferences.Instance.ItemsGet();
+		}
+		if(swordTut)
+		{
+			PlayerPreferences.Instance.SwordTutorialFinished();
+		}
+		if(returnedHome)
+		{
+			PlayerPreferences.Instance.WheresMomFinished();
+		}
+		if(bowTut)
+		{
+			PlayerPreferences.Instance.BowTutorialFinished();
+		}
+		if(puzzle)
+		{
+			PlayerPreferences.Instance.PuzzleFinished();
+		}
+		if(boss)
+		{
+			PlayerPreferences.Instance.BossFinished();
+		}
+
+		StartCoroutine(WaitTilDoneTalking());
+	}
+
+	IEnumerator WaitTilDoneTalking()
+	{
+		while(ConversationManager.Instance.talking) yield return null;
+		DisableColliders();
 	}
 
 	void OnDrawGizmos()
 	{
 		Gizmos.color = Color.red;
 		Gizmos.DrawCube(transform.position,new Vector2(1,1));
+	}
+
+	//destroy this object
+	public void Destroy()
+	{
+		Destroy(this.gameObject);
+	}
+
+	//activates my collider
+	public virtual void ActivateTrigger()
+	{
+		myTrigger.enabled = true;
+	}
+
+	//deactivates my collider
+	public virtual void DeactivateTrigger()
+	{
+		myTrigger.enabled = false;
+	}
+
+	//'opens all related doors' or otherwise impeads progress with colliders
+	public void EnableColliders()
+	{
+		for(int i=0;i<questColliders.Length;i++)
+		{
+			questColliders[i].Enable();
+		}
+	}
+
+	//'opens all related doors' or otherwise removes colliders impeading progress
+	public void DisableColliders()
+	{
+		for(int i=0;i<questColliders.Length;i++)
+		{
+			questColliders[i].Disable();
+		}
 	}
 }

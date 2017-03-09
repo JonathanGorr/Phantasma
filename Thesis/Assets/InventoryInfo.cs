@@ -5,10 +5,8 @@ using UnityEngine.UI;
 
 namespace Inventory
 {
-	public class InventoryInfo : MonoBehaviour {
-
-		public PlayerInput _input;
-		private LevelManager _manager;
+	public class InventoryInfo : MonoBehaviour 
+	{
 		bool canShow = false;
 		bool shown = false;
 		bool moving = false;
@@ -36,10 +34,9 @@ namespace Inventory
 
 		void Awake()
 		{
-			_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-			_input.onLeftTrigger += Toggle;
-			LevelManager.pause += CannotShow;
-			LevelManager.unPause += HideInfo;
+			PlayerInput.onLeftTrigger += Toggle;
+			PauseMenu.pause += CannotShow;
+			PauseMenu.unPause += HideInfo;
 		}
 
 		void CannotShow() { canShow = false; }
@@ -47,7 +44,7 @@ namespace Inventory
 		public void Toggle()
 		{
 			//not shown and can't be shown so don't
-			if(!_manager.paused)  return;
+			if(!PauseMenu.paused)  return;
 			if(!canShow && !shown) return;
 			if(moving) StopCoroutine("Move");
 			StartCoroutine("Move");
@@ -60,44 +57,53 @@ namespace Inventory
 			StartCoroutine("Move");
 		}
 
-		Color RarityColor(Item.ItemRarity rarity)
+		Color RarityColor(string rarity)
 		{
-			switch(rarity)
+			ItemRarity r;
+			if(rarity != null)
 			{
-				case Item.ItemRarity.common:
-				return Color.black;
-				break;
-				case Item.ItemRarity.uncommon:
+				r = (ItemRarity)System.Enum.Parse(typeof(ItemRarity), rarity);
+				switch(r)
+				{
+				case ItemRarity.common:
+				return Color.white;
+				case ItemRarity.uncommon:
 				return Color.yellow;
-				break;
-				case Item.ItemRarity.rare:
+				case ItemRarity.rare:
 				return new Color(1,0,1);
-				break;
-				case Item.ItemRarity.legendary:
+				case ItemRarity.legendary:
 				return Color.red;
-				break;
 				default:
-				return Color.black;
-				break;
+				return Color.white;
+				}
+			}
+			else
+			{
+				r = ItemRarity.common;
+				return Color.white;
 			}
 		}
 
 		public void SetInfo(Item i)
 		{
 			item = i;
-			title.text = item.Title;
-			title.color = RarityColor(i.Rarity);
-			description.text = item.Description;
-			power.text = item.Power.ToString();
-			defense.text = item.Defense.ToString();
-			vitality.text = item.Vitality.ToString();
+			title.color = RarityColor(i.rarity);
+			title.text = i.title;
+			description.text = i.description;
+			//stats
+			if(i.id != -1)
+			{
+				power.text = i.stats[0].ToString();
+				defense.text = i.stats[1].ToString();
+				vitality.text = i.stats[2].ToString();
+			}
 		}
 
 		// moves info panel behind and to the side of the main
 		// does a min/max x comparison with menu window and moves til met
 		IEnumerator Move()
 		{
-			if(!shown) UI.TurnOn(cg);
+			if(!shown) cg.TurnOn();
 			shown = !shown;
 			moving = true;
 			while((shown && t < 1) || (!shown && t > 0))
@@ -111,7 +117,7 @@ namespace Inventory
 			}
 			t = Mathf.Clamp(t, 0, 1);
 			moving = false;
-			if(!shown)UI.TurnOff(cg);
+			if(!shown)cg.TurnOff();
 		}
 
 		public string Title

@@ -60,9 +60,9 @@ public class Switch : MonoBehaviour {
 		//goes through all triggers in array
 		foreach(DoorTrigger trigger in doorTriggers)
 		{
-			if(trigger != null)
-				//draws a line
-				Gizmos.DrawLine(transform.position, trigger.door.transform.position);
+			if(trigger != null) 
+				if(trigger.door)
+					Gizmos.DrawLine(transform.position, trigger.door.transform.position);
 		}
 
 	}

@@ -20,7 +20,7 @@ public class Treasure : MonoBehaviour {
 	{
 		_inventory = (Inventory.Inventory)GameObject.FindObjectOfType(typeof(Inventory.Inventory));
 		//get all (coins) in our database
-		currency = _inventory.database.FetchItemsBySlug("coin");
+		currency = _inventory.database.FetchItemListBySlug("coin");
 	}
 
 	public void Dispense()
@@ -35,7 +35,7 @@ public class Treasure : MonoBehaviour {
 			//early out if no change is desired from this coin value
 			if(change[i] == 0) continue;
 			//get this currency coin
-			GameObject coin = (GameObject) Resources.Load("Prefabs/Items/" + currency[i].Slug + "_" + currency[i].Title);
+			GameObject coin = (GameObject) Resources.Load("Prefabs/Items/" + currency[i].slug + currency[i].id);
 			//spawn change[i] number of those coins
 			for(int j=0;j<change[i];j++)
 			{
@@ -53,11 +53,11 @@ public class Treasure : MonoBehaviour {
 	//returns a change array of the number of valued coins that should be spawned
 	int[] MakeChange(int amt)
 	{
-		int golds = (int)amt/currency[2].Value;
-		if(golds > 0) { amt = amt % currency[2].Value; }
+		int golds = (int)amt/currency[2].value;
+		if(golds > 0) { amt = amt % currency[2].value; }
 
-		int silvers = (int)amt/currency[1].Value;
-		if(silvers > 0) { amt = amt % currency[1].Value; }
+		int silvers = (int)amt/currency[1].value;
+		if(silvers > 0) { amt = amt % currency[1].value; }
 
 		//remainder in pennies
 		int coppers = (int)amt;

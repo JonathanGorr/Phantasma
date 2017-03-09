@@ -1,0 +1,83 @@
+{ 	
+	"quests": 
+	[
+		{
+			"ID": 0,
+			"Slug": "Main",
+			"Title": "Main Quest",
+			"Description": "The main story of this game.",
+			"Hint": "Find mom in the castle.",
+			"IsActive": false,
+			"IsComplete": false,
+			"objectives":
+			[
+				{
+					"ID": 1,
+					"Slug": "VisitDad",
+					"Title": "Go to the cemetary.",
+					"Description": "Take flowers to the cemetary and pay your respects.",
+					"Hint": "I'ts to the west.",
+					"IsActive": false,
+					"IsComplete": false,
+					"rewards": [0, 0, 0]
+				},
+				
+				{
+					"ID": 2,
+					"Slug": "SwordLesson",
+					"Title": "Sword Lesson.",
+					"Description": "Learn how to use your weapons!",
+					"Hint": "Use the dpad to change weapons.",
+					"IsActive": false,
+					"IsComplete": false,
+					"rewards": [0, 0, 0]
+				},
+				
+				{
+					"ID": 3,
+					"Slug": "FindMom",
+					"Title": "Find Mom!",
+					"Description": "She has been taken by bandits!",
+					"Hint": "She's probably in the castle.",
+					"IsActive": false,
+					"IsComplete": false,
+					"rewards": [0, 0, 0]
+				},
+				
+				{
+					"ID": 4,
+					"Slug": "BowLesson",
+					"Title": "Bow Lesson.",
+					"Description": "Learn how to use your weapons!",
+					"Hint": "Use the dpad to change weapons.",
+					"IsActive": false,
+					"IsComplete": false,
+					"rewards": [0, 0, 0]
+				}
+			]
+		},
+
+		{
+			"ID": 1,
+			"Slug": "Side",
+			"Title": "Side Quest",
+			"Description": "Optional Missions.",
+			"Hint": "Kill, find or collect.",
+			"IsActive": false,
+			"IsComplete": false,
+			"objectives":
+			[
+				{
+					"ID": 1,
+					"Slug": "Kill",
+					"Title": "Kill stuff",
+					"Description": "Kill 5 things",
+					"Hint": "These things are found in the forest.",
+					"IsActive": false,
+					"IsComplete": false,
+					"rewards": [0, 0, 0]
+				}
+			]
+		}
+	]
+}

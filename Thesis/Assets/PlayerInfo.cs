@@ -14,11 +14,7 @@ using Inventory;
 
 public class PlayerInfo : MonoBehaviour {
 
-	private Inventory.Inventory _inventory;
-	private QuestSystem.QuestManager _questManager;
-	private UI _ui;
-	private SFX _sfx;
-	private Evolution _evo;
+	public static PlayerInfo Instance = null;
 
 	[Header("Costume Colors")]
 	public SpriteRenderer[] torso;
@@ -33,61 +29,59 @@ public class PlayerInfo : MonoBehaviour {
 		get { return location; }
 	}
 
-	void OnEnable()
+	void Awake()
 	{
-		if(!_inventory) 	_inventory = (Inventory.Inventory)GameObject.FindObjectOfType( typeof(Inventory.Inventory)); //GameObject.Find("Inventory").GetComponent<Inventory.Inventory>();
-		if(!_sfx) 			_sfx = GameObject.Find("_LevelManager").GetComponent<SFX>();
-		if(!_evo) 			_evo = _sfx.GetComponent<Evolution>();
-		if(!_questManager) 	_questManager = _sfx.GetComponent<QuestManager>();
-		if(!_ui) 			_ui = _sfx.transform.Find("UI").GetComponent<UI>();
+		if(Instance == null) Instance = this;
 	}
 
 	public void AddItem(int id)
 	{
 		//get item
-		Item item = _inventory.database.FetchItem(id);
-		if(item.Slots) //these items take up slots in inventory
+		Item item = Inventory.Inventory.Instance.database.FetchItem(id);
+
+		if(item.slots) //these items take up slots in inventory
 		{
-			_inventory.AddItem(item.ID);
+			Inventory.Inventory.Instance.AddItem(item.id, true);
 		}
 		else //these items don't take up space in the inventory
 		{
-			switch(item.Slug)
+			switch(item.slug)
 			{
 				case "coin":
-				_inventory.AddCoins(item.Value);
+				Inventory.Inventory.Instance.AddCoins(item.value);
 				break;
 				case "blood":
-				_evo.AddBlood(item.Value);
+				Evolution.Instance.AddBlood(item.value);
 				break;
 			}
 		}
 
-		_sfx.PlayFX(item.Slug + "_pickup", transform.position);
+		SFX.Instance.PlayFX(item.slug + "_pickup", transform.position);
+
 	}
 
 	//used to add new objective to a player's quest( objective should not(?) give player the associated quest...
 	public void AddObjective(Objective obj)
 	{
 		//check if objective is active before adding
-		if(_questManager.GetQuest(obj.questKey).IsActive) { print("quest already active for this player"); return; }
+		if(QuestManager.Instance.GetQuest(obj.questKey).IsActive) { print("quest already active for this player"); return; }
 
 		//if this is a location objective...
-		if(_questManager.GetQuestObjective(obj.questKey, obj.objectiveKey).GetType() == typeof(LocationObjective))
+		if(QuestManager.Instance.GetQuestObjective(obj.questKey, obj.objectiveKey).GetType() == typeof(LocationObjective))
 		{
 			//give it a reference to the player's location for comparison
-			LocationObjective lo = _questManager.GetQuestObjective(obj.questKey, obj.objectiveKey) as LocationObjective;
+			LocationObjective lo = QuestManager.Instance.GetQuestObjective(obj.questKey, obj.objectiveKey) as LocationObjective;
 			lo.MyPlayersLocation = location;
 		}
 
-		_questManager.GetQuest(obj.questKey).Activate();
-		_questManager.GetQuestObjective(obj.questKey, obj.objectiveKey).Activate();
+		QuestManager.Instance.GetQuest(obj.questKey).Activate();
+		QuestManager.Instance.GetQuestObjective(obj.questKey, obj.objectiveKey).Activate();
 	}
 
 	public void UpdateObjective(Objective obj)
 	{
 		//check if objective is active before adding
-		if(!_questManager.GetQuest(obj.questKey).IsActive) { print("quest inactive for this player"); return; }
-		_questManager.GetQuestObjective(obj.questKey, obj.objectiveKey).SetComplete();
+		if(!QuestManager.Instance.GetQuest(obj.questKey).IsActive) { print("quest inactive for this player"); return; }
+		QuestManager.Instance.GetQuestObjective(obj.questKey, obj.objectiveKey).SetComplete();
 	}
 }

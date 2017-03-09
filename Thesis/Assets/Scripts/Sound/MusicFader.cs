@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 
 public class MusicFader : MonoBehaviour {
 
+	public static MusicFader Instance = null;
+
 	[Tooltip("Press J to start transition")] public bool debug;
 
 	[Header("Audio Sources")]
@@ -34,9 +36,11 @@ public class MusicFader : MonoBehaviour {
 
 	void Awake()
 	{
+		if(Instance == null) Instance = this;
 		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
 
+	#if UNITY_EDITOR
 	void Update()
 	{
 		if(debug)
@@ -47,6 +51,7 @@ public class MusicFader : MonoBehaviour {
 			}
 		}
 	}
+	#endif
 
 	public void SetVolume(float v)
 	{

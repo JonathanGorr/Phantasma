@@ -1,0 +1,15 @@
+horse_feet_BL = 915 0 87 65
+horse_feet_BR = 915 80 86 66
+horse_feet_FL = 0 795 101 81
+horse_feet_FR = 116 795 98 80
+horse_head = 0 443 402 337
+horse_lowerleg_BL = 632 744 54 157
+horse_lowerleg_BR = 560 744 57 157
+horse_lowerleg_FL = 229 795 85 130
+horse_lowerleg_FR = 915 161 85 130
+horse_tail = 585 443 128 286
+horse_torso = 0 0 900 428
+horse_upperleg_BL = 417 443 153 244
+horse_upperleg_BR = 871 443 115 182
+horse_upperleg_FL = 417 702 128 210
+horse_upperleg_FR = 728 443 128 206

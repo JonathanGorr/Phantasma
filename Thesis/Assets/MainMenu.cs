@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
 
-	LevelManager _manager;
 	EventSystem _eventSystem;
 	public GameObject newGameButton;
 	public GameObject continueButton;
@@ -17,17 +17,27 @@ public class MainMenu : MonoBehaviour {
 		{
 			if(_eventSystem == null)
 			{
-				_eventSystem = _manager.es;
+				_eventSystem = LevelManager.Instance.es;
 			}
 			return _eventSystem;
 		}
 	}
 
+	void Awake()
+	{
+		PlayerInput.onSwitch += SetMenu;
+	}
+
 	void Start()
 	{
-		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-		//set the current button to new game or continue based on memory
+		if(!SaveSystem.DoesSaveGameExist(0))
+		{
+			print("no save game");
+		 	continueButton.SetActive(false);
+	 	}
 		SetMenu();
+
+		Player.Instance.SetPosition(GameObject.FindWithTag("Respawn").transform.position);
 	}
 
 	//called whenever unity application window loses focus
@@ -45,18 +55,24 @@ public class MainMenu : MonoBehaviour {
 			EventSystem.SetSelectedGameObject(newGameButton);
 	}
 
+	void SetMenu(string inP)
+	{
+		EventSystem.firstSelectedGameObject = newGameButton;
+			EventSystem.SetSelectedGameObject(newGameButton);
+	}
+
 	public void NewGame()
 	{
-		_manager.StartNewGame();
+		LevelManager.Instance.StartNewGame();
 	}
 
 	public void Continue()
 	{
-		_manager.StartContinue();
+		LevelManager.Instance.StartContinue();
 	}
 
 	public void Quit()
 	{
-		_manager.StartQuit();
+		LevelManager.Instance.StartQuit();
 	}
 }

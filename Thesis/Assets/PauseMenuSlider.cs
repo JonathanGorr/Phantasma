@@ -13,7 +13,7 @@ public class PauseMenuSlider : PauseMenuUI {
 
 	void Update()
 	{
-		if(!_manager.paused) return;
+		if(!PauseMenu.paused) return;
 		if(!isSelected) return;
 
 		//move the slider value with horizontal axis

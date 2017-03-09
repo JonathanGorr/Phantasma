@@ -10,9 +10,6 @@ public class WeaponController : MonoBehaviour {
 	bool switching = false;
 	string currentSceneName;
 	private LevelManager _manager;
-	private PlayerInput _input;
-	private SFX _sfx;
-	private PlayerPreferences _prefs;
 
 	public Player _player;
 	public CharacterController2D _controller;
@@ -42,19 +39,16 @@ public class WeaponController : MonoBehaviour {
 		currentSceneName = scene.name;
 	}
 
-	void Start() 
+	void Start()
 	{
 		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-		_sfx   =  _manager.GetComponent<SFX>();
-		_input =  _manager.GetComponent<PlayerInput>();
-		_input.onPad += Switch;
-		_prefs =  _manager.GetComponent<PlayerPreferences>();
+		PlayerInput.onPad += Switch;
 		StartCoroutine(SwitchWeapon(Weapons.Empty));
 	}
 
 	void OnDisable()
 	{
-		//SceneManager.sceneLoaded -= OnSceneLoaded;
+		SceneManager.sceneLoaded -= OnSceneLoaded;
 	}
 
 	public bool IsWeapon(Weapons w)//returns the weapon enum of the current Weapon
@@ -75,9 +69,10 @@ public class WeaponController : MonoBehaviour {
 	void Switch(PlayerInput.PADDirection direction)
 	{
 		//return if items not received yet
+		if(PlayerInput._l1) { print("still held"); return; }
 		if(currentSceneName != "Start") return;
-		if(!_prefs.itemsGet && !debug) return;
-		if(_manager.paused) return;
+		if(!PlayerPreferences.Instance.itemsGet) return;
+		if(PauseMenu.paused) return;
 		if(switching) return;
 
 		switch(direction)
@@ -101,7 +96,7 @@ public class WeaponController : MonoBehaviour {
 	{
 		switching = true;
 		while(_player.combatState == CombatState.Attacking) yield return null;
-		while(!_player._ready) yield return null;
+		while(!_player.ready) yield return null;
 		//while(_anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f) yield return null;
 		weapon = GetWeapon(w);
 		while(switching)
@@ -122,7 +117,7 @@ public class WeaponController : MonoBehaviour {
 				break;
 			}
 
-			_sfx.PlayFX("sheathe", _player.myTransform.position);
+			SFX.Instance.PlayFX("sheathe", _player.myTransform.position);
 
 			//hides unmatching, enables matching
 			for(int i=0;i<weapons.Length; i++)
@@ -134,7 +129,7 @@ public class WeaponController : MonoBehaviour {
 			}
 
 			//wait until buttons depressed ):
-			while(_input._DPadHorizontal != 0 || _input._DPadVertical != 0)
+			while(PlayerInput._pad)
 			{
 				yield return null;
 			}

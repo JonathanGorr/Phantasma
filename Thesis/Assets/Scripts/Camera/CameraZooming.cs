@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraZooming : MonoBehaviour {
+public class CameraZooming : WaitForPlayer {
 
 	public float distanceMin = 3.0f;
 	public float distanceMax = 10.0f;
@@ -15,31 +15,33 @@ public class CameraZooming : MonoBehaviour {
 
 	Camera cam;
 
-	//components
-	private LevelManager _manager;
-	private WeaponController _switcher;
-	private PlayerInput _input;
+	Vector2 input;
 
-	void Start()
+	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
+		while(Player.Instance == null) yield return null;
+
 		cam = GetComponent<Camera>();
-		_manager = GameObject.Find ("_LevelManager").GetComponent<LevelManager>();
-		_input = _manager.GetComponent<PlayerInput> ();
-		_switcher = _manager.Player.GetComponent<WeaponController>();
+		//Player.Instance.died += Disable;
+	}
+
+	void Disable()
+	{
+		//print("Disable");
 	}
 
 	void FixedUpdate()
 	{
-		if(!_switcher.IsWeapon(Weapons.Bow)) return;
+		if(Player.Instance._health.Dead) return;
+		if(!Player.Instance) return;
 
 		cam.fieldOfView = distance;
-
 		//if aiming, and the bow is selected
-		if(_input.L1Down && !_manager.paused)
+		if(!PauseMenu.paused)//_input.L1Down
 		{
 			cam.transform.position = new Vector3
-				(cam.transform.position.x + _input.RAnalog.x * sensitivity,
-        		cam.transform.position.y + _input.RAnalog.y * sensitivity / 2,
+				(cam.transform.position.x + PlayerInput.Instance.RAnalog.x * sensitivity,
+				cam.transform.position.y + PlayerInput.Instance.RAnalog.y * sensitivity / 2,
             	cam.transform.position.z);
 		}
 	}

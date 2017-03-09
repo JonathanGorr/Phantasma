@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 087bcceb4d6c7c2418ea34ba2c246c8c
-timeCreated: 1431495045
+timeCreated: 1487729566
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -37,6 +37,7 @@ TextureImporter:
     21300060: StoneWall2xDistance
     21300062: Banner
     21300064: PressurePlate
+    21300066: crate_damage_03
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -474,6 +475,19 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
+    - serializedVersion: 2
+      name: crate_damage_03
+      rect:
+        serializedVersion: 2
+        x: 1031
+        y: 2218
+        width: 188
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
     outline: []
   spritePackingTag: 
   userData: 

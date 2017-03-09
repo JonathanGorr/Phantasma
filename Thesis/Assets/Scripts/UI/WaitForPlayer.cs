@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 
 public class WaitForPlayer : MonoBehaviour {
 
-	public LevelManager _manager;
 	[HideInInspector] public string currentSceneName;
 
 	void Awake()
@@ -23,13 +22,12 @@ public class WaitForPlayer : MonoBehaviour {
 
 	public virtual void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
-		_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
 		currentSceneName = scene.name;
 		StartCoroutine(Initialize(scene));
 	}
 
 	public virtual IEnumerator Initialize(Scene scene)
 	{
-		while(_manager.Player == null) yield return null;
+		while(Player.Instance == null) yield return null;
 	}
 }

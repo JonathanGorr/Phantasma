@@ -3,6 +3,8 @@ using System.Collections;
 
 public class SFX : MonoBehaviour {
 
+	public static SFX Instance = null;
+
 	public GameObject fxPrefab;
 
 	[Header("Player")]
@@ -11,12 +13,19 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] playerJump;
 	public AudioClip[] playerDied;
 	public AudioClip[] sheathes;
+	public AudioClip[] slideBlocking;
 	public AudioClip[] slide;
 	[Header("Enemy")]
 	public AudioClip[] enemyHurt;
 	public AudioClip[] enemyDied;
+	public AudioClip flyingSkullAttack;
+	public AudioClip flyingSkullWindup;
+	public AudioClip fireball;
+	public AudioClip[] skeletonHurt;
+	public AudioClip[] skeletonDeath;
 	[Header("Weapon Sounds")]
 	public AudioClip[] swings;
+	public AudioClip[] slideAttackWhooshes;
 	public AudioClip[] bowDraw;
 	public AudioClip[] bowShoot;
 	[Header("Collision")]
@@ -26,8 +35,13 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] arrowImpact_Flesh;
 	[Header("Status")]
 	public AudioClip heal;
+	[Header("Items")]
+	public AudioClip bloodPickup;
 	[Header("Environment")]
-	public AudioClip[] potSmashes;
+	public AudioClip[] potShatters;
+	public AudioClip[] woodHits;
+	public AudioClip[] woodShatters;
+	public AudioClip door;
 	[Header("Money")]
 	public AudioClip coinBounces;
 	public AudioClip buy;
@@ -48,8 +62,16 @@ public class SFX : MonoBehaviour {
 	public AudioClip scroll;
 	public AudioClip back;
 	public AudioClip select;
+	[Header("Debug")]
+	public AudioClip debug;
+	public AudioClip error;
 
 	public AudioClip[] page_flips;
+
+	void Awake()
+	{
+		if(Instance == null) Instance = this;
+	}
 
 	public void PlayUI(string command)
 	{
@@ -58,6 +80,12 @@ public class SFX : MonoBehaviour {
 		switch(command)
 		{
 			//UI
+			case "debug":
+			clip = debug;
+			break;
+			case "error":
+			clip = error;
+			break;
 			case "scroll":
 			clip = scroll;
 			break;
@@ -118,6 +146,7 @@ public class SFX : MonoBehaviour {
 
 		switch(command)
 		{
+			//player
 			case "player_Hurt":
 				clip = playerHurt[Random.Range(0, playerHurt.Length)];
 				break;
@@ -137,8 +166,37 @@ public class SFX : MonoBehaviour {
 				clip = swings[Random.Range(0, swings.Length)];
 				pitch = 2f;
 				break;
+			case "swing_slide":
+				clip = slideAttackWhooshes[Random.Range(0, slideAttackWhooshes.Length)];
+				pitch = 1f;
+				break;
 			case "jump":
 				clip = playerJump[Random.Range(0, playerJump.Length)];
+				break;
+			case "slide":
+				clip = slide[Random.Range(0, slide.Length)];
+				break;
+			case "slide_blocking":
+				clip = slide[Random.Range(0, slide.Length)];
+				break;
+
+
+			//enemies
+			//skeleton
+			case "hurt_skeleton":
+				clip = skeletonHurt[Random.Range(0, skeletonHurt.Length)];
+				break;
+			case "death_skeleton":
+				clip = skeletonDeath[Random.Range(0, skeletonDeath.Length)];
+				break;
+			case "attack_flyingSkull":
+				clip = flyingSkullAttack;
+				break;
+			case "windup_flyingSkull":
+				clip = flyingSkullWindup;
+				break;
+			case "fireball":
+				clip = fireball;
 				break;
 
 			//arrow
@@ -165,14 +223,26 @@ public class SFX : MonoBehaviour {
 				break;
 
 			//environment
-			case "smash":
-				clip = potSmashes[Random.Range(0, potSmashes.Length)];
+			case "smash_pot":
+				clip = potShatters[Random.Range(0, potShatters.Length)];
+				break;
+			case "smash_wood":
+				clip = woodShatters[Random.Range(0, woodShatters.Length)];
+				break;
+			case "damage_wood":
+				clip = woodHits[Random.Range(0, woodHits.Length)];
 				break;
 			case "coin_bounce":
 				clip = coinBounces;
 				break;
 			case "buy":
 				clip = buy;
+				break;
+			case "door":
+				clip = door;
+				break;
+			case "blood_pickup":
+				clip = bloodPickup;
 				break;
 			case "coin_drop":
 				clip = coinDrops[Random.Range(0, coinDrops.Length)];
@@ -189,9 +259,6 @@ public class SFX : MonoBehaviour {
 				break;
 			case "sheathe":
 				clip = sheathes[Random.Range(0, sheathes.Length)];
-				break;
-			case "slide":
-				clip = slide[Random.Range(0, slide.Length)];
 				break;
 			case "heal":
 				clip = heal;

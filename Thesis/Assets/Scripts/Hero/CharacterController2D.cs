@@ -34,13 +34,11 @@ public class CharacterController2D : MonoBehaviour
 			return below || right || left || above;
 		}
 
-
 		public void reset()
 		{
 			right = left = above = below = becameGroundedThisFrame = movingDownSlope = false;
 			slopeAngle = 0f;
 		}
-
 
 		public override string ToString()
 		{
@@ -54,7 +52,8 @@ public class CharacterController2D : MonoBehaviour
 
 	#region events, properties and fields
 
-	public event Action<RaycastHit2D> onControllerCollidedEvent;
+	public event Action<RaycastHit2D> onControllerCollidedEventHorizontal;
+	public event Action<RaycastHit2D> onControllerCollidedEventVertical;
 	public event Action<Collider2D> onTriggerEnterEvent;
 	public event Action<Collider2D> onTriggerStayEvent;
 	public event Action<Collider2D> onTriggerExitEvent;
@@ -100,6 +99,12 @@ public class CharacterController2D : MonoBehaviour
 	/// </summary>
 	[SerializeField]
 	LayerMask oneWayPlatformMask = 0;
+
+	/// <summary>
+	/// Entity:
+	/// The mask that only blocks from left & right but not top; you can fall onto these objects from above
+	/// </summary>
+	public LayerMask entitiesMask = 0;
 
 	/// <summary>
 	/// the max slope angle that the CC2D can climb
@@ -163,7 +168,8 @@ public class CharacterController2D : MonoBehaviour
 	/// stores any raycast hits that occur this frame. we have to store them in case we get a hit moving
 	/// horizontally and vertically so that we can send the events after all collision state is set
 	/// </summary>
-	List<RaycastHit2D> _raycastHitsThisFrame = new List<RaycastHit2D>( 2 );
+	List<RaycastHit2D> _raycastHitsThisFrameHorizontal = new List<RaycastHit2D>( 2 );
+	List<RaycastHit2D> _raycastHitsThisFrameVertical = new List<RaycastHit2D>( 2 );
 
 	// horizontal/vertical movement data
 	float _verticalDistanceBetweenRays;
@@ -221,13 +227,11 @@ public class CharacterController2D : MonoBehaviour
 
 	#endregion
 
-
 	[System.Diagnostics.Conditional( "DEBUG_CC2D_RAYS" )]
 	void DrawRay( Vector3 start, Vector3 dir, Color color )
 	{
 		Debug.DrawRay( start, dir, color );
 	}
-
 
 	#region Public
 
@@ -243,7 +247,8 @@ public class CharacterController2D : MonoBehaviour
 
 		// clear our state
 		collisionState.reset();
-		_raycastHitsThisFrame.Clear();
+		_raycastHitsThisFrameHorizontal.Clear();
+		_raycastHitsThisFrameVertical.Clear();
 		_isGoingUpSlope = false;
 
 		primeRaycastOrigins();
@@ -279,10 +284,17 @@ public class CharacterController2D : MonoBehaviour
 			velocity.y = 0;
 
 		// send off the collision events if we have a listener
-		if( onControllerCollidedEvent != null )
+		if( onControllerCollidedEventHorizontal != null )
 		{
-			for( var i = 0; i < _raycastHitsThisFrame.Count; i++ )
-				onControllerCollidedEvent( _raycastHitsThisFrame[i] );
+			for( var i = 0; i < _raycastHitsThisFrameHorizontal.Count; i++ )
+				onControllerCollidedEventHorizontal( _raycastHitsThisFrameHorizontal[i] );
+		}
+
+		// send off the collision events if we have a listener
+		if( onControllerCollidedEventVertical != null )
+		{
+			for( var i = 0; i < _raycastHitsThisFrameVertical.Count; i++ )
+				onControllerCollidedEventVertical( _raycastHitsThisFrameVertical[i] );
 		}
 
 		ignoreOneWayPlatformsThisFrame = false;
@@ -339,7 +351,6 @@ public class CharacterController2D : MonoBehaviour
 		_raycastOrigins.bottomLeft = modifiedBounds.min;
 	}
 
-
 	/// <summary>
 	/// we have to use a bit of trickery in this one. The rays must be cast from a small distance inside of our
 	/// collider (skinWidth) to avoid zero distance rays which will get the wrong normal. Because of this small offset
@@ -370,15 +381,24 @@ public class CharacterController2D : MonoBehaviour
 			{
 				// the bottom ray can hit a slope but no other ray can so we have special handling for these cases
 				//handle slope movement
-				if( i == 0 && handleHorizontalSlope( ref deltaMovement, Vector2.Angle( _raycastHit.normal, Vector2.up )) )
+				if(i == 0)
 				{
-					_raycastHitsThisFrame.Add( _raycastHit );
-					break;
-				}
-				//don't handle slope movement
-				else
-				{
-					break;
+					if(Mathf.Approximately(_raycastHit.normal.x, -1)) { collisionState.right = true; }
+					if(Mathf.Approximately(_raycastHit.normal.x, 1)) { collisionState.left = true; }
+					if(Mathf.Approximately(_raycastHit.normal.x, 0)) collisionState.left = collisionState.right = false;
+
+					_raycastHitsThisFrameHorizontal.Add( _raycastHit );
+
+					//this is a slope ray
+					if(handleHorizontalSlope( ref deltaMovement, Vector2.Angle( _raycastHit.normal, Vector2.up )) )
+					{
+						//_raycastHitsThisFrameHorizontal.Add( _raycastHit );
+						//print("handle");
+						break;
+					}
+					//don't handle slope movement
+					else
+						break;
 				}
 			}
 		}
@@ -392,56 +412,47 @@ public class CharacterController2D : MonoBehaviour
 	/// <param name="angle">Angle.</param>
 	bool handleHorizontalSlope( ref Vector3 deltaMovement, float angle )
 	{
-		// disregard 90 degree angles (walls)
-		if( Mathf.RoundToInt( angle ) == 90 ) { deltaMovement.x = 0; return false; }
+		if( Mathf.RoundToInt( angle ) == 90 ) { deltaMovement.x = 0;  return false; } //if the angle is a wall, just stop
+		if(angle > slopeLimit) return false; //if our angle exceeds our slope limit, don't handle slope
+		if(ignoreOneWayPlatformsThisFrame) return false; //don't slope if ignore platforms
 
-		//don't slope if ignore platforms
-		if(ignoreOneWayPlatformsThisFrame) return false;
+		// we only need to adjust the deltaMovement if we are not jumping
+		// TODO: this uses a magic number which isn't ideal! The alternative is to have the user pass in if there is a jump this frame
+		if( deltaMovement.y < jumpingThreshold )
+		{
+			// apply the slopeModifier to slow our movement up the slope
+			var slopeModifier = slopeSpeedMultiplier.Evaluate( angle );
+			deltaMovement.x *= slopeModifier;
 
-		if(angle > slopeLimit)// too steep. get out of here
-		{
-			return false;
-		}
-		// if we can walk on slopes and our angle is small enough we need to move up
-		else
-		{
-			// we only need to adjust the deltaMovement if we are not jumping
-			// TODO: this uses a magic number which isn't ideal! The alternative is to have the user pass in if there is a jump this frame
-			if( deltaMovement.y < jumpingThreshold )
+			// we dont set collisions on the sides for this since a slope is not technically a side collision.
+			// smooth y movement when we climb. we make the y movement equivalent to the actual y location that corresponds
+			// to our new x location using our good friend Pythagoras
+			deltaMovement.y = Mathf.Abs( Mathf.Tan( angle * Mathf.Deg2Rad ) * deltaMovement.x );
+			var isGoingRight = deltaMovement.x > 0;
+
+			// safety check. we fire a ray in the direction of movement just in case the diagonal we calculated above ends up
+			// going through a wall. if the ray hits, we back off the horizontal movement to stay in bounds.
+			var ray = isGoingRight ? _raycastOrigins.bottomRight : _raycastOrigins.bottomLeft;
+			RaycastHit2D raycastHit;
+			if( collisionState.wasGroundedLastFrame )
+				raycastHit = Physics2D.Raycast( ray, deltaMovement.normalized, deltaMovement.magnitude, platformMask );
+			else
+				raycastHit = Physics2D.Raycast( ray, deltaMovement.normalized, deltaMovement.magnitude, platformMask & ~oneWayPlatformMask );
+
+			if( raycastHit )
 			{
-				// apply the slopeModifier to slow our movement up the slope
-				var slopeModifier = slopeSpeedMultiplier.Evaluate( angle );
-				deltaMovement.x *= slopeModifier;
-
-				// we dont set collisions on the sides for this since a slope is not technically a side collision.
-				// smooth y movement when we climb. we make the y movement equivalent to the actual y location that corresponds
-				// to our new x location using our good friend Pythagoras
-				deltaMovement.y = Mathf.Abs( Mathf.Tan( angle * Mathf.Deg2Rad ) * deltaMovement.x );
-				var isGoingRight = deltaMovement.x > 0;
-
-				// safety check. we fire a ray in the direction of movement just in case the diagonal we calculated above ends up
-				// going through a wall. if the ray hits, we back off the horizontal movement to stay in bounds.
-				var ray = isGoingRight ? _raycastOrigins.bottomRight : _raycastOrigins.bottomLeft;
-				RaycastHit2D raycastHit;
-				if( collisionState.wasGroundedLastFrame )
-					raycastHit = Physics2D.Raycast( ray, deltaMovement.normalized, deltaMovement.magnitude, platformMask );
+				// we crossed an edge when using Pythagoras calculation, so we set the actual delta movement to the ray hit location
+				deltaMovement = (Vector3)raycastHit.point - ray;
+				if( isGoingRight )
+					deltaMovement.x -= _skinWidth;
 				else
-					raycastHit = Physics2D.Raycast( ray, deltaMovement.normalized, deltaMovement.magnitude, platformMask & ~oneWayPlatformMask );
-
-				if( raycastHit )
-				{
-					// we crossed an edge when using Pythagoras calculation, so we set the actual delta movement to the ray hit location
-					deltaMovement = (Vector3)raycastHit.point - ray;
-					if( isGoingRight )
-						deltaMovement.x -= _skinWidth;
-					else
-						deltaMovement.x += _skinWidth;
-				}
-
-				_isGoingUpSlope = true;
-				collisionState.below = true;
+					deltaMovement.x += _skinWidth;
 			}
+
+			_isGoingUpSlope = true;
+			collisionState.below = true;
 		}
+
 		return true;
 	}
 
@@ -460,6 +471,9 @@ public class CharacterController2D : MonoBehaviour
 		// if we are moving up, we should ignore the layers in oneWayPlatformMask
 		var mask = platformMask;
 		if( ( isGoingUp && !collisionState.wasGroundedLastFrame ) || ignoreOneWayPlatformsThisFrame ) mask &= ~oneWayPlatformMask;
+		//don't collide with enemies if falling onto them
+		if( ( !isGoingUp && !collisionState.wasGroundedLastFrame ))  mask &= ~entitiesMask; 
+		//TODO: somehow disable vertical collision entirely
 
 		for( var i = 0; i < totalVerticalRays; i++ )
 		{
@@ -485,7 +499,7 @@ public class CharacterController2D : MonoBehaviour
 					collisionState.below = true;
 				}
 
-				_raycastHitsThisFrame.Add( _raycastHit );
+				_raycastHitsThisFrameVertical.Add( _raycastHit );
 
 				// this is a hack to deal with the top of slopes. if we walk up a slope and reach the apex we can get in a situation
 				// where our ray gets a hit that is less then skinWidth causing us to be ungrounded the next frame due to residual velocity.
@@ -519,6 +533,8 @@ public class CharacterController2D : MonoBehaviour
 		_raycastHit = Physics2D.Raycast( slopeRay, rayDirection, slopeCheckRayDistance, platformMask );
 		if( _raycastHit )
 		{
+			_raycastHitsThisFrameVertical.Add( _raycastHit );
+
 			// bail out if we have no slope
 			var angle = Vector2.Angle( _raycastHit.normal, Vector2.up );
 			if( angle == 0 )

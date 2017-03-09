@@ -6,70 +6,117 @@ using System.IO;
 
 namespace Inventory
 {
-	public class ItemDatabase : MonoBehaviour {
+	[System.Serializable]
+	public class Database
+	{
+		public List<Item> items;
+	}
 
-		private List<Item> database = new List<Item>();
-		private JsonData itemData;
+	public class ItemDatabase : MonoBehaviour
+	{
+		public static ItemDatabase Instance = null;
+
+		public Database database;
 
 		void Awake()
 		{
-			//load a json file into this container
-			itemData = JsonMapper.ToObject(File.ReadAllText(Application.dataPath + "/StreamingAssets/Items.json"));
-			ConstructItemDatabase();
+			if(Instance == null) Instance = this;
+			LevelManager.onGoToMenu += Clear;
+		}
+
+		public void Clear()
+		{
+			print("cleared database");
+			database.items.Clear();
+		}
+
+		Item Search<T>(List<T> list, int id) where T : Item
+		{
+			for(int i=0;i<list.Count;i++)
+			{
+				if(list[i].id == id) return list[i];
+			}
+			return null;
+		}
+
+		Item Search<T>(List<T> list, string slug) where T : Item
+		{
+			for(int i=0;i<list.Count;i++)
+			{
+				if(list[i].slug == slug) return list[i];
+			}
+			return null;
 		}
 
 		//by id
 		public Item FetchItem(int id)
 		{
-			for(int i = 0;i<database.Count;i++)
+			Item item = null;
+			while(item == null)
 			{
-				if(database[i].ID == id) return database[i];
+				item = Search(database.items, id);
+				break;
 			}
-			return null;
+			return item;
 		}
 
 		//by slug string
 		public Item FetchItem(string slug)
 		{
-			for(int i = 0;i<database.Count;i++)
+			Item item = null;
+			while(item == null)
 			{
-				if(database[i].Slug == slug) return database[i];
+				item = Search(database.items, slug);
+				break;
 			}
-			return null;
+			return item;
 		}
 
-		public List<Item> FetchItemsBySlug(string slug)
+		public List<Item> FetchItemListBySlug(string slug)
 		{
 			List<Item> found = new List<Item>();
-			for(int i=0;i<database.Count;i++)
+			for(int i=0;i<database.items.Count;i++)
 			{
-				if(database[i].Slug == slug) found.Add(database[i]);
+				if(database.items[i].slug == slug) found.Add(database.items[i]);
 			}
-			if(found.Count == 0) { print("none found"); return null; }
+			if(found.Count == 0) { /*print("none found");*/ return null; }
 			return found;
 		}
 
-		void ConstructItemDatabase()
+		//copies streaming assets
+		public string CreateNewItemDatabase()
 		{
-			//creates a new item for each entry in the json
-			for(int i=0;i<itemData.Count;i++)
-			{
-				//get values by json identifier and contruct items with them
-				database.Add(new Item(
-				(int)itemData[i]["id"],
-				(string)itemData[i]["title"],
-				(string)itemData[i]["description"],
-				(int)itemData[i]["value"],
-				(bool)itemData[i]["slots"],
+			//fill database with inventory.json
+			JsonUtility.FromJsonOverwrite(StaticMethods.GetStreamingAsset("Inventory.json"), database);
+			//create the inventory after database created
+			Inventory.Instance.ConstructInventory();
+			#if UNITY_EDITOR
+			print("created new database");
+			#endif
+			return JsonUtility.ToJson(database);
+		}
 
-				(int)itemData[i]["stats"]["power"],
-				(int)itemData[i]["stats"]["defense"],
-				(int)itemData[i]["stats"]["vitality"],
+		//returns the current database as a json string for saving
+		public string GetMyDatabase()
+		{
+			//create new item database if none already exists
+			if(database.items.Count == 0) CreateNewItemDatabase();
+			#if UNITY_EDITOR
+			print("saving database");
+			#endif
+			return JsonUtility.ToJson(this.database);
+		}
 
-				(bool)itemData[i]["stackable"],
-				(string)itemData[i]["rarity"],
-				(string)itemData[i]["slug"]));
-			}
+		//creates database from save game
+		public void LoadItemDatabase()
+		{
+			JsonUtility.FromJsonOverwrite(SaveSystem.thisSaveGame.inventory, database);
+
+			//create the inventory after database created
+			Inventory.Instance.ConstructInventory();
+			#if UNITY_EDITOR
+			print("loaded database");
+			#endif
 		}
 	}
 }

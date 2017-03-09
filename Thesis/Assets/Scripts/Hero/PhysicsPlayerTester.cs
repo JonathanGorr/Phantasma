@@ -33,7 +33,7 @@ namespace CharacterController
 			_controller = GetComponent<CharacterController2D>();
 			
 			// listen to some events for illustration purposes
-			_controller.onControllerCollidedEvent += onControllerCollider;
+			_controller.onControllerCollidedEventHorizontal += onControllerCollider;
 			_controller.onTriggerEnterEvent += onTriggerEnterEvent;
 			_controller.onTriggerExitEvent += onTriggerExitEvent;
 		}

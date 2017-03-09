@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class Bow : Weapon {
 
-	SFX _sfx;
-	LevelManager _manager;
 	public WeaponController _weaponController;
-	public Player _player;
-	public AnimationMethods _animMethods;
 	public GameObject indicatorPrefab;
 	public GameObject arrowPrefab;
 	public Ray ray;
@@ -40,26 +36,17 @@ public class Bow : Weapon {
 
 	public override void OnEnable()
 	{
-		if(!_manager)
-		{
-			_manager = GameObject.Find("_LevelManager").GetComponent<LevelManager>();
-			_sfx = _manager.GetComponent<SFX>();
-			_input = _manager.GetComponent<PlayerInput>();
-			line.sortingLayerName = sortingLayer;
-			line.sortingOrder = sortingNumber;
-		}
-
-		_input.onL1 += StartAim;
+		PlayerInput.onL1 += StartAim;
 	}
 
 	void OnDisable()
 	{
-		_input.onL1 -= StartAim;
+		PlayerInput.onL1 -= StartAim;
 	}
 
 	void StartAim()
 	{	
-		if(_manager.paused) return;
+		if(PauseMenu.paused) return;
 		StartCoroutine("Aim");
 		Rotate();
 	}
@@ -92,15 +79,15 @@ public class Bow : Weapon {
 	{
 		float progress = 0;
 
-		while(_input.L1Down)
+		while(PlayerInput.Instance.L1Down)
 		{
 			if(!aiming)
 			{
 				aiming = true;
-				_sfx.PlayFX("draw_arrow", transform.position);
+				SFX.Instance.PlayFX("draw_arrow", transform.position);
 				if(!arrowIndicator) 
 				{
-					arrowIndicator = Instantiate(indicatorPrefab, _player.myTransform).transform;
+					arrowIndicator = Instantiate(indicatorPrefab, _entity.myTransform).transform;
 					arrowCG = arrowIndicator.GetComponent<CanvasGroup>();
 				}
 				arrowIndicator.gameObject.SetActive(true);
@@ -109,26 +96,24 @@ public class Bow : Weapon {
 			else
 			{
 				Rotate();
-				direction = new Vector2(_input.RAnalog.x, _input.RAnalog.y);
-				_player.SetFacing(_input.RAnalog.x < 0 ? true : false);
+				direction = new Vector2(PlayerInput.Instance.RAnalog.x, PlayerInput.Instance.RAnalog.y);
 				Debug.DrawRay(transform.position, direction);
 
 				// set the arrow speed to the progress of the draw animation;
 				// shooting at animation end would yield highest speed( and power? ).
-				AnimatorStateInfo currentState = _player._anim.GetCurrentAnimatorStateInfo(0);
+				AnimatorStateInfo currentState = _entity._anim.GetCurrentAnimatorStateInfo(0);
 				if(currentState.IsName("Block"))
 				{
 					if(progress < 1) progress = Mathf.Clamp(currentState.normalizedTime, 0, 1);
 
-					while(_input.R1Down && !ready) yield return null;
+					while(PlayerInput.Instance.R1Down && !ready) yield return null;
 					ready = true;
 
-					if(_input.R1Down && _animMethods.canFire && ready && progress > .5f && _player._stamina.Ready)
+					if(PlayerInput.Instance.R1Down && animMethods.canFire && ready && progress > .5f && _entity._stamina.Ready)
 					{
-						_player._stamina.UseStamina(_player.lightAttackDrain);
-						_animMethods.CantFire();
+						animMethods.CantFire();
 						FireArrow(progress);
-						_player._anim.SetBool("Blocking", false);
+						_entity._anim.SetBool("Blocking", false);
 						aiming = false;
 						ready = false;
 						yield return null;
@@ -139,7 +124,7 @@ public class Bow : Weapon {
 		}
 
 		//set off
-		_player._anim.SetBool("Blocking", false);
+		_entity._anim.SetBool("Blocking", false);
 		line.numPositions = 0;
 		arrowIndicator.gameObject.SetActive(false);
 		aiming = false;
@@ -148,12 +133,12 @@ public class Bow : Weapon {
 	void FireArrow(float progress)
 	{
 		float speed = Mathf.SmoothStep(0, maxSpeed, progress);
-		_sfx.PlayFX("fire_arrow", transform.position);
+		SFX.Instance.PlayFX("fire_arrow", transform.position);
 		GameObject arrow = Instantiate(arrowPrefab, transform.position, Quaternion.Euler(new Vector3(0,0, lookRotation + 90)));
-		arrow.GetComponent<Rigidbody2D>().velocity = direction * speed;
+		arrow.GetComponent<Rigidbody2D>().velocity = (_entity.facing == Facing.left ? -transform.right : transform.right) * speed * normalizedDistance;
 		Arrow a = arrow.GetComponent<Arrow>();
+		a.myEntity = _entity;
 		a.Damage = damage;
-		a.SFX = _sfx;
 	}
 
 	void Rotate()

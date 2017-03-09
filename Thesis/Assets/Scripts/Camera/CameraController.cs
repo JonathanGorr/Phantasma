@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour {
 
+	public static CameraController Instance = null;
+
 	public Camera m_Camera;
 	[Header("Target Averaging")]
 	public float m_DampTime = 0.2f;
@@ -24,6 +26,7 @@ public class CameraController : MonoBehaviour {
 	// Use this for initialization
 	void Awake () 
 	{
+		if(Instance == null) Instance = this;
 		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
 

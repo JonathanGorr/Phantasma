@@ -4,14 +4,39 @@ using UnityEngine;
 
 namespace QuestSystem
 {
+	/// <summary>
+	/// Quest trigger:
+	/// gives the player quests/quest objectives on trigger enter
+	/// Gets destroyed if the quest in questmanager is completed
+	/// </summary>
+
 	public class QuestTrigger : MonoBehaviour {
 
-		private QuestManager _questManager;
 		public Objective objective;
 
-		void Awake()
+		public enum CompleteAction 
+		{ 
+			destroy, //if the object is a sprite that you want to disappear
+			ignore //if the object is an npc or something that doesn't need to be destroyed
+		}
+
+		public CompleteAction completedAction = CompleteAction.destroy;
+
+		void Start()
 		{
-			_questManager = GameObject.Find("_LevelManager").GetComponent<QuestManager>();
+			//if this game has been loaded, and the quest is already completed, destroy, ignore or change dialog
+			if(QuestManager.Instance.GetQuestObjective(objective.questKey, objective.objectiveKey).isComplete)
+			{
+				switch(completedAction)
+				{
+				case CompleteAction.destroy:
+				Destroy(this.gameObject);
+				break;
+				case CompleteAction.ignore:
+				GetComponentInChildren<Collider2D>().enabled = false;
+				break;
+				}
+			}
 		}
 
 		void OnTriggerEnter2D(Collider2D col)
@@ -19,9 +44,8 @@ namespace QuestSystem
 			if(col.CompareTag("Player"))
 			{
 				//if this objective is inactive, don't update
-				if(!_questManager.GetQuest(objective.questKey).IsActive) return;
-				_questManager.GetQuestObjective(objective.questKey, objective.objectiveKey).SetComplete();
-				//col.GetComponent<PlayerInfo>().CompleteObjective(objective);
+				if(!QuestManager.Instance.GetQuest(objective.questKey).IsActive) return;
+				//QuestManager.Instance.GetQuestObjective(objective.questKey, objective.objectiveKey).SetComplete();
 			}
 		}
 	}

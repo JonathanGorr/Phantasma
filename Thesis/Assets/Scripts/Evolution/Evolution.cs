@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class Evolution : WaitForPlayer {
 
+	public static Evolution Instance = null;
+
 	/*this class stores the functionality of evolution;
 	what weapons and health upgrades are unlocked
 
@@ -59,90 +61,52 @@ public class Evolution : WaitForPlayer {
 	//Depending on choice, assign prefab weapon to hand slot?
 	*/
 
-	//this determines when the upgrade bool is true
-	
-	//private int blood;
-	[SerializeField, HideInInspector]
-	private Text bloodCounter;
-
-	//must serialize or else reference defaults to null
-	[SerializeField, HideInInspector]
-	public GameObject _evoMenu;
+	public Text bloodCounter;
+	public CanvasGroup _evoMenu;
 
 	[HideInInspector]
-	public int blood;
+	private int blood;
+
+	[HideInInspector]
+	public int Blood
+	{
+		get { return blood; }
+		set { blood = value; }
+	}
 	
 	private bool open;
 
-	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
+	void Awake()
 	{
-		if(_manager.Player == null) yield return null;
-		if(scene.name == "Start")
-		{
-			bloodCounter = GameObject.Find("BloodCounter").GetComponent<Text>();
-			_evoMenu = GameObject.Find ("EvolutionMenu");
-		}
+		if(Instance == null) Instance = this;
+		UpdateUI();
 	}
 
-	void FixedUpdate()
+	public void UpdateUI()
 	{
-		if(bloodCounter != null)
-		{
-			//assign current blood to ui
-			bloodCounter.text = blood.ToString();
-
-			//announce benchmarks
-			switch(blood)
-			{
-			case 10:
-				//print ("you have " + blood + " blood!");
-				break;
-			case 20:
-				//print ("you have " + blood + " blood!");
-				break;
-			case 5:
-				//print ("you have " + blood + " blood!");
-				break;
-			}
-
-			if(_evoMenu != null)
-			{
-				//toggle window open
-				if(Input.GetButtonDown("360_BackButton"))
-				{
-					open = !open;
-					print("open/Close");
-				}
-				if(open)
-				{
-					Open();
-				}
-				else if(!open)
-				{
-					Close();
-				}
-			}
-		}
+		bloodCounter.text = blood.ToString();
 	}
 
 	public void AddBlood(int b)
 	{
 		blood += b;
+		UpdateUI();
 	}
 
 	public void SubtractBlood(int b)
 	{
 		blood -= b;
+		UpdateUI();
 	}
 
 	void Open()
 	{
-		_evoMenu.SetActive(true);
+		_evoMenu.TurnOn();
 	}
 	
 	void Close()
 	{
-		_evoMenu.SetActive(false);
+		_evoMenu.TurnOff();
 	}
 }
 

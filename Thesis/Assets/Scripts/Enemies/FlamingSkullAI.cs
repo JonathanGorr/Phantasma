@@ -1,165 +1,332 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FlamingSkullAI : Entity {
-	
-	public Transform target;
+public class FlamingSkullAI : Enemy {
 
 	private Vector3 targetPosition;
+	public Transform fireballSpawnLocation;
+	public Rigidbody2D jaw;
+	public AudioSource chatteringTeeth;
+	public ParticleSystem fire;
+	public ParticleSystem smoke;
+	public Explode explode;
+	bool exploded = false;
 
-	public float
-		lookAtDistance,
-		chaseRange,
-		attackRange,
-		distance,
-		attackSpeed = 6f,
-		attackRepeatTime = 4f,
-		knockBackDistance = 220f;
-
-	public AudioClip _chatteringTeeth;
-	public AudioClip _attack;
-
-	private bool left;
+	[Header("FlamingSkull Attack")]
+	public float attackSpeed = 6f;
 	private bool attacking = false;
-	private Vector2 faceLeft;
-	private Vector2 faceRight;
+	public float chargeAttackDuration = 1;
+	public float riseHeight = 4f;
+	public GameObject fireballPrefab;
+	public float fireballAttackChance = .3f;
+	public float perFireballDelay = 1f;
+	public int fireBalls = 3;
+	public float fireballSpeed = 10;
+	public float fireballChargeTime = 1;
+	public float healthRatioLimit = 0.5f; //if the health is under this %, speed up attacks or change slightly
+	public float subRatioMultiplier = 2; //multiply or divide times and speeds by this if health under ratio
+	float magnitude;
+	public float bounceTolerance = 40;
 
-	private Color debugColor;
+	GameObject currentFireball;
 
-	public override void Start()
+	public override void Awake()
 	{
-		base.Start();
-
-		_anim = GetComponent<Animator> ();
-		
-		//cache transform, dont call every frame 
-		myTransform = transform;
-
-		//flipping
-		faceLeft = new Vector2(transform.localScale.x, transform.localScale.y);
-		faceRight = new Vector2(-transform.localScale.x, transform.localScale.y);
-
-		GetComponent<AudioSource>().clip = _chatteringTeeth;
-		GetComponent<AudioSource>().Play();
+		base.Awake();
+		myCollider.enabled = false;
 	}
 
-	public override void OnHurt()
+	public override void OnHurt(Entity offender)
 	{
-		//TODO: on hit, turn into a rolling, deactivated physics ball that is temporarily invincible?
-		if(left){
-			GetComponent<Rigidbody2D>().AddForce(Vector3.right * knockBackDistance);
-			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
-		}
-		else if(!left)
+		if(target == null)
 		{
-			GetComponent<Rigidbody2D>().AddForce(-Vector3.right * knockBackDistance);
-			//rigidbody2D.AddForce(Vector3.up * knockBackDistance);
+			target = offender;
+			_AIState = EnemyState.Chase;
 		}
+
+		if(!attacking) StartCoroutine("ChargeAttack");
 	}
 
-	void FixedUpdate()
+	public override IEnumerator Patrol()
 	{
-		if(!target) return;
-
-		//variable distance between the player and the enemy
-		distance = Vector2.Distance(target.position, transform.position);
-
-		//only update player position when chasing, not attacking
-		if(!attacking)
+		speed = walkSpeed;
+		SetFacing(myTransform.position.x < startLocation.x ? Facing.left : Facing.right);
+		debugColor = Color.green;
+		while(_AIState == EnemyState.Patrol)
 		{
-			//update target position
-			targetPosition = target.position;
-		}
+			//find target
+			target = CircleCast();
+			if(target) { _AIState = EnemyState.Chase; }
 
-		//movement
-		myTransform.position = Vector2.MoveTowards(myTransform.position, targetPosition, speed * Time.fixedDeltaTime);
-
-		//player location
-		//player is on the right side
-		if(target.position.x < myTransform.position.x)
-		{
-			left = true;
-		}
-		//if the player is left
-		else if(target.position.x > myTransform.position.x)
-		{
-			left = false;
-		}
-
-		//if distance is within lookatdistance, run the method
-		if(distance < lookAtDistance && !attacking)
-		{
-			LookAt();
-		}
-		if(distance < chaseRange && !attacking)
-		{
-			LookAt();
-			ChasePlayer(runSpeed);
-		}
-
-		//if player is not within the lookatdistance, show green
-		if(distance > lookAtDistance && !attacking)
-		{
-			//play idle anim
-			speed = 0;
-			debugColor = Color.green;
-		}
-
-		//if player is within attack range, run the attack method
-		if (distance < attackRange && Time.time > 0 && !attacking)
-		{
-			debugColor = Color.red;
-			StartCoroutine(AttackPlayer());
+			if(Vector2.Distance(myTransform.position, startLocation) > 0.1f)
+			{
+				SetFacing(_velocity.x < 0 ? Facing.left : Facing.right);
+				myTransform.position = Vector2.MoveTowards(myTransform.position, startLocation, speed * Time.fixedDeltaTime);
+				yield return null;
+			}
+			else //we have arrived at start location. Dont move and face original facing.
+			{
+				SetFacing(startFacing);
+			}
+			yield return null;
 		}
 	}
 
-	void LookAt()
+	public override void FixedUpdate()
 	{
-		//yellow color
-		debugColor = Color.yellow;
-		
-		//flip
-		if(left)
-		{
-			myTransform.localScale = faceLeft;
-		}
-		else if(!left)
-		{
-			myTransform.localScale = faceRight;
-		}
-		return;
+		if(target) Distance();
+		if(_health.Dead) magnitude = rbody.velocity.sqrMagnitude;
 	}
-	
-	void ChasePlayer(float modifiedSpeed)
+
+	public override IEnumerator Chase()
 	{
-		debugColor = Color.red;
+		cam.RegisterMe(myTransform);
 		speed = runSpeed;
+		debugColor = Color.red;
+		while(_AIState == EnemyState.Chase)
+		{
+			SetTargetFacing();
+
+			//only update player position when chasing, not attacking
+			if(!attacking)
+			{
+				//update target position
+				targetPosition = target.Center;
+
+				//search if target is too far away
+				if(distance > sightRadius)
+				{
+					_AIState = EnemyState.Search;
+				}
+				else
+				{
+					//if player is within attack range, run the attack method
+					if (distance < attackRange)
+					{
+						StartCoroutine("Attack");
+						yield return null;
+					}
+					else if(distance < sightRadius)
+					{
+						StartCoroutine("FireballAttack");
+						yield return null;
+					}
+				}
+			}
+
+			yield return null;
+		}
 	}
 
-	void AttackSound()
+	public override void OnBecameInvisible()
 	{
-		GetComponent<AudioSource>().PlayOneShot(_attack);
+		if(!_health.Dead) return;
+		Destroy(this.gameObject);
+	}
+
+	public override void OnDeath()
+	{
+		//stop coroutines
+		StopCoroutine("AttackSequence");
+		StopCoroutine("ChargeAttack");
+		StopCoroutine("FireballAttack");
+		StopCoroutine(_AIState.ToString()); //stop the current coroutine
+		StopCoroutine("StateMachine"); //stop the coroutine state machine
+
+		if(currentFireball) Destroy(currentFireball);
+
+		rbody.isKinematic = false;
+		rbody.bodyType = RigidbodyType2D.Dynamic;
+		rbody.gravityScale = 1;
+		rbody.velocity = Vector2.zero;
+		rbody.mass = 100;
+
+		//jaw
+		jaw.transform.SetParent(null); //detach jaw
+		jaw.bodyType = RigidbodyType2D.Dynamic;
+		jaw.gravityScale = 1;
+		jaw.mass = 100;
+
+		//turn off chattering teeth asrc
+		chatteringTeeth.Stop();
+
+		//turn off particles
+		fire.Stop();
+		smoke.Stop();
+
+		cam.UnRegisterMe(myTransform);
+		myTrigger.enabled = false;
+		myCollider.enabled = true;
+
+		//change layers
+		gameObject.layer = LayerMask.NameToLayer("TransparentFX");
+		jaw.gameObject.layer = LayerMask.NameToLayer("TransparentFX");
+		SFX.Instance.PlayFX("skeleton_death", transform.position);
+
+		_anim.SetInteger("AnimState", 3);
+		base.OnDeath();
+		this.enabled = false;
+	}
+
+	public override IEnumerator Search()
+	{
+		target = null;
+		cam.UnRegisterMe(myTransform);
+		float t = searchTime;
+		debugColor = Color.yellow;
+		while(_AIState == EnemyState.Search)
+		{
+			//wait x seconds before giving up and returning to start location
+			while(t > 0 && target == null)
+			{
+				print("go to target last location");
+				myTransform.position = Vector2.MoveTowards(myTransform.position,
+						 targetPosition + new Vector3(0, riseHeight, 0), speed * Time.fixedDeltaTime);
+						yield return null;
+				//find target while waiting
+				target = CircleCast();
+				t -= Time.deltaTime;
+				yield return null;
+			}
+
+			_AIState = EnemyState.Patrol;
+			yield return null;
+		}
+	}
+
+	void SetTargetFacing()
+	{
+		SetFacing(target.Center.x > myTransform.position.x ? Facing.left : Facing.right);
+	}
+
+	void OnCollisionEnter2D(Collision2D col)
+	{
+		// when the enemy dies then hits the ground, detach the jaw and drop stuff?
+		if(!_health.Dead) return;
+		//play bounce sound if magnitude of vertical impact exceeds threshold
+		if(Mathf.Abs(magnitude) > bounceTolerance * rbody.mass)
+		{
+			SFX.Instance.PlayFX("hurt_skeleton", myTransform.position);
+		}
+		if(exploded) return;
+		smoke.Emit(5);
+		exploded = true;
+		explode.OnExplode();
+	}
+
+	void OnTriggerEnter2D(Collider2D col)
+	{
+		if(col.CompareTag("Player"))
+		{
+			col.GetComponent<Health>().TakeDamage(this, 1);
+		}
+	}
+
+	IEnumerator FireballAttack()
+	{
+		attacking = true;
+
+		int i = Random.Range(1, fireBalls);
+		while(i > 0)
+		{
+			currentFireball = Instantiate(fireballPrefab, fireballSpawnLocation.position, Quaternion.identity);
+			Fireball myFireball = currentFireball.GetComponent<Fireball>();
+			myFireball.myEntity = this;//set source of projectile to this
+
+			//ignore collision between enemy and projectile
+			Collider2D fireballCollider = currentFireball.GetComponent<Collider2D>();
+			Physics2D.IgnoreCollision(fireballCollider, myCollider);
+			Physics2D.IgnoreCollision(fireballCollider, jaw.GetComponent<Collider2D>());
+
+			Rigidbody2D fireRbody = currentFireball.GetComponent<Rigidbody2D>();
+			fireRbody.isKinematic = true;
+
+			//charge up a fireball
+			float t = fireballChargeTime;
+			while(t > 0)
+			{
+				SetTargetFacing();
+				float size = Mathf.Lerp(1, 0, t);
+				currentFireball.transform.localScale = new Vector3(size, size, 1);
+				t -= Time.deltaTime;
+				yield return null;
+			}
+
+			i--;
+			fireRbody.isKinematic = false;
+			SFX.Instance.PlayFX("fireball", fireballSpawnLocation.position);
+			myFireball.StartFlight((target.Center - fireballSpawnLocation.position).normalized);
+			yield return new WaitForSeconds(perFireballDelay);
+		}
+
+		yield return new WaitForSeconds (_health.HealthRatio < healthRatioLimit ? attackDelay/subRatioMultiplier : attackDelay);
+		_anim.SetInteger("AnimState", 0); //windup then transition to attack
+
+		//can now start new attack
+		attacking = false;
+	}
+
+	IEnumerator ChargeAttack()
+	{
+		attacking = true;
+
+		SFX.Instance.PlayFX("windup_flyingSkull", myTransform.position);
+		_anim.SetInteger("AnimState", 1); //windup then transition to attack
+		yield return new WaitForSeconds (0.5f); //delay before attacking
+		speed = _health.HealthRatio < healthRatioLimit ? attackSpeed * subRatioMultiplier : attackSpeed;
+		SFX.Instance.PlayFX("attack_flyingSkull", myTransform.position);
+
+		//charge attack
+		float t = chargeAttackDuration;
+
+		while(t > 0)
+		{
+			t-= Time.deltaTime;
+			myTransform.position = Vector2.MoveTowards(myTransform.position, targetPosition, speed * Time.fixedDeltaTime);
+			yield return null;
+		}
+
+		_anim.SetInteger("AnimState", 0); //idle transition from windup
+		//rise up to a height above the player
+		float targetYposition = target.Center.y + riseHeight;
+		while(myTransform.position.y < targetYposition)
+		{
+			myTransform.position = Vector2.MoveTowards(myTransform.position, 
+			new Vector3(myTransform.position.x, targetYposition, myTransform.position.z),
+			speed * Time.fixedDeltaTime);
+			yield return null;
+		}
+
+		yield return new WaitForSeconds (_health.HealthRatio < healthRatioLimit ? attackDelay/subRatioMultiplier : attackDelay);
+		_anim.SetInteger("AnimState", 0); //windup then transition to attack
+
+		//can now start new attack
+		attacking = false;
 	}
 
 	//stop, telegraph attack, attack, then return to follow sequence
 	//once within range, repeat
-	public IEnumerator AttackPlayer()
+	public IEnumerator Attack()
 	{
-		_anim.SetTrigger ("WindUp");
+		//dont move
 		speed = 0;
-		attacking = true;
-		yield return new WaitForSeconds (0.5f);
-		speed = attackSpeed;
-		_anim.SetTrigger("Attack");
-		AttackSound ();
-		yield return new WaitForSeconds (1f);
-		attacking = false;
-		yield return new WaitForSeconds (1f);
-	}
-
-	void OnDrawGizmos()
-	{
-		Gizmos.color = debugColor;
-		Gizmos.DrawWireSphere(transform.position, chaseRange);
+		//the player is not targeted by any other enemies
+		if(CameraController.Instance.m_Targets.Count < 3 && CameraController.Instance.m_Targets.Contains(this.transform))
+		{
+			if(_health.HealthRatio >= 0.5f && Random.value < fireballAttackChance)
+			{
+				StartCoroutine("FireballAttack");
+			}
+			else
+			{
+				StartCoroutine("ChargeAttack");
+			}
+		}
+		//the player is already targeted by 1 or more enemies
+		else
+		{
+			StartCoroutine("FireballAttack");
+		}
+		yield return null;
 	}
 }

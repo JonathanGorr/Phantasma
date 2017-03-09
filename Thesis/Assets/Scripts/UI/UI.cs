@@ -11,17 +11,13 @@ using UnityEngine.SceneManagement;
 
 public class UI : MonoBehaviour {
 
-	public LevelManager _manager;
-	public QuestSystem.QuestManager _questManager;
-	public PlayerInput _input;
-	public SFX _sfx;
-	public PauseMenu _menu;
+	public static UI Instance = null;
 
 	[Header("UI Refs")]
-	public CanvasGroup _pauseScreen;
-	public CanvasGroup  _controlScreen;
-	public CanvasGroup  _ui;
-	public CanvasGroup  _dialog;
+	public CanvasGroup  cg;
+	public CanvasGroup _bloodMeterCG;
+	public CanvasGroup _questIcon;
+	public Animator cinemaBars;
 
 	[Header("Player")]
 	public Slider _healthBar;
@@ -30,6 +26,7 @@ public class UI : MonoBehaviour {
 	public Animator _bloodMeter;
 
 	[Header("Quests")]
+	public QuestSystem.QuestManager _questManager;
 	public RectTransform _objectiveUIPrefab;
 	public RectTransform _contentGroup;
 	public Animator _envelope;
@@ -56,6 +53,7 @@ public class UI : MonoBehaviour {
 
 	void Awake()
 	{
+		if(Instance == null) Instance = this;
 		SceneManager.sceneLoaded += OnSceneLoaded;
 		QuestUpdate(0);
 	}
@@ -66,42 +64,26 @@ public class UI : MonoBehaviour {
 
 		if(scene.name == "Menu")
 		{
-			Hide(_barsCG);
+			_barsCG.TurnOff();
+			_bloodMeterCG.TurnOff();
+			_questIcon.TurnOff();
 		}
 		else if(scene.name == "Start")
 		{
-			Reveal(_barsCG);
+			_barsCG.TurnOn();
+			_bloodMeterCG.TurnOn();
+			_questIcon.TurnOn();
 		}
 	}
 
 	void Update()
 	{
-		if(_manager.paused)
+		if(PauseMenu.paused)
 		{
-			_questScrollBar.value += _input.RAnalog.y * questScrollSpeed;
+			_questScrollBar.value += PlayerInput.Instance.RAnalog.y * questScrollSpeed;
 		}
 	}
 
-	public static void TurnOff(CanvasGroup cg)
-	{
-		cg.alpha = 0;
-		cg.interactable = false;
-		cg.blocksRaycasts = false;
-	}
-	public static void TurnOn(CanvasGroup cg)
-	{
-		cg.alpha = 1;
-		cg.interactable = true;
-		cg.blocksRaycasts = true;
-	}
-	public void Hide(CanvasGroup cg)
-	{
-		StartCoroutine(CGFader(cg, false));
-	}
-	public void Reveal(CanvasGroup cg)
-	{
-		StartCoroutine(CGFader(cg, true));
-	}
 	public void BloodAnim()
 	{
 		_bloodMeter.SetTrigger("Add");
@@ -154,7 +136,7 @@ public class UI : MonoBehaviour {
 		questUpdates += count;
 
 		//don't add if already paused
-		if(_manager.paused)
+		if(PauseMenu.paused)
 		{
 			questUpdates = 0;
 			_envelope.SetInteger("AnimState", 0);
@@ -175,29 +157,5 @@ public class UI : MonoBehaviour {
 	{
 		questUpdates = 0;
 		QuestUpdate(0);
-	}
-
-	IEnumerator CGFader(CanvasGroup cg, bool reveal)
-	{
-		//turn off interaction immediately if hiding
-		if(!reveal)
-		{
-			cg.interactable = false;
-			cg.blocksRaycasts = false;
-		}
-		//lerp
-		float t = reveal ? 0 : 1;
-		while((t < 1 && reveal) || (t > 0 && !reveal))
-		{
-			t += (reveal ? Time.deltaTime : -Time.deltaTime) * fadeSpeed;
-			cg.alpha = t;
-			yield return null;
-		}
-		//turn on interaction at the end of the fade if revealing
-		if(reveal)
-		{
-			cg.interactable = true;
-			cg.blocksRaycasts = true;
-		}
 	}
 }

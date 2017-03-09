@@ -22,18 +22,12 @@ public class Objective
 public class QuestSource : MonoBehaviour {
 
 	//debug
-	private QuestManager _questManager;
-	/*public*/ Quest questRef;
-	/*public*/ QuestObjective objectiveRef;
 	private Collider2D myCollider;
 	public Objective objective;
 
 	void Awake()
 	{
 		myCollider = GetComponent<Collider2D>();
-		_questManager = GameObject.Find("_LevelManager").GetComponent<QuestManager>();
-		this.questRef = _questManager.GetQuest(objective.questKey);
-		this.objectiveRef = _questManager.GetQuestObjective(objective.questKey, objective.objectiveKey);
 	}
 
 	//give a player a quest if trigger entered
@@ -43,10 +37,16 @@ public class QuestSource : MonoBehaviour {
 		{
 			if(col.CompareTag("Player"))
 			{
-				//print("called");
-				col.GetComponent<PlayerInfo>().AddObjective(this.objective);
-				Physics2D.IgnoreCollision(col, myCollider);
+				StartCoroutine(AddQuest(col));
 			}
 		}
+	}
+
+	//adds quest after done talking
+	IEnumerator AddQuest(Collider2D col)
+	{
+		while(ConversationManager.Instance.talking) yield return null;
+		col.GetComponent<PlayerInfo>().AddObjective(this.objective);
+		Physics2D.IgnoreCollision(col, myCollider);
 	}
 }

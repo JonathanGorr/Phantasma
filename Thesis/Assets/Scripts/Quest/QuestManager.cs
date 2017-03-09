@@ -2,22 +2,58 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 namespace QuestSystem
 {
-	public class QuestManager : MonoBehaviour {
+	//JSON STUFF
+	[System.Serializable]
+	public class QuestArray
+	{
+		public List<QuestEntry> quests; //IMPORTANT: this must be named the same as the json array string
+	}
 
-		[HideInInspector] public UI _ui;
-		[HideInInspector] public SFX _sfx;
+	[System.Serializable]
+	public class QuestEntry
+	{
+		public int ID;
+		public string Slug;
+		public string Title;
+		public string Description;
+		public string Hint;
+		public bool IsActive;
+		public bool IsComplete;
+		public int[] rewards;
+		public List<ObjectiveEntry> objectives;
+	}
+
+	[System.Serializable]
+	public class ObjectiveEntry
+	{
+		public int ID;
+		public string Slug;
+		public string Title;
+		public string Description;
+		public string Hint;
+		public bool IsActive;
+		public bool IsComplete;
+		public int[] rewards;
+	}
+
+	public class QuestManager : MonoBehaviour 
+	{
+		public static QuestManager Instance = null;
 
 		//A entry for the hack dictionary
 		public List<Quest> questList = new List<Quest>();
 
+		public QuestArray questDatabase;
+
 		void Awake()
 		{
+			if(Instance == null) Instance = this;
 			SceneManager.sceneLoaded += OnSceneLoaded;
-			_ui = transform.Find("UI").GetComponent<UI>();
-			_sfx = GetComponent<SFX>();
+			CreateNewDatabase();
 		}
 
 		void OnSceneLoaded( Scene scene, LoadSceneMode m)
@@ -26,6 +62,41 @@ namespace QuestSystem
 			{
 				Clone();
 			}
+		}
+
+		//copies streaming assets
+		public string CreateNewDatabase() //TODO: you can make these methods generic and static
+		{
+			//fill database with inventory.json
+			JsonUtility.FromJsonOverwrite(StaticMethods.GetStreamingAsset("Quests.json"), questDatabase);
+
+			//TODO: construct the quests UI menu from here
+
+			#if UNITY_EDITOR
+			//print("created quest database");
+			#endif
+			return JsonUtility.ToJson(questDatabase);
+		}
+
+		//returns the current database for saving
+		public string GetMyDatabase()
+		{
+			#if UNITY_EDITOR
+			print("saving quest database");
+			#endif
+			return JsonUtility.ToJson(questDatabase);
+		}
+
+		//creates database from save game
+		public void LoadDatabase()
+		{
+			JsonUtility.FromJsonOverwrite(SaveSystem.thisSaveGame.inventory, questDatabase);
+
+			//create the inventory after database created
+			//Inventory.Instance.ConstructInventory();
+			#if UNITY_EDITOR
+			print("loaded quest database");
+			#endif
 		}
 
 		//runs the checkprogress() methods on each objective and quest
@@ -47,7 +118,6 @@ namespace QuestSystem
 				{
 					//early out for inactive objectives
 					if(!questList[i].objectiveList[j].IsActive) continue;
-
 					//check if finished
 					questList[i].objectiveList[j].CheckProgress();
 				}
@@ -71,11 +141,8 @@ namespace QuestSystem
 		{
 			Quest q = GetQuest(questKey);
 			if(q.objectiveList.Count == 0) { print("This quest has no objectives."); return null; }
-
+			if(q == null) print("Objective doesn't exist in quest list!");
 			return q.GetObjective(objectiveKey);
-
-			print("Objective doesn't exist in quest list!");
-			return null;
 		}
 
 		//replace all quests and their objectives with instances with loaded values
@@ -89,7 +156,6 @@ namespace QuestSystem
 
 				//create an instance of every quest( as is a reference of mutable assets )
 				questList[i] = ScriptableObject.Instantiate(questList[i]) as Quest;
-				questList[i].QuestManager = this; //assign quest manager reference
 
 				if(questList[i].objectiveList.Count == 0) { print("no objectives at all."); continue; } //continue with loop; but don't execute below
 

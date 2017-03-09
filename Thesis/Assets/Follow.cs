@@ -27,6 +27,7 @@ public class Follow : MonoBehaviour {
 
 	public void OnDeath()
 	{
+		//print("called");
 		Destroy(this.gameObject);
 	}
 

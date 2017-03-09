@@ -36,7 +36,7 @@ public class CameraFinishedPanning : MonoBehaviour {
 		if(!done)
 		{
 			//if(_input._jump)
-			if(_input._anyKeyDown)
+			if(Input.anyKeyDown)
 			{
 				_anim.SetTrigger("Skip");
 			}

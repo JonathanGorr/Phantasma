@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 
 public class Multiplayer : MonoBehaviour {
 
+	public static Multiplayer Instance = null;
+
 	//This is used to give subsequent players alternative appearances( to distinguish )
 	[System.Serializable]
 	public class Avatar
@@ -47,8 +49,13 @@ public class Multiplayer : MonoBehaviour {
 	}
 
 	public GameObject playerPrefab;
-	[SerializeField] private int playerCount = 0;
 	public List<Avatar> players = new List<Avatar>();
+
+	[SerializeField] private int playerCount = 0;
+	public int PlayerCount()
+	{
+		return playerCount;
+	}
 
 	public Player GetPlayer(int id)
 	{
@@ -71,33 +78,22 @@ public class Multiplayer : MonoBehaviour {
 
 	void Awake()
 	{
-		
+		if(Instance == null) Instance = this;
 	}
 
 	void Update()
 	{
+#if UNITY_EDITOR
 		if(Input.GetKeyDown(KeyCode.F))
 		{
 			CreatePlayer();
 		}
+#endif
 	}
 
 	void OrderListByIndex() //sort player list by index
 	{
 		
-	}
-
-	void OnSceneLoaded(Scene scene, LoadSceneMode m)
-	{
-		if(scene.name == "Menu")
-		{
-			
-		}
-	}
-
-	public int PlayerCount()
-	{
-		return playerCount;
 	}
 
 	//assign random colors
@@ -121,14 +117,14 @@ public class Multiplayer : MonoBehaviour {
 		Color s = shoesPalette[Random.Range(0, shoesPalette.Length)];
 		for(int i = 0;i<pi.shoes.Length;i++)
 		{
-			pi.shoes[i].color = p;
+			pi.shoes[i].color = s;
 		}
 
 		//armor
 		Color a = armorPalette[Random.Range(0, armorPalette.Length)];
 		for(int i = 0;i<pi.armor.Length;i++)
 		{
-			pi.armor[i].color = p;
+			pi.armor[i].color = a;
 		}
 	}
 
@@ -150,20 +146,20 @@ public class Multiplayer : MonoBehaviour {
 		//shoes
 		for(int i = 0;i<pi.shoes.Length;i++)
 		{
-			pi.shoes[i].color = p;
+			pi.shoes[i].color = s;
 		}
 
 		//armor
 		for(int i = 0;i<pi.armor.Length;i++)
 		{
-			pi.armor[i].color = p;
+			pi.armor[i].color = a;
 		}
 	}
 
 	//automatically creates random character
 	public Multiplayer.Avatar CreatePlayer()
 	{
-		GameObject go = Instantiate(playerPrefab);
+		GameObject go = Instantiate(playerPrefab, GameObject.FindWithTag("Respawn").transform.position, Quaternion.identity);
 		DontDestroyOnLoad(go);
 		Player p = go.GetComponent<Player>();
 

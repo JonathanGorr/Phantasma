@@ -23,16 +23,24 @@ public class Loader : MonoBehaviour {
 		{
 			GameObject lm = Instantiate(levelManagerPrefab);
 			lm.name = "_LevelManager";
-			DontDestroyOnLoad(lm);
 		}
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
-		if(scene.name == "Initialize")
+		if(scene.name == "Menu")
 		{
-			//go to the next scene( Menu )
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+			if(Player.Instance == null)
+			{
+				Multiplayer.Instance.CreatePlayer();
+			}
+		}
+		else if(scene.name == "Start")
+		{
+			if(Player.Instance == null)
+			{
+				Multiplayer.Instance.CreatePlayer();
+			}
 		}
 	}
 }

@@ -5,65 +5,41 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
-	[HideInInspector]
-	public bool paused = false;
+	public static LevelManager Instance = null;
 
 	[HideInInspector] public bool canTransition;
-	private string currentSceneName;
+	//private string currentSceneName;
 
 	//components
 	private Multiplayer.Avatar avatar;
 	public Fading _fader;
 	public Multiplayer _mp;
-	public PlayerPreferences _prefs;
 	public Evolution _evo;
-	public PlayerInput _input;
 	public UI ui;
 	public EventSystem es;
 	public SFX _sfx;
 
-	public delegate void OnPause();
-	public static event OnPause pause;
-	public delegate void UnPause();
-	public static event UnPause unPause;
-
 	[HideInInspector]
 	private bool controlOn;
 
-	public Multiplayer.Avatar Avatar
-	{
-		get
-		{
-			if(avatar == null)
-			{
-				avatar = _mp.CreatePlayer();
-			}
-			return avatar;
-		}
-	}
-
-	public Player Player
-	{
-		get
-		{
-			return Avatar.Player;
-		}
-	}
-
 	void Awake()
 	{
+		Time.timeScale = 1;
+		DontDestroyOnLoad(this.gameObject);
+		if(Instance == null) Instance = this;
 		SceneManager.sceneLoaded += OnSceneLoaded;
-		_input.onStart += Pause;
-		_input.onSelect += ControlWindow;
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
 		Application.targetFrameRate = 60;
-		currentSceneName = scene.name;
+		_fader.BeginFade (-1); //call the fade in function
+		//currentSceneName = scene.name;
 
 		if(scene.name == "Initialize")
 		{
+			//go to the next scene( Menu )
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 			Cursor.visible = false;
 		}
 		else if(scene.name == "Menu")
@@ -72,62 +48,8 @@ public class LevelManager : MonoBehaviour {
 		}
 		else
 		{
-			_fader.BeginFade (-1);
 			Cursor.visible = false;
 		}
-	}
-
-	public void ControlWindow()
-	{
-		print("show");
-		//toggle
-		controlOn = !controlOn;
-		if(controlOn)ui.Reveal(ui._controlScreen);
-		else ui.Hide(ui._controlScreen);
-	}
-
-	public void Pause()
-	{
-		if(_input.L1Down) return;
-		paused = !paused;
-		if(paused) StartCoroutine(IEPause());
-		else StartCoroutine(IEResume());
-	}
-	private IEnumerator IEPause()
-	{
-		yield return new WaitForEndOfFrame();
-		if(pause != null) pause();
-		ui.ClearUpdates();
-		if(controlOn) UI.TurnOff(ui._controlScreen);
-		ui.Reveal(ui._pauseScreen);
-		//set this button as the active selection
-		if(!_input._controller) Cursor.visible = true;
-		paused = true;
-
-		//play sound then wait until sound finished to set volume
-		_sfx.PlayUI("pause");
-		while(_sfx.asrc.isPlaying) 
-		{
-			yield return null;
-		}
-		AudioListener.volume = .25f;
-	}
-	public void Resume()
-	{
-		StartCoroutine(IEResume());
-	}
-	public IEnumerator IEResume()
-	{
-		yield return new WaitForEndOfFrame();
-		if(unPause != null) unPause();
-		//resume if not paused
-		_sfx.PlayUI("pause");
-		AudioListener.volume = 1f;
-		if(controlOn)UI.TurnOn(ui._controlScreen);
-		ui.Hide(ui._pauseScreen);
-		if(!_input._controller) Cursor.visible = false;
-		paused = false;
-		yield return null;
 	}
 
 	public void StartNewGame ()
@@ -155,69 +77,88 @@ public class LevelManager : MonoBehaviour {
 		StartCoroutine (Restart());
 	}
 
+	public delegate void OnLevelChange();
+	public static event OnLevelChange onLevelChange;
+
+	public delegate void OnNewGame();
+	public static event OnNewGame onNewGame;
+
 	public IEnumerator NewGame()
 	{
+		PlayerPrefs.DeleteAll();
 		Time.timeScale = 1;
-		_prefs.EraseAll();
-		paused = false;
-		float fadeTime = GetComponent<Fading> ().BeginFade (1);
-		yield return new WaitForSeconds (fadeTime);
+		SaveSystem.DeleteSaveGame(0);
+		SaveSystem.Save(0);
+		if(onNewGame != null) onNewGame();
+		if(onLevelChange != null) onLevelChange();
+		yield return new WaitForSeconds (_fader.BeginFade (1));
 		SceneManager.LoadScene(2);
 	}
+
+	public delegate void OnGoToMenu();
+	public static event OnGoToMenu onGoToMenu;
 
 	public IEnumerator GoToMenu()
 	{
+		SaveSystem.Save(0);
 		Time.timeScale = 1;
-		//load level
-		paused = false;
-		float fadeTime = _fader.BeginFade (1);
-		yield return new WaitForSeconds (fadeTime);
-		if(_prefs != null) _prefs.SaveStats (Player.transform.position, _evo.blood, Player.GetComponent<Health>().health);
-		SceneManager.LoadScene(0);
+		if(onGoToMenu != null) onGoToMenu();
+		if(onLevelChange != null) onLevelChange();
+		yield return new WaitForSeconds (_fader.BeginFade (1));
+		SceneManager.LoadScene(1);
 	}
+
+	public delegate void OnContinue();
+	public static event OnContinue onContinue;
 
 	public IEnumerator Continue()
 	{
+		SaveSystem.Load(0);
 		Time.timeScale = 1;
-		//load level
-		paused = false;
-		float fadeTime = _fader.BeginFade (1);
-		yield return new WaitForSeconds (fadeTime);
+		if(onContinue != null) onContinue();
+		if(onLevelChange != null) onLevelChange();
+		yield return new WaitForSeconds (_fader.BeginFade (1));
 		SceneManager.LoadScene(2);
 	}
 
+	public delegate void OnQuit();
+	public static event OnQuit onQuit;
+
 	public IEnumerator Quit()
 	{
+		SaveSystem.Save(0);
 		Time.timeScale = 1;
-		paused = false;
-		float fadeTime = _fader.BeginFade (1);
-		yield return new WaitForSeconds (fadeTime);
+		if(onQuit != null) onQuit();
+		if(onLevelChange != null) onLevelChange();
+		yield return new WaitForSeconds (_fader.BeginFade (1));
 		Application.Quit ();
 	}
 
+	void OnApplicationQuit()
+	{
+		SaveSystem.Save(0);
+	}
+
+	public delegate void OnRestart();
+	public static event OnRestart onRestart;
+
 	public IEnumerator Restart()
 	{
-		Time.timeScale = 1;
-		//if player is not dead, save their stats
-		paused = false;
-		float fadeTime = _fader.BeginFade (1);
-		yield return new WaitForSeconds (fadeTime);
-
 		//player is not dead, set position to last checkpoint
-		if(_prefs && !Player._health.dead)
+		if(Player.Instance._health.Dead)
 		{
-			//if a checkpoint was never met, set respawn to respawn
-			if(PlayerPrefs.GetFloat("playerX") == 0 && PlayerPrefs.GetFloat("playerY") == 0)
-				_prefs.SaveStats(_prefs.spawn.position, _evo.blood, Player.GetComponent<Health>().health);
-				//else if a checkpoint was hit, set the respawn location to that
-			else
-				_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"), PlayerPrefs.GetFloat("playerY"), 0), _evo.blood, Player.GetComponent<Health>().health);
+			SaveSystem.Load(0);
 		}
 		//else, set their health to max and remove their blood, set location to prefs location
 		else
 		{
-			_prefs.SaveStats (new Vector3(PlayerPrefs.GetFloat("playerX"),PlayerPrefs.GetFloat("playerY"),0), 0, Player.GetComponent<Health>().maxHealth);
+			SaveSystem.Save(0);
 		}
+
+		Time.timeScale = 1;
+		if(onRestart != null) onRestart();
+		if(onLevelChange != null) onLevelChange();
+		yield return new WaitForSeconds (_fader.BeginFade (1));
 
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}

@@ -4,14 +4,15 @@ public interface IEntity {
 
 	string Title { get; }
 	string Description { get; }
-	bool FacingLeft { get; set; }
 	Vector2 LookDirection { get; set; }
-	void Heal();
-	void OnHurt();
+	void OnHurt(Entity offender); //health passes the id of the offending entity to set target
 	void OnDeath();
 	void Attack();
 	void Block();
 	void Roll();
+	void Jump();
 	void BackStep();
 	void RotateBody();
+	void SetPosition(Vector2 pos);
+	void SetFacing(Facing facing);
 }

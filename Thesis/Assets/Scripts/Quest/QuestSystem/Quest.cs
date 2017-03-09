@@ -6,22 +6,21 @@ namespace QuestSystem
 	[System.Serializable]
 	public class Quest : ScriptableObject, IQuest
 	{
-		QuestManager _qm;
 		public string key;
 		public string title;
 		public string description;
 		public string hint;
 		public bool isActive;
 		public bool isComplete;
-		public Item reward;
+		[HideInInspector] public Item reward;
+
+		public delegate void OnComplete();
+		public event OnComplete onCompleted;
+
+		public delegate void OnActivated();
+		public event OnActivated onActivated;
 
 		public List<QuestObjective> objectiveList = new List<QuestObjective>();
-
-		public QuestManager QuestManager
-		{
-			get { return _qm; }
-			set { _qm = value; }
-		}
 
 		public virtual string Key
 		{
@@ -82,6 +81,7 @@ namespace QuestSystem
 
 		public void SetComplete()
 		{
+			if(onCompleted != null) onCompleted();
 			isComplete = true;
 			Debug.Log("objective complete");
 		}
@@ -95,6 +95,7 @@ namespace QuestSystem
 
 		public virtual void Activate()
 		{
+			if(onActivated != null) onActivated();
 			isActive = true;
 		}
 

@@ -4,27 +4,14 @@ using UnityEngine.UI;
 
 public class DeathMessage : WaitForPlayer {
 
-	private GameObject deathMessage;
-	private Health _health;
+	public CanvasGroup deathMessage;
 	public float delay = 3f;
 
 	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
-		while(_manager.Player == null) yield return null;
+		while(Player.Instance == null) yield return null;
 
-		_health = _manager.Player.GetComponent<Health>();
-		deathMessage = GameObject.Find ("DeathMessage");
-		if(deathMessage) deathMessage.SetActive (false);
-	}
-
-	void Update()
-	{
-		if(!_health) return;
-
-		if(_health.dead)
-		{
-			StartCoroutine(Restart());
-		}
+		Player.Instance._health.onDeath += StartRestart;
 	}
 
 	public void StartRestart()
@@ -34,10 +21,10 @@ public class DeathMessage : WaitForPlayer {
 
 	public IEnumerator Restart()
 	{
-		Camera.main.GetComponent<CameraController>().enabled = false;
-		deathMessage.SetActive (true);
+		CameraController.Instance.enabled = false;
+		Utilities.Instance.Reveal(deathMessage);
 		yield return new WaitForSeconds(delay);
-		deathMessage.SetActive (false);
-		_manager.StartRestart ();
+		Utilities.Instance.Hide(deathMessage);
+		LevelManager.Instance.StartRestart ();
 	}
 }

@@ -5,7 +5,29 @@ using UnityEngine.UI;
 
 public class Stamina : MonoBehaviour {
 
-	private UI _ui;
+	public Entity myEntity;
+	public WeaponController _weaponController;
+	public Animator _anim;
+
+	//anim behaviours
+	AttackStateBehaviour attackState;
+	BackstepStateBehaviour backstepState;
+	RollStateBehaviour rollState;
+	SlideAttackStateBehaviour slideAttackState;
+	SpecialAttackStateBehaviour specialAttackState;
+	private BlockStateBehaviour blockState;
+	private BlockAttackStateBehaviour blockAttackState;
+
+	public delegate void RanOut();
+	public event RanOut ranOut;
+
+	[Header("Stamina Drain")]
+	public float jumpDrain = 1;
+	public float rollDrain = 1;
+	public float backStepDrain = 1;
+	public float blockedHitDrain = 1;
+	public float blockDrain = 1;
+
 	public Slider _staminaBar;
 	[SerializeField] private float stamina;
 	public float maxStamina = 10;
@@ -30,16 +52,39 @@ public class Stamina : MonoBehaviour {
 
 	void OnEnable()
 	{
-		if(gameObject.CompareTag("Player"))
-		{
-			_staminaBar = GameObject.Find("UI").GetComponent<UI>().MyStaminaBar;
-		}
+		_staminaBar = GameObject.Find("UI").GetComponent<UI>().MyStaminaBar;
 		stamina = maxStamina;
 		UpdateStaminaBar();
 		StartCoroutine("RecoverStamina");
+
+		//behaviours
+		attackState = _anim.GetBehaviour<AttackStateBehaviour>();
+		backstepState = _anim.GetBehaviour<BackstepStateBehaviour>();
+		rollState = _anim.GetBehaviour<RollStateBehaviour>();
+		slideAttackState = _anim.GetBehaviour<SlideAttackStateBehaviour>();
+		specialAttackState = _anim.GetBehaviour<SpecialAttackStateBehaviour>();
+		blockState = _anim.GetBehaviour<BlockStateBehaviour>();
+		blockAttackState = _anim.GetBehaviour<BlockAttackStateBehaviour>();
+
+		//register
+		attackState.onEnter += Attack;
+		backstepState.onEnter += Backstep;
+		rollState.onEnter += Roll;
+		slideAttackState.onEnter += SlideAttack;
+		specialAttackState.onEnter += SpecialAttack;
+		//blockState.onEnter += Block;
+		blockAttackState.onEnter += BlockAttack;
 	}
 
-	public void UseStamina(float cost)
+	void Attack(){ 			Drain(_weaponController.weapon.regularAttackStaminaDrain); }
+	void SpecialAttack(){ 	Drain(_weaponController.weapon.specialAttackStaminaDrain); }
+	void Backstep(){ 		Drain(backStepDrain); }
+	void Roll(){ 			Drain(rollDrain); }
+	void SlideAttack(){ 	Drain(_weaponController.weapon.slideAttackStaminaDrain); }
+	//void Block(){ 			Drain(blockDrain); }
+	void BlockAttack(){ 	Drain(_weaponController.weapon.blockAttackStaminaDrain); }
+
+	public void Drain(float cost)
 	{
 		if(stamina <= 0) return;
 		stamina -= cost;
@@ -61,7 +106,7 @@ public class Stamina : MonoBehaviour {
 		while(true)
 		{
 			//wait until you can recover
-			while(t > 0)
+			while(t > 0 && myEntity.combatState != CombatState.Blocking)
 			{
 				t -= Time.deltaTime;
 				yield return null;
@@ -72,7 +117,7 @@ public class Stamina : MonoBehaviour {
 			//recover
 			if(stamina < maxStamina && t <= 0)
 			{
-				stamina += Time.deltaTime * recoverSpeed;
+				stamina += Time.deltaTime * (myEntity.combatState == CombatState.Blocking ? recoverSpeed/12 : recoverSpeed);
 			}
 
 			UpdateStaminaBar();
