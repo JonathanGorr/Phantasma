@@ -13,7 +13,7 @@ Please use an xbox or ps4 controller.
 2. 4 different enemy classes.
 3. 3 weapon classes (Sword and Shield, Spier and Bow).
 4. Physics-based environmental puzzles and platforming.
-Quest and inventory system.
+5. Basic Quest and inventory system.
 
 # Wishlist
 1. Archer enemy.
