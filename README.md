@@ -8,14 +8,14 @@ Phantasma (game) is a work in progress.
 Phantasma does not currently have keyboard+Mouse controls;
 Please use an xbox or ps4 controller.
 
-Key Features - Version 0.212 (03.16.2017) :
+# Key Features - Version 0.212 (03.16.2017)
 1. Fast paced, time-precise combat mechanics.
 2. 4 different enemy classes.
 3. 3 weapon classes (Sword and Shield, Spier and Bow).
 4. Physics-based environmental puzzles and platforming.
 Quest and inventory system.
 
-Wishlist:
+# Wishlist
 1. Archer enemy.
 2. Warlock enemy to replace the flying skull.
 2. Boss redesign.
