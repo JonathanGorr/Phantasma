@@ -49,9 +49,9 @@ Thesis/[Tt]emp/
 Thesis/[Oo]bj/
 Thesis/[Bb]uild/
 Thesis/[Bb]uilds/
-Thesis/[Dd]ocumentation/
-Thesis/[Rr]eferences/
-Thesis/[Dd]esignFiles/
+[Dd]ocumentation/
+[Rr]eferences/
+[Dd]esignFiles/
 Thesis/Assets/AssetStoreTools*
 
 # Visual Studio 2015 cache directory
