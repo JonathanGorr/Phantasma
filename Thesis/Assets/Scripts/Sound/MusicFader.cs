@@ -19,11 +19,11 @@ public class MusicFader : MonoBehaviour {
 	public AudioSource event_Music;
 
 	[Header("Settings")]
-	public bool resetEventMusicOnTransitionEnd = false;
-	public float fadeSpeed = 1;
-	bool done = false;
+	public float speed = 1;
+	bool eventOn = false;
 	bool transitioning = false;
 	float t = 0;
+	float volume = 0.5f;
 
 	[Header("Themes")]
 	public AudioClip menuTheme;
@@ -38,6 +38,16 @@ public class MusicFader : MonoBehaviour {
 	{
 		if(Instance == null) Instance = this;
 		SceneManager.sceneLoaded += OnSceneLoaded;
+
+		if(PlayerPrefs.GetInt("GameCreated") == 0)
+		{
+			bg_Music.volume = volume;
+			PlayerPrefs.SetFloat("MusicVolume", volume);
+		}
+		else if(PlayerPrefs.GetInt("GameCreated") == 1)
+		{
+			bg_Music.volume = PlayerPrefs.GetFloat("MusicVolume");
+		}
 	}
 
 	#if UNITY_EDITOR
@@ -53,10 +63,18 @@ public class MusicFader : MonoBehaviour {
 	}
 	#endif
 
+	void OnApplicationQuit()
+	{
+		PlayerPrefs.SetFloat("MusicVolume", volume);
+		PlayerPrefs.Save();
+	}
+
 	public void SetVolume(float v)
 	{
-		bg_Music.volume = v;
-		event_Music.volume = v;
+		//set volume of whichever one is currently unmuted/playing
+		volume = v;
+		if(!bg_Music.mute) bg_Music.volume = v;
+		if(!event_Music.mute) event_Music.volume = v;
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
@@ -88,18 +106,31 @@ public class MusicFader : MonoBehaviour {
 	IEnumerator CrossFade()
 	{
 		transitioning = true;
-		done = !done; //toggle
-		while((done && t < 1) || (!done && t > 0)) //while not 1...
-		{
-			t += (done ? Time.deltaTime : -Time.deltaTime) * fadeSpeed; //add time to 1
+		eventOn = !eventOn; //toggle
 
-			bg_Music.volume = 1f - t;
+		//unmute these immediately
+		if(eventOn)
+			event_Music.mute = false;
+		else
+			bg_Music.mute = false;
+		
+		while((eventOn && t < volume) || (!eventOn && t > 0)) //while not 1...
+		{
+			t += (eventOn ? Time.deltaTime : -Time.deltaTime) * speed; //add time to 1
+
+			bg_Music.volume = volume - t;
 			event_Music.volume = t;
 
 			yield return null;
 		}
-		t = Mathf.Clamp(t, 0, 1);
-		if(!done && resetEventMusicOnTransitionEnd) event_Music.Stop();
+		t = Mathf.Clamp(t, 0, volume);
+
+		//mute these finally
+		if(eventOn)
+			bg_Music.mute = true;
+		else
+			event_Music.mute = true;
+
 		transitioning = false;
 	}
 }

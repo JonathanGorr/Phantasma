@@ -2,6 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// An enemy instantiator.
+/// </summary>
+
 public class Spawner : MonoBehaviour {
 
 	public GameObject[] enemyPool;

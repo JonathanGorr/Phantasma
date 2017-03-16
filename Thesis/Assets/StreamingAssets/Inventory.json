@@ -2,6 +2,8 @@
     "items" : [
         {
             "id": 0,
+			"title": "Blood",
+			"description": "Used to heal yourself as well as upgrade.",
             "count" : 0,
             "value": 1,
             "slug": "blood",
@@ -11,6 +13,8 @@
 
         {
             "id": 1,
+			"title": "Bronze Coin",
+			"description": "Pretty penny.",
             "count" : 0,
             "value": 1,
             "slug": "coin",
@@ -20,6 +24,8 @@
 
         {
             "id": 2,
+			"title": "Silver Coin",
+			"description": "Worth something.",
             "value": 10,
             "slug": "coin",
 			"stackable": true,
@@ -28,6 +34,8 @@
 
         {
             "id": 3,
+			"title": "Gold Coin",
+			"description": "Very valuable!",
             "value": 30,
             "slug": "coin",
 			"stackable": true,
@@ -36,6 +44,8 @@
 
         {
             "id": 4,
+			"title": "Scroll",
+			"description": "Contains a quest or fragment of lore.",
             "value": 0,
             "slug": "scroll",
 			"stackable": false,

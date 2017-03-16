@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : Entity {
 
 	[Header("Enemy")]
+	public LineOfSight sight;
 	public LayerMask layers;
 	public bool canRotate = false;
 	public enum EnemyState { Patrol, Chase, Search }
 	public EnemyState _AIState = EnemyState.Patrol;
 
-	[HideInInspector] public Entity target;
 	[HideInInspector] public CameraController cam;
 
 	[HideInInspector] public Color debugColor;
@@ -22,23 +23,37 @@ public class Enemy : Entity {
 	public Rigidbody2D rbody;
 
 	[Header("Ranges")]
-	public float distance;
-	public float chaseRange = 7f;
+	public float distance = 99;
 	public float attackRange = 2f;
-	public float sightRadius = 5f;
-	public float tooCloseRange = 1f;
 	public float searchTime = 3f;
 	public float minDistance = 2f;
 
+	public DrawWireDisc[] ranges;
+
 	public float Distance() //returns the distance between me and my target
 	{
-		distance = Vector2.Distance(myTransform.position, target.myTransform.position);
+		distance = Vector2.Distance(myTransform.position, sight.target.myTransform.position);
 		return distance;
 	}
+
+	#if UNITY_EDITOR
+	void OnGUI()
+	{
+		if(!rend.isVisible) return;
+		ranges[0].diameter = attackRange;
+	}
+	#endif
 
 	public override void Awake()
 	{
 		base.Awake();
+
+		#if UNITY_EDITOR
+		//get all of our editor wire circles
+		ranges[0].color = Color.red;
+		ranges[0].diameter = attackRange;
+		#endif
+
 		startLocation = myTransform.position;
 		startFacing = facing;
 		cam = Camera.main.GetComponent<CameraController>();
@@ -46,14 +61,20 @@ public class Enemy : Entity {
 		StartCoroutine("StateMachine");
 	}
 
-	public virtual Entity CircleCast() //casts a circle to detect targets
+	public override void Subscribe()
 	{
-		Collider2D col = Physics2D.OverlapCircle(transform.position, chaseRange, layers);
-		if(col != null) 
-		{
-			return col.GetComponent<Entity>();
-		}
-		else return null;
+		sight.foundEntity += FoundTarget;
+		sight.lostEntity += LostTarget;
+
+		base.Subscribe();
+	}
+
+	public override void UnSubscribe()
+	{
+		sight.foundEntity -= FoundTarget;
+		sight.lostEntity -= LostTarget;
+
+		base.UnSubscribe();
 	}
 
 	public virtual IEnumerator StateMachine()
@@ -64,6 +85,18 @@ public class Enemy : Entity {
 			if(!rend.isVisible) yield return null;
 			yield return StartCoroutine(_AIState.ToString());
 		}
+	}
+
+	//called by the lineofSight script when the player enters the collider and is visible to the enemy
+	public virtual void FoundTarget(Entity e)
+	{
+		if(_AIState == EnemyState.Chase) return;
+		_AIState = EnemyState.Chase;
+	}
+	//called by the lineofSight script when the player has left the collider
+	public virtual void LostTarget(Entity e)
+	{
+		_AIState = EnemyState.Search;
 	}
 
 	public virtual IEnumerator Patrol()
@@ -88,15 +121,5 @@ public class Enemy : Entity {
 		{
 			yield return null;
 		}
-	}
-
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.blue;
-		Gizmos.DrawWireSphere(transform.position, sightRadius);
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(transform.position, chaseRange);
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(transform.position, attackRange);
 	}
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-
 namespace CharacterController {
 
 [RequireComponent( typeof( BoxCollider2D ), typeof( Rigidbody2D ) )]
@@ -43,7 +42,7 @@ public class CharacterController2D : MonoBehaviour
 		public override string ToString()
 		{
 			return string.Format( "[CharacterCollisionState2D] r: {0}, l: {1}, a: {2}, b: {3}, movingDownSlope: {4}, angle: {5}, wasGroundedLastFrame: {6}, becameGroundedThisFrame: {7}",
-			                     right, left, above, below, movingDownSlope, slopeAngle, wasGroundedLastFrame, becameGroundedThisFrame );
+			                    right, left, above, below, movingDownSlope, slopeAngle, wasGroundedLastFrame, becameGroundedThisFrame );
 		}
 	}
 
@@ -57,7 +56,6 @@ public class CharacterController2D : MonoBehaviour
 	public event Action<Collider2D> onTriggerEnterEvent;
 	public event Action<Collider2D> onTriggerStayEvent;
 	public event Action<Collider2D> onTriggerExitEvent;
-
 
 	/// <summary>
 	/// when true, one way platforms will be ignored when moving vertically for a single frame
@@ -104,7 +102,7 @@ public class CharacterController2D : MonoBehaviour
 	/// Entity:
 	/// The mask that only blocks from left & right but not top; you can fall onto these objects from above
 	/// </summary>
-	public LayerMask entitiesMask = 0;
+	public string entitiesMask;
 
 	/// <summary>
 	/// the max slope angle that the CC2D can climb
@@ -118,7 +116,6 @@ public class CharacterController2D : MonoBehaviour
 	/// </summary>
 	/// <value>The jumping threshold.</value>
 	public float jumpingThreshold = 0.07f;
-
 
 	/// <summary>
 	/// curve for multiplying speed based on slope (negative = down slope and positive = up slope)
@@ -235,6 +232,16 @@ public class CharacterController2D : MonoBehaviour
 
 	#region Public
 
+	public void IgnoreEntityCollision()
+	{
+		platformMask &= ~(1 << LayerMask.NameToLayer(entitiesMask));
+	}
+
+	public void RestoreEntityCollision()
+	{
+		platformMask |= 1 << LayerMask.NameToLayer(entitiesMask);
+	}
+
 	/// <summary>
 	/// attempts to move the character to position + deltaMovement. Any colliders in the way will cause the movement to
 	/// stop when run into.
@@ -330,8 +337,6 @@ public class CharacterController2D : MonoBehaviour
 	}
 
 	#endregion
-
-
 	#region Movement Methods
 
 	/// <summary>
@@ -352,6 +357,18 @@ public class CharacterController2D : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Don't collide if inside the collider
+	/// </summary>
+	bool InsideCollider(Vector3 rayOrigin, Collider2D col)
+	{
+		if(rayOrigin.x < col.bounds.max.x
+		&& rayOrigin.x > col.bounds.min.x )
+			return true;
+		
+		return false;
+	}
+
+	/// <summary>
 	/// we have to use a bit of trickery in this one. The rays must be cast from a small distance inside of our
 	/// collider (skinWidth) to avoid zero distance rays which will get the wrong normal. Because of this small offset
 	/// we have to increase the ray distance skinWidth then remember to remove skinWidth from deltaMovement before
@@ -359,10 +376,10 @@ public class CharacterController2D : MonoBehaviour
 	/// </summary>
 	void moveHorizontally( ref Vector3 deltaMovement )
 	{
-		var isGoingRight = deltaMovement.x > 0;
-		var rayDistance = Mathf.Abs( deltaMovement.x ) + _skinWidth;
-		var rayDirection = isGoingRight ? Vector2.right : -Vector2.right;
-		var initialRayOrigin = isGoingRight ? _raycastOrigins.bottomRight : _raycastOrigins.bottomLeft;
+		bool isGoingRight = deltaMovement.x > 0;
+		float rayDistance = Mathf.Abs( deltaMovement.x ) + _skinWidth;
+		Vector2 rayDirection = isGoingRight ? Vector2.right : -Vector2.right;
+		Vector3 initialRayOrigin = isGoingRight ? _raycastOrigins.bottomRight : _raycastOrigins.bottomLeft;
 
 		for( var i = 0; i < totalHorizontalRays; i++ )
 		{
@@ -379,26 +396,37 @@ public class CharacterController2D : MonoBehaviour
 			
 			if( _raycastHit )
 			{
+
 				// the bottom ray can hit a slope but no other ray can so we have special handling for these cases
 				//handle slope movement
 				if(i == 0)
 				{
-					if(Mathf.Approximately(_raycastHit.normal.x, -1)) { collisionState.right = true; }
-					if(Mathf.Approximately(_raycastHit.normal.x, 1)) { collisionState.left = true; }
-					if(Mathf.Approximately(_raycastHit.normal.x, 0)) collisionState.left = collisionState.right = false;
+					//don't collide with entity if inside an entity collider
+					if(_raycastHit.collider.gameObject.layer == LayerMask.NameToLayer(entitiesMask))
+					{
+						//inside enemy collider?
+						if(InsideCollider(initialRayOrigin, _raycastHit.collider))
+						{
+							//skip collision
+							continue;
+						}
+					}
 
 					_raycastHitsThisFrameHorizontal.Add( _raycastHit );
 
 					//this is a slope ray
 					if(handleHorizontalSlope( ref deltaMovement, Vector2.Angle( _raycastHit.normal, Vector2.up )) )
 					{
-						//_raycastHitsThisFrameHorizontal.Add( _raycastHit );
-						//print("handle");
 						break;
 					}
-					//don't handle slope movement
+					//not a slope; colliding with a wall
 					else
+					{
+						if(Mathf.Approximately(_raycastHit.normal.x, -1)) { collisionState.right = true; }
+						if(Mathf.Approximately(_raycastHit.normal.x, 1)) { collisionState.left = true; }
+						if(Mathf.Approximately(_raycastHit.normal.x, 0)) collisionState.left = collisionState.right = false;
 						break;
+					}
 				}
 			}
 		}
@@ -444,9 +472,13 @@ public class CharacterController2D : MonoBehaviour
 				// we crossed an edge when using Pythagoras calculation, so we set the actual delta movement to the ray hit location
 				deltaMovement = (Vector3)raycastHit.point - ray;
 				if( isGoingRight )
+				{
 					deltaMovement.x -= _skinWidth;
+				}
 				else
+				{
 					deltaMovement.x += _skinWidth;
+				}
 			}
 
 			_isGoingUpSlope = true;
@@ -471,9 +503,8 @@ public class CharacterController2D : MonoBehaviour
 		// if we are moving up, we should ignore the layers in oneWayPlatformMask
 		var mask = platformMask;
 		if( ( isGoingUp && !collisionState.wasGroundedLastFrame ) || ignoreOneWayPlatformsThisFrame ) mask &= ~oneWayPlatformMask;
-		//don't collide with enemies if falling onto them
-		if( ( !isGoingUp && !collisionState.wasGroundedLastFrame ))  mask &= ~entitiesMask; 
-		//TODO: somehow disable vertical collision entirely
+		//don't collide with enemies vertically
+		mask &= ~(1 << LayerMask.NameToLayer(entitiesMask));
 
 		for( var i = 0; i < totalVerticalRays; i++ )
 		{

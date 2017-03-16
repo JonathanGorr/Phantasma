@@ -295,8 +295,6 @@ public class PlayerInput : WaitForPlayer {
 
 	void Update()
 	{
-		//if(Input.GetKeyDown(KeyCode.Joystick1Button6)) { SFX.Instance.PlayUI("debug"); }
-		if(Input.GetButtonDown("DS4_LeftTrigger")) { SFX.Instance.PlayUI("debug"); }
 		LTrigger();
 		RTrigger();
 		Dpad();
@@ -404,6 +402,13 @@ public class PlayerInput : WaitForPlayer {
 		}
 		while(Input.GetButton(controllerState.ToString() + "_XButton") && x) return; 
 		x = false;
+	}
+
+	//A button
+	public bool ADown
+	{
+		get { while(Input.GetButton(controllerState.ToString() + "_AButton")) return true;
+		return false; }
 	}
 
 	//A (X) button

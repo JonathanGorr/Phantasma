@@ -2,6 +2,7 @@
 
 public class ConversationComponent : MonoBehaviour {
 
+	public Transform speaker; //who am I looking at?
     public Conversation[] Conversations;
 
     void Awake()
@@ -24,7 +25,7 @@ public class ConversationComponent : MonoBehaviour {
 			Conversation c = UncompleteDialog();
 			if(c == null) return;
 
-			ConversationManager.Instance.StartConversation(transform, Conversations[0]);
+			ConversationManager.Instance.StartConversation(speaker, Conversations[0]);
 		}
 	}
 

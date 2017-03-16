@@ -33,7 +33,6 @@ public class ConversationManager : MonoBehaviour {
 	public CanvasGroup _DialogBox;
 	private AudioClip _sound;
 	private AudioClip _bgMusic;
-	private float conversationSpeed = .1f;
 	private bool submit;
 	public bool PlayLetterSound = true;
 	public AudioClip letterSound;
@@ -71,6 +70,12 @@ public class ConversationManager : MonoBehaviour {
         {
 			StartCoroutine(DisplayConversation(speaker, conversation));
         }
+    }
+
+    public void SetVolume(float v)
+    {
+    	dialogueAsrc.volume = v;
+		letterAsrc.volume = v;
     }
 
     //used to skip dialog

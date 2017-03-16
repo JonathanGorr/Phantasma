@@ -76,7 +76,7 @@ TextureImporter:
     overridden: 0
   - buildTarget: Android
     maxTextureSize: 128
-    textureFormat: 12
+    textureFormat: 13
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -190,7 +190,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     outline: []
-  spritePackingTag: 
+  spritePackingTag: Items
   userData: 
   assetBundleName: 
   assetBundleVariant: 

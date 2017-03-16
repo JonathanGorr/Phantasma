@@ -2,9 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Health : MonoBehaviour {
+/// <summary>
+/// Health:
+/// The amount of vitality attributed to an entity.
+/// Things that typically have 'health':
+/// enemies, player, breakable objects
+/// </summary>
 
-	bool killed = false;
+public class Health : MonoBehaviour {
 
 	[Header("Health")]
 	public int health;
@@ -13,7 +18,6 @@ public class Health : MonoBehaviour {
 	[Header("Bools")]
 	public bool	aggro;
 	public bool	invincible;
-	public bool blocking;
 
 	public bool Dead
 	{
@@ -31,6 +35,12 @@ public class Health : MonoBehaviour {
 	public delegate void OnDeath();
 	public event OnDeath onDeath;
 
+	public virtual void OnKill()
+	{
+		OnDeath died = onDeath;
+		if(died != null) died();
+	}
+
 	public float HealthRatio
 	{
 		get { return health/maxHealth; }
@@ -44,13 +54,15 @@ public class Health : MonoBehaviour {
 
 	public virtual void TakeDamage(Entity e, int dmg)
 	{
-		if(killed) return;
+		if(Dead) return;
 		if(invincible) return;
 
-		if(blocking) dmg = (int)Mathf.Ceil(dmg/2);
-		if(_hitPoints) _hitPoints.TakeDamage(dmg);
-		//when a weapon collides, subtract health by the passes int(damage)
-		health = Mathf.Clamp (health - dmg, 0, maxHealth);
+		if(dmg > 0)
+		{
+			if(_hitPoints) _hitPoints.TakeDamage(dmg);
+			//when a weapon collides, subtract health by the passes int(damage)
+			health = Mathf.Clamp (health - dmg, 0, maxHealth);
+		}
 		//if an enemy has no health left, drop blood and destroy object
 		if (Dead) { OnKill(); }
 		else { if(onHurt != null) onHurt(e); }
@@ -59,7 +71,7 @@ public class Health : MonoBehaviour {
 
 	public virtual void Heal()
 	{
-		if(killed) return;
+		if(Dead) return;
 
 		if(health == maxHealth || health == 0) return;
 		health += 1;
@@ -70,7 +82,7 @@ public class Health : MonoBehaviour {
 
 	public virtual void Heal(int heal)
 	{
-		if(killed) return;
+		if(Dead) return;
 
 		if(heal <= 0 || health == maxHealth || health == 0) return;
 		health += heal;
@@ -81,6 +93,7 @@ public class Health : MonoBehaviour {
 
 	public virtual void UpdateHealthBar()
 	{
+		if(!_healthBar) return;
 		_healthBar.maxValue = maxHealth;
 		_healthBar.value = health;
 	}
@@ -88,12 +101,5 @@ public class Health : MonoBehaviour {
 	public void SetInvincible(bool truth)
 	{
 		invincible = truth;
-	}
-
-	public virtual void OnKill()
-	{
-		if(killed) return;
-		killed = true;
-		if(onDeath!=null) onDeath();
 	}
 }

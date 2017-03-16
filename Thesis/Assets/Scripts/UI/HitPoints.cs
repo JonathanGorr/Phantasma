@@ -18,7 +18,7 @@ public class HitPoints : MonoBehaviour {
 	
 	Vector3 RandomSpawn() //returns a random spawn location
 	{
-	 	return new Vector3(Random.Range(-0.6f,0.6f), 0, 0);
+	 	return new Vector3(Random.Range(-0.2f,0.2f), 0, 0);
 	}
 
 	public void TakeDamage(int value)

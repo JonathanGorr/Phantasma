@@ -3,18 +3,21 @@ using System.Collections;
 
 public class FlamingSkullAI : Enemy {
 
-	private Vector3 targetPosition;
+	Vector3 targetPosition;
 	public Transform fireballSpawnLocation;
 	public Rigidbody2D jaw;
 	public AudioSource chatteringTeeth;
 	public ParticleSystem fire;
 	public ParticleSystem smoke;
 	public Explode explode;
+	public Collider2D myCollider;
 	bool exploded = false;
 
 	[Header("FlamingSkull Attack")]
 	public float attackSpeed = 6f;
 	private bool attacking = false;
+	public bool firing = false;
+	public bool charging = false;
 	public float chargeAttackDuration = 1;
 	public float riseHeight = 4f;
 	public GameObject fireballPrefab;
@@ -36,31 +39,47 @@ public class FlamingSkullAI : Enemy {
 		myCollider.enabled = false;
 	}
 
+	public override void FoundTarget(Entity e)
+	{
+		base.FoundTarget(e);
+	}
+
 	public override void OnHurt(Entity offender)
 	{
-		if(target == null)
+		SFX.Instance.PlayFX("attack_flyingSkull", myTransform.position);
+
+		if(sight.target == null)
 		{
-			target = offender;
+			sight.target = offender;
 			_AIState = EnemyState.Chase;
 		}
 
-		if(!attacking) StartCoroutine("ChargeAttack");
+		if(firing) 
+		{
+			Destroy(currentFireball);
+			StopCoroutine("FireballAttack");
+		}
+
+		if(charging)
+		{
+			charging = false;
+			StopCoroutine("ChargeAttack");
+		}
+
+		SetTargetFacing();
+		StartCoroutine("ChargeAttack");
 	}
 
 	public override IEnumerator Patrol()
 	{
 		speed = walkSpeed;
-		SetFacing(myTransform.position.x < startLocation.x ? Facing.left : Facing.right);
+		//if the start location is left of me, face left
+		SetFacing(startLocation.x < myTransform.position.x ? Facing.left : Facing.right);
 		debugColor = Color.green;
 		while(_AIState == EnemyState.Patrol)
 		{
-			//find target
-			target = CircleCast();
-			if(target) { _AIState = EnemyState.Chase; }
-
 			if(Vector2.Distance(myTransform.position, startLocation) > 0.1f)
 			{
-				SetFacing(_velocity.x < 0 ? Facing.left : Facing.right);
 				myTransform.position = Vector2.MoveTowards(myTransform.position, startLocation, speed * Time.fixedDeltaTime);
 				yield return null;
 			}
@@ -74,13 +93,15 @@ public class FlamingSkullAI : Enemy {
 
 	public override void FixedUpdate()
 	{
-		if(target) Distance();
+		if(sight.target) 
+		{
+			Distance();
+		}
 		if(_health.Dead) magnitude = rbody.velocity.sqrMagnitude;
 	}
 
 	public override IEnumerator Chase()
 	{
-		cam.RegisterMe(myTransform);
 		speed = runSpeed;
 		debugColor = Color.red;
 		while(_AIState == EnemyState.Chase)
@@ -90,28 +111,34 @@ public class FlamingSkullAI : Enemy {
 			//only update player position when chasing, not attacking
 			if(!attacking)
 			{
-				//update target position
-				targetPosition = target.Center;
-
 				//search if target is too far away
-				if(distance > sightRadius)
+				if(sight.target == null)
 				{
 					_AIState = EnemyState.Search;
 				}
 				else
 				{
-					//if player is within attack range, run the attack method
-					if (distance < attackRange)
-					{
-						StartCoroutine("Attack");
-						yield return null;
-					}
-					else if(distance < sightRadius)
-					{
-						StartCoroutine("FireballAttack");
-						yield return null;
-					}
+					StartCoroutine("FireballAttack");
+					yield return null;
 				}
+			}
+
+			//if player is within attack range, run the attack method
+			if (distance <= attackRange)
+			{
+				//only if caught in the fireball routine do we
+				//stop the fireball routine and set attacking to false
+				if(firing)
+				{
+					//wait until done firing, if firing...
+					while(firing) yield return null;
+					attacking = false;
+					//stop the fireball shooting coroutine
+					StopCoroutine("FireballAttack");
+				}
+
+				while(attacking) yield return null;
+				StartCoroutine("ChargeAttack");
 			}
 
 			yield return null;
@@ -168,23 +195,24 @@ public class FlamingSkullAI : Enemy {
 		this.enabled = false;
 	}
 
+	public override void SetFacing(Facing face)
+	{
+		base.SetFacing(face);
+	}
+
 	public override IEnumerator Search()
 	{
-		target = null;
-		cam.UnRegisterMe(myTransform);
 		float t = searchTime;
 		debugColor = Color.yellow;
 		while(_AIState == EnemyState.Search)
 		{
 			//wait x seconds before giving up and returning to start location
-			while(t > 0 && target == null)
+			while(t > 0 && !sight.CanPlayerBeSeen())
 			{
-				print("go to target last location");
 				myTransform.position = Vector2.MoveTowards(myTransform.position,
 						 targetPosition + new Vector3(0, riseHeight, 0), speed * Time.fixedDeltaTime);
 						yield return null;
 				//find target while waiting
-				target = CircleCast();
 				t -= Time.deltaTime;
 				yield return null;
 			}
@@ -196,7 +224,7 @@ public class FlamingSkullAI : Enemy {
 
 	void SetTargetFacing()
 	{
-		SetFacing(target.Center.x > myTransform.position.x ? Facing.left : Facing.right);
+		SetFacing(targetPosition.x < myTransform.position.x ? Facing.left : Facing.right);
 	}
 
 	void OnCollisionEnter2D(Collision2D col)
@@ -218,7 +246,10 @@ public class FlamingSkullAI : Enemy {
 	{
 		if(col.CompareTag("Player"))
 		{
-			col.GetComponent<Health>().TakeDamage(this, 1);
+			if(charging)
+			{
+				col.GetComponent<Health>().TakeDamage(this, 1);
+			}
 		}
 	}
 
@@ -229,6 +260,12 @@ public class FlamingSkullAI : Enemy {
 		int i = Random.Range(1, fireBalls);
 		while(i > 0)
 		{
+			firing = true;
+
+			//get target position once the moment before firing
+			targetPosition = sight.target.Center;
+			SetTargetFacing();
+
 			currentFireball = Instantiate(fireballPrefab, fireballSpawnLocation.position, Quaternion.identity);
 			Fireball myFireball = currentFireball.GetComponent<Fireball>();
 			myFireball.myEntity = this;//set source of projectile to this
@@ -243,19 +280,24 @@ public class FlamingSkullAI : Enemy {
 
 			//charge up a fireball
 			float t = fireballChargeTime;
-			while(t > 0)
+			while(t > 0 && currentFireball)
 			{
-				SetTargetFacing();
 				float size = Mathf.Lerp(1, 0, t);
 				currentFireball.transform.localScale = new Vector3(size, size, 1);
 				t -= Time.deltaTime;
 				yield return null;
 			}
 
+			//get target position once the moment before firing
+			targetPosition = sight.target.Center;
+
 			i--;
+			_anim.SetTrigger("SpitFireball");
 			fireRbody.isKinematic = false;
 			SFX.Instance.PlayFX("fireball", fireballSpawnLocation.position);
-			myFireball.StartFlight((target.Center - fireballSpawnLocation.position).normalized);
+			myFireball.StartFlight((targetPosition - fireballSpawnLocation.position).normalized);
+
+			firing = false;
 			yield return new WaitForSeconds(perFireballDelay);
 		}
 
@@ -268,27 +310,35 @@ public class FlamingSkullAI : Enemy {
 
 	IEnumerator ChargeAttack()
 	{
+		print("charge attack");
 		attacking = true;
 
 		SFX.Instance.PlayFX("windup_flyingSkull", myTransform.position);
 		_anim.SetInteger("AnimState", 1); //windup then transition to attack
+
+		//get target position once the moment before firing
+		targetPosition = sight.target.Center;
+
 		yield return new WaitForSeconds (0.5f); //delay before attacking
+
 		speed = _health.HealthRatio < healthRatioLimit ? attackSpeed * subRatioMultiplier : attackSpeed;
 		SFX.Instance.PlayFX("attack_flyingSkull", myTransform.position);
 
 		//charge attack
 		float t = chargeAttackDuration;
 
-		while(t > 0)
+		charging = true;
+		while(t > 0 && charging)
 		{
 			t-= Time.deltaTime;
 			myTransform.position = Vector2.MoveTowards(myTransform.position, targetPosition, speed * Time.fixedDeltaTime);
 			yield return null;
 		}
+		charging = false;
 
 		_anim.SetInteger("AnimState", 0); //idle transition from windup
 		//rise up to a height above the player
-		float targetYposition = target.Center.y + riseHeight;
+		float targetYposition = targetPosition.y + riseHeight;
 		while(myTransform.position.y < targetYposition)
 		{
 			myTransform.position = Vector2.MoveTowards(myTransform.position, 
@@ -306,7 +356,7 @@ public class FlamingSkullAI : Enemy {
 
 	//stop, telegraph attack, attack, then return to follow sequence
 	//once within range, repeat
-	public IEnumerator Attack()
+	IEnumerator Attack()
 	{
 		//dont move
 		speed = 0;

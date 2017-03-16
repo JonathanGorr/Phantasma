@@ -21,7 +21,7 @@ public class DeathMessage : WaitForPlayer {
 
 	public IEnumerator Restart()
 	{
-		CameraController.Instance.enabled = false;
+		//CameraController.Instance.enabled = false;
 		Utilities.Instance.Reveal(deathMessage);
 		yield return new WaitForSeconds(delay);
 		Utilities.Instance.Hide(deathMessage);

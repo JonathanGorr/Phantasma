@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class CameraFinishedPanning : MonoBehaviour {
 
 	public Animator _anim;
-	PlayerInput _input;
 	GameObject _eventSystem;
 	private bool done = false;
 
@@ -16,26 +15,25 @@ public class CameraFinishedPanning : MonoBehaviour {
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode m)
 	{
+		_anim.enabled = false;
+		done = false;
+
 		if(scene.name == "Menu")
 		{
+			_anim.Rebind();
 			_anim.enabled = true;
-			_input = GameObject.Find("_LevelManager").GetComponent<PlayerInput>();
+
 			_eventSystem = GameObject.Find ("EventSystem");
-			if (_eventSystem) _eventSystem.SetActive (false);
+			_eventSystem.SetActive (false);
+
 			_anim.SetTrigger("Pan");
-		}
-		else
-		{
-			_anim.enabled = false;
 		}
 	}
 
 	void Update()
 	{
-		if(!_input) return;
 		if(!done)
 		{
-			//if(_input._jump)
 			if(Input.anyKeyDown)
 			{
 				_anim.SetTrigger("Skip");

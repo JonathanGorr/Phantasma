@@ -19,7 +19,7 @@ public class Footsteps : MonoBehaviour {
 		if (	_controller.isGrounded 
 		    && _controller.velocity.magnitude < 7 
 		    && _controller.velocity.magnitude > 0.1 
-		    && col.gameObject.tag == "Ground"
+		    && col.gameObject.tag == "Stone"
 		    && step == true) {
 
 			StartCoroutine(WalkOnStone(audioStepLengthWalk));

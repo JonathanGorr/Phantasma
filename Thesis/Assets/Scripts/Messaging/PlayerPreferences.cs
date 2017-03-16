@@ -21,16 +21,6 @@ public class PlayerPreferences : MonoBehaviour {
 	public Checkpoint Puzzle;
 	public Checkpoint Boss;
 
-	[Header("Story Progress")]
-	public bool motherMet;
-	public bool	fatherMet;
-	public bool	itemsGet;
-	public bool	swordLesson;
-	public bool	returnedHome;
-	public bool	bowLesson;
-	public bool	puzzle;
-	public bool	boss;
-
 	void Awake()
 	{
 		#if !UNITY_EDITOR
@@ -88,7 +78,13 @@ public class PlayerPreferences : MonoBehaviour {
 		{
 			if(debug) print("Prefs: new game just created");
 			Player.Instance._health.health = Player.Instance._health.maxHealth;
-			Player.Instance.SetPosition(GameObject.FindWithTag("Respawn").transform.position);
+
+			//set player position to spawn gameobject
+			Vector2 spawn = GameObject.FindWithTag("Respawn").transform.position;
+			PlayerPrefs.SetFloat ("PlayerX", spawn.x);
+			PlayerPrefs.SetFloat ("PlayerY", spawn.y);
+
+			Player.Instance.SetPosition(spawn);
 
 			Inventory.Inventory.Instance.Coins = 0;
 			Inventory.Inventory.Instance.UpdateCoinUI();
@@ -151,7 +147,6 @@ public class PlayerPreferences : MonoBehaviour {
 	public void MotherMet()
 	{
 		MeetDad.ActivateTrigger();
-		motherMet = true;
 
 		PlayerPrefs.SetInt("MotherMet", 1);
 		PlayerPrefs.Save();
@@ -159,7 +154,6 @@ public class PlayerPreferences : MonoBehaviour {
 
 	public void FatherMet()
 	{
-		fatherMet = true;
 		//destroy mom and dad dialog
 		MeetDad.DisableColliders();
 		//set sword tut and checkpoint to true
@@ -173,9 +167,7 @@ public class PlayerPreferences : MonoBehaviour {
 
 	public void ItemsGet()
 	{
-		itemsGet = true;
 		GameObject.Find("Father").GetComponent<FollowEntity>().SetTarget(Player.Instance);
-
 		PlayerPrefs.SetInt("ItemsGet", 1);
 		PlayerPrefs.Save();
 	}
@@ -183,7 +175,6 @@ public class PlayerPreferences : MonoBehaviour {
 	public void SwordTutorialFinished()
 	{
 		MeetDad.DeactivateTrigger();
-		swordLesson = true;
 		WheresMom.ActivateTrigger();
 
 		PlayerPrefs.SetInt("SwordTutorial", 1);
@@ -194,7 +185,6 @@ public class PlayerPreferences : MonoBehaviour {
 	{
 		SwordLesson.DeactivateTrigger();
 		BowLesson.ActivateTrigger();
-		returnedHome = true;
 
 		PlayerPrefs.SetInt("ReturnedHome", 1);
 		PlayerPrefs.Save();

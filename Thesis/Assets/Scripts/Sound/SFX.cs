@@ -15,33 +15,45 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] sheathes;
 	public AudioClip[] slideBlocking;
 	public AudioClip[] slide;
+
 	[Header("Enemy")]
 	public AudioClip[] enemyHurt;
 	public AudioClip[] enemyDied;
 	public AudioClip flyingSkullAttack;
 	public AudioClip flyingSkullWindup;
 	public AudioClip fireball;
+	public AudioClip windUpLight;
+	public AudioClip windUpHeavy;
 	public AudioClip[] skeletonHurt;
 	public AudioClip[] skeletonDeath;
+	public AudioClip[] skeletonAlerted;
+
 	[Header("Weapon Sounds")]
 	public AudioClip[] swings;
 	public AudioClip[] slideAttackWhooshes;
 	public AudioClip[] bowDraw;
 	public AudioClip[] bowShoot;
+
 	[Header("Collision")]
 	public AudioClip[] block;
 	public AudioClip[] weaponCollide;
 	public AudioClip[] arrowImpact_Wood;
 	public AudioClip[] arrowImpact_Flesh;
+
 	[Header("Status")]
 	public AudioClip heal;
+
 	[Header("Items")]
 	public AudioClip bloodPickup;
+	public AudioClip[] itemPickup;
+
 	[Header("Environment")]
 	public AudioClip[] potShatters;
 	public AudioClip[] woodHits;
 	public AudioClip[] woodShatters;
 	public AudioClip door;
+	public AudioClip elevatorButtonPressed;
+
 	[Header("Money")]
 	public AudioClip coinBounces;
 	public AudioClip buy;
@@ -49,19 +61,23 @@ public class SFX : MonoBehaviour {
 	public AudioClip[] coinCollects;
 
 	public AudioSource asrc;
+
 	[Header("UI")]
 	public AudioClip[] potions;
 	public AudioClip[] foods;
 	public AudioClip[] armors;
 	public AudioClip[] weapons;
+
 	[Header("Jingles")]
 	public AudioClip newQuest;
 	public AudioClip finishQuest;
 	public AudioClip failQuest;
+
 	[Header("Buttons")]
 	public AudioClip scroll;
 	public AudioClip back;
 	public AudioClip select;
+
 	[Header("Debug")]
 	public AudioClip debug;
 	public AudioClip error;
@@ -137,6 +153,7 @@ public class SFX : MonoBehaviour {
 	public void SetVolume(float v)
 	{
 		asrc.volume = v;
+
 	}
 
 	public void PlayFX(string command, Vector3 position)
@@ -186,6 +203,9 @@ public class SFX : MonoBehaviour {
 			case "hurt_skeleton":
 				clip = skeletonHurt[Random.Range(0, skeletonHurt.Length)];
 				break;
+			case "alert_skeleton":
+				clip = skeletonAlerted[Random.Range(0, skeletonAlerted.Length)];
+				break;
 			case "death_skeleton":
 				clip = skeletonDeath[Random.Range(0, skeletonDeath.Length)];
 				break;
@@ -197,6 +217,12 @@ public class SFX : MonoBehaviour {
 				break;
 			case "fireball":
 				clip = fireball;
+				break;
+			case "windUp_light":
+				clip = windUpLight;
+				break;
+			case "windup_heavy":
+				clip = windUpHeavy;
 				break;
 
 			//arrow
@@ -250,6 +276,12 @@ public class SFX : MonoBehaviour {
 			case "coin_pickup":
 				clip = coinCollects[Random.Range(0, coinCollects.Length)];
 				break;
+			case "item_pickup":
+				clip = itemPickup[Random.Range(0, itemPickup.Length)];
+				break;
+			case "elevatorButton_Pressed":
+				clip = elevatorButtonPressed;
+				break;
 
 			case "block":
 				clip = block[Random.Range(0, block.Length)];
@@ -270,11 +302,13 @@ public class SFX : MonoBehaviour {
 
 		if(clip == null) return;
 
+		//create a world space SFX audio source
 		GameObject go = Instantiate(fxPrefab, position, Quaternion.identity);
 		go.name = clip.name;
-		AudioSource asrc = go.GetComponent<AudioSource>();
-		asrc.pitch = pitch;
-		asrc.clip = clip;
-		asrc.Play();
+		AudioSource asrcClone = go.GetComponent<AudioSource>();
+		asrcClone.pitch = pitch;
+		asrcClone.clip = clip;
+		asrcClone.volume = asrc.volume;
+		asrcClone.Play();
 	}
 }

@@ -11,8 +11,6 @@ public class CameraZooming : WaitForPlayer {
 	public float distance = 10f;
 	public float sensitivity = 0.5f;
 
-	public bool zoomable;
-
 	Camera cam;
 
 	Vector2 input;
@@ -20,14 +18,7 @@ public class CameraZooming : WaitForPlayer {
 	public override IEnumerator Initialize(UnityEngine.SceneManagement.Scene scene)
 	{
 		while(Player.Instance == null) yield return null;
-
 		cam = GetComponent<Camera>();
-		//Player.Instance.died += Disable;
-	}
-
-	void Disable()
-	{
-		//print("Disable");
 	}
 
 	void FixedUpdate()
@@ -37,7 +28,7 @@ public class CameraZooming : WaitForPlayer {
 
 		cam.fieldOfView = distance;
 		//if aiming, and the bow is selected
-		if(!PauseMenu.paused)//_input.L1Down
+		if(!PauseMenu.paused)
 		{
 			cam.transform.position = new Vector3
 				(cam.transform.position.x + PlayerInput.Instance.RAnalog.x * sensitivity,

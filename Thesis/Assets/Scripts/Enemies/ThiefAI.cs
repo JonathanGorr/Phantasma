@@ -24,9 +24,7 @@ public class ThiefAI : EnemyAI {
 		debugColor = Color.green;
 		while(_AIState == EnemyState.Patrol)
 		{
-			target = CircleCast();
-
-			if(target)
+			if(sight.CanPlayerBeSeen())
 			{
 				cam.RegisterMe(myTransform);
 				_AIState = EnemyState.Chase;

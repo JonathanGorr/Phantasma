@@ -16,7 +16,7 @@ namespace Inventory
 		public ItemDatabase database;
 		public RectTransform itemPrefab;
 		public RectTransform slotPrefab;
-		bool inInventory = false;
+		//bool inInventory = false;
 		public Text coinText;
 		int coins;
 

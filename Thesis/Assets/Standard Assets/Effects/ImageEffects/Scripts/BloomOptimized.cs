@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace UnityStandardAssets.ImageEffects
 {
@@ -8,7 +9,6 @@ namespace UnityStandardAssets.ImageEffects
     [AddComponentMenu ("Image Effects/Bloom and Glow/Bloom (Optimized)")]
     public class BloomOptimized : PostEffectsBase
     {
-
         public enum Resolution
 		{
             Low = 0,
@@ -38,6 +38,18 @@ namespace UnityStandardAssets.ImageEffects
         public Shader fastBloomShader = null;
         private Material fastBloomMaterial = null;
 
+        bool on = true;
+
+        void Awake()
+        {
+        	//listen to the toggle UI
+        	GameObject.Find("ToggleBloom").GetComponent<UnityEngine.UI.Toggle>().onValueChanged.AddListener(Toggle);
+        }
+
+		public void Toggle(bool b)
+        {
+        	on = b;
+        }
 
         public override bool CheckResources ()
 		{
@@ -58,7 +70,7 @@ namespace UnityStandardAssets.ImageEffects
 
         void OnRenderImage (RenderTexture source, RenderTexture destination)
 		{
-            if (CheckResources() == false)
+            if (CheckResources() == false || !on)
 			{
                 Graphics.Blit (source, destination);
                 return;

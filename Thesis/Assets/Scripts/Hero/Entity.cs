@@ -9,7 +9,7 @@ using CharacterController;
 /// </summary>
 
 public enum Facing { left, right }
-public enum CombatState { Idle, Blocking, Attacking, Rolling, BackStepping, Jumping }
+public enum CombatState { Idle, Blocking, Aiming, Attacking, Rolling, BackStepping, Jumping }
 public class Entity : MonoBehaviour, IEntity {
 
 	public Facing facing;
@@ -71,10 +71,10 @@ public class Entity : MonoBehaviour, IEntity {
 	public Stamina _stamina;
 	public CombatState combatState;
 	public Collider2D myTrigger;
-	public Collider2D myCollider;
 
 	//anim state behaviours
 	[HideInInspector] public AttackStateBehaviour attackState;
+	[HideInInspector] public SpecialAttackStateBehaviour specialAttackState;
 	[HideInInspector] public BlockStateBehaviour blockState;
 	[HideInInspector] public BackstepStateBehaviour backstepState;
 	[HideInInspector] public JumpStateBehaviour jumpState;
@@ -84,12 +84,22 @@ public class Entity : MonoBehaviour, IEntity {
 	[HideInInspector] public bool moving = false;
 	public bool canMove = true;
 	public bool canFace = true;
+	public bool canJump = true;
+	public bool canDropAttack = false;
+	public bool canSpecialAttack = false;
 	[HideInInspector] public float damping; // how fast do we change direction? higher means faster
 	public float actionDamping = 3f;
 	public float inAirDamping = 20f;
 	public float groundDamping = 8f;
 	[HideInInspector] public Vector3 _velocity;
 	[HideInInspector] public bool ready = true;
+
+	[Header("Height Detection")]
+	public float killHeight = 10;
+	public float dropAttackHeight = 3;
+	public float height;
+	public RaycastHit2D heightHit;
+	public LayerMask groundLayers;
 
 	[Header("Speeds")]
 	public float walkSpeed = 3f;
@@ -99,11 +109,17 @@ public class Entity : MonoBehaviour, IEntity {
 	[HideInInspector] public float speed;
 	public float gravity = -25;
 
-	Vector2 startScale;
+	[HideInInspector] public Vector2 startScale;
 
 	//listen to entity death
 	public delegate void OnDied();
 	public event OnDied died;
+	//Must manually set instance if called in derived classes
+	protected virtual void HasDied()
+	{
+		OnDied hasDied = died;
+		if(hasDied != null) hasDied();
+	}
 
 	public Vector3 Center
 	{
@@ -124,7 +140,7 @@ public class Entity : MonoBehaviour, IEntity {
 
 		if(!myTransform) myTransform = transform;
 		startScale = myTransform.localScale;
-		facing = myTransform.localScale.x < 0 ? Facing.left : Facing.right;
+		//facing = myTransform.localScale.x < 0 ? Facing.left : Facing.right;
 
 		Subscribe();
 	}
@@ -137,12 +153,28 @@ public class Entity : MonoBehaviour, IEntity {
 
 	public virtual void OnAttackEnter()  
 	{
+		SetDamping(actionDamping);
 		canMove = false;
 		canFace = false;
 		StartCoroutine(Ready(attackDelay)); 
 	}
 	public virtual void OnAttackExit()  
 	{
+		SetDamping(groundDamping);
+		canMove = true;
+		canFace = true;
+	}
+
+	public virtual void OnSpecialAttackEnter()  
+	{
+		SetDamping(actionDamping);
+		canMove = false;
+		canFace = false;
+		StartCoroutine(Ready(attackDelay)); 
+	}
+	public virtual void OnSpecialAttackExit()  
+	{
+		SetDamping(groundDamping);
 		canMove = true;
 		canFace = true;
 	}
@@ -175,7 +207,7 @@ public class Entity : MonoBehaviour, IEntity {
 		SetDamping(actionDamping);
 		canMove = false;
 		canFace = false; 
-		StartCoroutine(Ready(blockAttackDelay));
+		StartCoroutine(Ready(backStepDelay));
 	}
 	public virtual void OnBackstepExit() 
 	{
@@ -189,6 +221,7 @@ public class Entity : MonoBehaviour, IEntity {
 	}
 	public virtual void OnJumpExit()
 	{
+		SetDamping(groundDamping);
 	}
 
 	public virtual void Subscribe()
@@ -202,6 +235,12 @@ public class Entity : MonoBehaviour, IEntity {
 			attackState = _anim.GetBehaviour<AttackStateBehaviour>();
 			attackState.onEnter += OnAttackEnter;
 			attackState.onExit += OnAttackExit;
+		}
+		if(_anim.GetBehaviour<SpecialAttackStateBehaviour>())
+		{
+			specialAttackState = _anim.GetBehaviour<SpecialAttackStateBehaviour>();
+			specialAttackState.onEnter += OnSpecialAttackEnter;
+			specialAttackState.onExit += OnSpecialAttackExit;
 		}
 		if(_anim.GetBehaviour<BlockStateBehaviour>())
 		{
@@ -250,6 +289,11 @@ public class Entity : MonoBehaviour, IEntity {
 			backstepState.onEnter -= OnBackstepEnter;
 			backstepState.onExit -= OnBackstepExit;
 		}
+		if(specialAttackState)
+		{
+			specialAttackState.onEnter -= OnSpecialAttackEnter;
+			specialAttackState.onExit -= OnSpecialAttackExit;
+		}
 		if(blockState)
 		{
 			blockState.onEnter -= OnBlockEnter;
@@ -281,12 +325,12 @@ public class Entity : MonoBehaviour, IEntity {
 	public virtual void OnHurt(Entity offender)
 	{
 		//if blocking, damage is half and you dont get knocked back
-		if(combatState == CombatState.Blocking)
+		if(blockState.inState)
 		{
 			SlideBlocking();
 			return;
 		}
-		BackStep();
+		if(CanForce()) BackStep();
 	}
 
 	//slide back from getting hit by a weapon when shielded
@@ -294,15 +338,12 @@ public class Entity : MonoBehaviour, IEntity {
 	{
 		//if(_stamina) _stamina.UseStamina(blockedHitDrain);
 		SFX.Instance.PlayFX("block", transform.position);
-		Force(slideBlocking);
+		if(CanForce()) Force(slideBlocking);
 		SFX.Instance.PlayFX("slide_blocking", myTransform.position);
 	}
 
 	public virtual void Force(Vector2 parm)
 	{
-		//don't move if colliding
-		if(_controller.collisionState.left || _controller.collisionState.right) { /*print("wall");*/ return; }
-
 		_velocity.y = Mathf.Sqrt(Mathf.Abs(parm.y) * -gravity);
 		_velocity.x = facing == Facing.left ? Mathf.Sqrt(Mathf.Abs(parm.x)) : -Mathf.Sqrt(Mathf.Abs(parm.x));
 		if(parm.x < 0) _velocity.x *= -1;
@@ -310,9 +351,19 @@ public class Entity : MonoBehaviour, IEntity {
 		_controller.move(_velocity * Time.deltaTime);
 	}
 
+	public virtual bool CanForce()
+	{
+		//if you're trying to roll right but you're blocked
+		if(facing == Facing.right && _controller.collisionState.right) return false;
+		//if you're trying to roll left and you're blocked
+		if(facing == Facing.left && _controller.collisionState.left) return false;
+		//not blocked or rolling in the opposite direction of a block...
+		return true;
+	}
+
 	public virtual void BackstepForce()
 	{
-		Force(backstep);
+		if(CanForce()) Force(backstep);
 	}
 	public virtual void Jump()
 	{
@@ -320,11 +371,11 @@ public class Entity : MonoBehaviour, IEntity {
 	}
 	public virtual void Lunge()
 	{
-		Force(attack);
+		if(CanForce()) Force(attack);
 	}
 	public virtual void Leap()
 	{
-		Force(leapAttack);
+		if(CanForce()) Force(leapAttack);
 	}
 
 	public virtual void SetFacing(Facing face)
@@ -353,12 +404,36 @@ public class Entity : MonoBehaviour, IEntity {
 		}
 		else
 		{
-			body.rotation = Quaternion.Euler(new Vector3(0,0, lastRotation));
+			body.rotation = Quaternion.Euler(new Vector3(0,0, facing == Facing.left ? rotOffset.x : rotOffset.y ));
+		}
+	}
+
+	/// <summary>
+	/// Detects how high the entity currently is above the ground.
+	/// Is used to detect whether an entity can perform a drop attack, as they can simply from a jump, currently.
+	/// </summary>
+	public virtual void HeightDetection()
+	{
+		heightHit = Physics2D.Raycast(myTransform.position, Vector2.down, Mathf.Infinity, groundLayers);
+		if(heightHit.collider != null)
+		{
+			height = heightHit.distance;
+
+			if(height >= dropAttackHeight)
+				canDropAttack = true;
+			else
+				canDropAttack = false;
+
+			if(height >= killHeight)
+				Debug.DrawLine(myTransform.position, heightHit.point, Color.red);
+			else
+				Debug.DrawLine(myTransform.position, heightHit.point, Color.green);
 		}
 	}
 
 	public virtual void Update()
 	{
+		HeightDetection();
 		moving = Moving;
 		//dont move down if grounded
 		if(_controller) { if( _controller.isGrounded) { _velocity.y = 0; } }
@@ -366,10 +441,6 @@ public class Entity : MonoBehaviour, IEntity {
 
 	public virtual void LateUpdate()
 	{
-		if(combatState == CombatState.Blocking)
-		{
-			RotateBody();
-		}
 	}
 
 	public virtual void Idle()
@@ -390,14 +461,20 @@ public class Entity : MonoBehaviour, IEntity {
 		combatState = CombatState.Blocking;
 	}
 
+	public virtual void Aim()
+	{
+		combatState = CombatState.Aiming;
+	}
+
 	public virtual void Roll()
 	{
 		combatState = CombatState.Rolling;
-		Force(roll);
+		if(CanForce()) Force(roll);
 	}
 
 	public virtual void BackStep()
 	{
+		_anim.SetTrigger("BackStep");
 		combatState = CombatState.BackStepping;
 	}
 
@@ -408,7 +485,7 @@ public class Entity : MonoBehaviour, IEntity {
 
 	public virtual void OnDeath()
 	{
-		if(died != null) died();
+		HasDied();
 		UnSubscribe();
 		canMove = false;
 		canFace = false;

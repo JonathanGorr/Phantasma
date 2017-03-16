@@ -7,23 +7,29 @@ public class EnemyAI : Enemy
 {
 	[Header("Enemy AI")]
 	[HideInInspector] public StaggerStateBehaviour staggerState;
+	[HideInInspector] public SpecialAttackStateBehaviour specialState;
 
 	[Header("Combat Maneuvers")]
 	public bool canBackstep = false;
 	public bool canBlock = false;
 	public float backstepChance = .25f;
 	public float blockChance = .25f;
+	public float strongAttackChance = .25f;
+
+	public float t = 0; //how long until the enemy enters patrol mode; returns home from searching
 
 	public float minYDistance = 3; //the minimum vertical distance the target must be to chase
 
 	//add targets to this list that are, for example, beyond an impassable barrier
-	List<Entity> ignoredTargets = new List<Entity>();
-
 	public enum JumpConfidence { none, half, full, twice } //how high can a entity jump over an obstacle?
 
 	[Header("Parms")]
 	public JumpConfidence jumpConfidence = JumpConfidence.half;
 	float[] jumps = new float[] { 0f, 0.5f, 1f, 2f }; //correlates to jump confidence
+
+	[Header("Special to Regular Attack Ratio")]
+	public int regularToSpecialAttackLimit = 3; //how many regular attacks must  occur before another special attack can occur
+	public int limit = 0;
 	
 	public override void Awake()
 	{
@@ -32,34 +38,74 @@ public class EnemyAI : Enemy
 		startLocation = myTransform.position;
 		startFacing = facing;
 		StartCoroutine("StateMachine");
-		cam = Camera.main.GetComponent<CameraController>();
 	}
 
 	public override void Subscribe()
 	{
 		base.Subscribe();
+
 		if(_anim.GetBehaviour<StaggerStateBehaviour>())
 		{
 			staggerState = _anim.GetBehaviour<StaggerStateBehaviour>();
 			staggerState.onEnter += OnStaggerEnter;
 			staggerState.onExit += OnStaggerExit;
 		}
-	}
 
+		if(_anim.GetBehaviour<SpecialAttackStateBehaviour>())
+		{
+			specialState = _anim.GetBehaviour<SpecialAttackStateBehaviour>();
+			specialState.onEnter += OnSpecialAttackEnter;
+			specialState.onExit += OnSpecialAttackExit;
+		}
+	}
 	public override void UnSubscribe()
 	{
 		base.UnSubscribe();
-		if(target)
-		{
-			if(canBackstep) target.attackState.onEnter -= BackStep;
-			if(canBlock) target.attackState.onEnter -= Block;
-			target = null;
-		}
+
 		if(staggerState)
 		{
 			staggerState.onEnter -= OnStaggerEnter;
 			staggerState.onExit -= OnStaggerExit;
 		}
+		if(specialState)
+		{
+			specialState.onEnter -= OnSpecialAttackEnter;
+			specialState.onExit -= OnSpecialAttackExit;
+		}
+	}
+
+	//called by the lineofSight script when the player enters the collider and is visible to the enemy
+	public override void FoundTarget(Entity e)
+	{
+		base.FoundTarget(e);
+
+		SFX.Instance.PlayFX("alert_skeleton", myTransform.position);
+		if(canBackstep)
+		{
+			e.attackState.onEnter += BackStep;
+			e.specialAttackState.onEnter += BackStep;
+		}
+		if(canBlock)
+		{
+			e.attackState.onEnter += Block;
+			e.specialAttackState.onEnter += Block;
+		}
+	}
+
+	//called by the lineofSight script when the player has left the collider
+	public override void LostTarget(Entity e)
+	{
+		if(canBackstep)
+		{
+			e.attackState.onEnter -= BackStep;
+			e.specialAttackState.onEnter -= BackStep;
+		}
+		if(canBlock) 
+		{
+			e.attackState.onEnter -= Block;
+			e.specialAttackState.onEnter -= Block;
+		}
+		base.LostTarget(e);
 	}
 
 	public virtual void OnStaggerEnter()
@@ -73,14 +119,12 @@ public class EnemyAI : Enemy
 		canFace = true;
 	}
 
-	//attack animation started
 	public override void OnAttackEnter()
 	{
 		canMove = false;
 		canFace = false;
 		base.OnAttackEnter();
 	}
-	//attack animation ended
 	public override void OnAttackExit()
 	{
 		canMove = true;
@@ -89,84 +133,75 @@ public class EnemyAI : Enemy
 		base.OnAttackExit();
 	}
 
+	public virtual void SpecialAttackEnter()
+	{
+		canMove = false;
+		canFace = false;
+	}
+	public virtual void SpecialAttackExit()
+	{
+		canMove = true;
+		canFace = true;
+		StartCoroutine(Ready(attackDelay));
+	}
+
 	//used for horizontal obstacle detection
 	public override void OnControllerColliderHorizontal (RaycastHit2D hit)
 	{
 		base.OnControllerColliderHorizontal(hit);
-
-		if(target)
+		//don't try and jump over entities
+		if(hit.collider.gameObject.layer != LayerMask.NameToLayer(_controller.entitiesMask))
 		{
-			if(hit.collider.GetComponent<Destructable>())
+			if(!_controller.collisionState.movingDownSlope)
 			{
-				Hack();
-			}
-			else
-			{
-				if(jumpConfidence != JumpConfidence.none)
+				if(hit.collider.GetComponent<Destructable>())
 				{
-					if(_controller.isGrounded) //jump if grounded
-					{
-						//get my height and obstacle's height
-						//decide whether to jump or repath based on how tall the obstacle is
-						float size = hit.collider.bounds.size.y;
-						float mySize = myTrigger.bounds.size.y;
-
-						float heightDifference = hit.collider.transform.position.y - myTrigger.transform.position.y;
-						print(heightDifference);
-
-						float percent = size / mySize;
-
-						print("My Size : " + mySize + ", " + "Obstacle Size : " + size + " = %" + Mathf.Round(percent*100) + " of my Size.");
-						//if obstacle's height is 2x less than my height( i can jump my height), jump
-						if(percent < jumps[(int)jumpConfidence])
-						{
-							Jump();
-						}
-						else
-						{
-							IgnoreTarget();
-						}
-					}
+					Hack();
 				}
-				//has no jump confidence, give up on searching for target
 				else
 				{
-					IgnoreTarget();
+					if(jumpConfidence != JumpConfidence.none)
+					{
+						if(_controller.isGrounded) //jump if grounded
+						{
+							Debug.DrawLine(myTransform.position, new Vector3(hit.collider.bounds.center.x, hit.collider.bounds.max.y, 0), Color.blue);
+
+							//get the jump height
+							float obstacleHeight = hit.collider.bounds.max.y - myTransform.position.y;
+							float myHeight = myTrigger.bounds.max.y - myTrigger.bounds.min.y;
+							float percent = obstacleHeight / myHeight;
+
+							//only jump when the actual obstacle is not walk-overable
+							if(percent > .1f)
+							{
+								#if UNITY_EDITOR
+								if(rend.isVisible) print("%" + Mathf.Round(percent * 100));
+								#endif
+
+								if(percent < jumps[(int)jumpConfidence])
+								{
+									Jump();
+								}
+								else
+								{
+									//IgnoreTarget();
+								}
+							}
+						}
+					}
+					//has no jump confidence, give up on searching for target
+					else
+					{
+						//IgnoreTarget();
+					}
 				}
 			}
 		}
-	}
-
-	public override void Force(Vector2 parm)
-	{
-		base.Force(parm);
-	}
-
-	public override Entity CircleCast()
-	{
-		Collider2D col = Physics2D.OverlapCircle(transform.position, sightRadius, layers);
-		if(col != null) 
-		{
-			if(ignoredTargets.Contains(col.GetComponent<Entity>())) return null;
-			return col.GetComponent<Entity>();
-		}
-		else return null;
-	}
-
-	void IgnoreTarget()
-	{
-		if(!ignoredTargets.Contains(target)) ignoredTargets.Add(target);
-
-		//unsubscribe to the target's animations
-		if(canBackstep) target.attackState.onEnter -= BackStep;
-		if(canBlock) target.attackState.onEnter -= Block;
-
-		target = null;
-		if(_AIState == EnemyState.Chase) _AIState = EnemyState.Search;
 	}
 
 	public override void Jump()
 	{
+		if(!_controller.isGrounded) return;
 		if(!canMove) return;
 		base.Jump();
 	}
@@ -177,11 +212,11 @@ public class EnemyAI : Enemy
 		base.SetFacing(face);
 	}
 
-	bool IsTargetLeft() //is the target left or right of me?
+	public bool IsTargetLeft() //is the target left or right of me?
 	{
 		//player is on the right side
-		if(!target) return false;
-		return target.myTransform.position.x < myTransform.position.x;
+		if(!sight.target) return false;
+		return sight.target.myTransform.position.x < myTransform.position.x;
 	}
 
 	//used to destroy obstacles
@@ -194,39 +229,60 @@ public class EnemyAI : Enemy
 		_anim.SetTrigger("Attack");
 	}
 
+	//am i facing the target?
+	bool FacingTarget()
+	{
+		if(facing == Facing.left && sight.target.myTransform.position.x < myTransform.position.x)
+			return true;
+		else if(facing == Facing.right && sight.target.myTransform.position.x > myTransform.position.x)
+			return true;
+		
+		return false;
+	}
+
 	public override void Attack()
 	{
 		if(!ready) return;
-		if(attackState.inState) return;
+		if(!FacingTarget()) return;
 
-		_anim.SetFloat("Combo", (int) Random.Range(0, 3));
-		_anim.SetTrigger("Attack");
+		if(limit < regularToSpecialAttackLimit || Random.value > strongAttackChance || !canSpecialAttack)
+		{
+			_anim.SetFloat("Combo", (int) Random.Range(0, 3));
+			_anim.SetTrigger("Attack");
+			limit ++;
+		}
+		else
+		{
+			limit = 0;
+			_anim.SetTrigger("StrongAttack");
+		}
 
 		base.Attack();
 	}
 
-	public virtual IEnumerator StateMachine()
+	public override IEnumerator StateMachine()
 	{
-		while(true) 
+		while(true)
 		{
 			//don't update if invisible
-			if(!rend.isVisible) yield return null;
+			//if(!rend.isVisible) yield return null;
 			yield return StartCoroutine(_AIState.ToString());
 		}
 	}
 
-	public virtual IEnumerator Patrol()
+	public override IEnumerator Patrol()
 	{
 		speed = walkSpeed;
-		ignoredTargets.Clear();
 		SetFacing(myTransform.position.x < startLocation.x ? Facing.left : Facing.right);
 		debugColor = Color.green;
+
 		while(_AIState == EnemyState.Patrol)
 		{
-			//find target
-			target = CircleCast();
-			if(target) { _AIState = EnemyState.Chase; }
-
+			//if running back to origin and the player comes behind me too close, notice
+			if(sight.target && sight.Distance <= attackRange)
+			{
+				_AIState = EnemyState.Chase;
+			}
 			//go home if not there already
 			if(Mathf.Abs(myTransform.position.x - startLocation.x) > .1f) //only check x distance
 			{
@@ -243,108 +299,99 @@ public class EnemyAI : Enemy
 		}
 	}
 
-	public virtual IEnumerator Chase()
+	public override IEnumerator Chase()
 	{
-		//listen to the target's animations
-		if(canBackstep) target.attackState.onEnter += BackStep;
-		if(canBlock) target.attackState.onEnter += Block;
-
-		cam.RegisterMe(myTransform);
+		SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
 		speed = runSpeed;
 		debugColor = Color.red;
-		while(_AIState == EnemyState.Chase)
+
+		while(_AIState == EnemyState.Chase && sight.CanPlayerBeSeen())
 		{
-			if(target == null) 
+			//drop attack if falling from an adequate height
+			if(_anim.GetBool("Falling") && height >= dropAttackHeight)
 			{
-			 	_AIState = EnemyState.Search;
-			 	yield break;
+				//print("fall attack");
+				_anim.SetTrigger("Attack");
+
+				//TODO: wait until grounded again( finished falling to ground ) to wait ~2 seconds, then return to normal behavior
+				yield return null;
 			}
-			else //we have target
+
+			//if the sight.target's y distance does not exceed value
+			if(Mathf.Abs(sight.target.transform.position.y - myTransform.position.y) <= minYDistance)
 			{
-				//too far to chase
-				if(distance > chaseRange)
+				if(canFace) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+
+				//far enough to chase
+				if(distance > attackRange)
 				{
-					//listen to the target's animations
-					if(canBackstep) target.attackState.onEnter -= BackStep;
-					if(canBlock) target.attackState.onEnter -= Block;
-					_AIState = EnemyState.Search;
-					yield break;
+					if(canMove && !attackState.inState && !staggerState.inState && !backstepState.inState) normalizedHorizontalSpeed = IsTargetLeft() ? -1 : 1; //chase
+					else normalizedHorizontalSpeed = 0;
 				}
-				else //we are in range
+				//close enough to attack
+				else if (distance <= attackRange)
 				{
-					//if the target's y distance does not exceed value
-					if(Mathf.Abs(target.transform.position.y - myTransform.position.y) <= minYDistance)
+					//attack if not blocking, attacking or special attacking
+					if(	!attackState.inState
+					&&	!specialAttackState.inState
+					&& 	!blockState.inState
+					&& !backstepState.inState)
 					{
-						if(distance > minDistance)
-						{
-							if(canFace) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
-						}
-						//far enough to chase
-						if(distance > attackRange)
-						{
-							if(canMove) normalizedHorizontalSpeed = IsTargetLeft() ? -1 : 1; //chase
-						}
-						//close enough to attack
-						else if (distance <= attackRange)
-						{
-							normalizedHorizontalSpeed = 0; //stop and attack
-							Attack();
-						}
-					}
-					else
-					{
-						normalizedHorizontalSpeed = 0; //stop and attack
-						//_AIState = EnemyState.Search;
+						Attack();
 					}
 				}
 			}
+			else
+			{
+				normalizedHorizontalSpeed = 0; //stop
+			}
+
 			yield return null;
 		}
 	}
 
-	public virtual IEnumerator Search()
+	public override IEnumerator Search()
 	{
-		cam.UnRegisterMe(myTransform);
-		ignoredTargets.Clear();
-		float t = searchTime;
+		print("search");
+		t = searchTime;
 		debugColor = Color.yellow;
-		while(_AIState == EnemyState.Search)
-		{
-			//wait x seconds before giving up and returning to start location
-			while(t > 0 && target == null)
-			{
-				//find target while waiting
-				target = CircleCast();
-				t -= Time.deltaTime;
-				yield return null;
-			}
 
-			_AIState = EnemyState.Patrol;
+		//wait x seconds before giving up and returning to start location
+		while(t > 0 && !sight.CanPlayerBeSeen())
+		{
+			//find target while waiting
+			t -= Time.deltaTime;
 			yield return null;
 		}
+
+		_AIState = EnemyState.Patrol;
+		yield return null;
 	}
 
 	public override void Block()
 	{
-		base.Block();
 	}
 
 	public override void BackStep()
 	{
-		//if(attackState.inState) return; //don't backstep if already attacking
 		if(Random.value > backstepChance) return;
-		if(target) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+		if(Distance() > attackRange) return;
+		Force(backstep);
+		if(sight.target) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
 		base.BackStep();
 	}
 
 	public override void OnDeath()
 	{
-		cam.UnRegisterMe(myTransform);
-		myTrigger.enabled = false;
-		myCollider.enabled = false;
-		ignoredTargets.Clear();
 		StopCoroutine(_AIState.ToString()); //stop the current coroutine
 		StopCoroutine("StateMachine"); //stop the coroutine state machine
+
+		LostTarget(sight.target);
+		UnSubscribe();
+
+		CameraController.Instance.UnRegisterMe(myTransform);
+		sight.enabled = false;
+		myTrigger.enabled = false;
 		gameObject.layer = LayerMask.NameToLayer("TransparentFX");
 		base.OnDeath();
 		this.enabled = false;
@@ -360,12 +407,20 @@ public class EnemyAI : Enemy
 
 	public override void OnHurt(Entity offender)
 	{
-		if(target == null)
+		//if hit unaware, stagger then aggro
+		if(_AIState != EnemyState.Chase)
 		{
-			target = offender;
-			_AIState = EnemyState.Chase;
+			sight.target = offender;
+			FoundTarget(offender);
+
+			_anim.SetTrigger("Stagger");
+			_anim.SetBool("Blocking", false);
 		}
-		normalizedHorizontalSpeed = 0;
+
+		//reset search time each time hit
+		t = searchTime;
+		//face the attacker on each hit
+		SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
 		base.OnHurt(offender);
 	}
 
@@ -385,8 +440,8 @@ public class EnemyAI : Enemy
 	
 	public override void FixedUpdate()
 	{
-		if(!rend.isVisible) return;
-		if(target) Distance();
+		//if(!rend.isVisible) return;
+		if(sight.target) Distance();
 		base.FixedUpdate();
 		Move();
 	}

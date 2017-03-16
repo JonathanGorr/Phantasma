@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 087bcceb4d6c7c2418ea34ba2c246c8c
-timeCreated: 1487729566
+timeCreated: 1489124299
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -38,6 +38,12 @@ TextureImporter:
     21300062: Banner
     21300064: PressurePlate
     21300066: crate_damage_03
+    21300068: Atlas2_0
+    21300070: Atlas2_1
+    21300072: Atlas2_2
+    21300074: Atlas2_3
+    21300076: Atlas2_4
+    21300078: Atlas2_5
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -93,15 +99,15 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
   - buildTarget: Standalone
-    maxTextureSize: 4096
-    textureFormat: -1
+    maxTextureSize: 2048
+    textureFormat: 12
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
-    overridden: 0
+    overridden: 1
   - buildTarget: Android
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     textureFormat: 12
     textureCompression: 1
     compressionQuality: 50
@@ -144,9 +150,9 @@ TextureImporter:
         x: 0
         y: 1069
         width: 990
-        height: 1281
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 499
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -154,8 +160,8 @@ TextureImporter:
       name: TowerBalcony
       rect:
         serializedVersion: 2
-        x: 1638
-        y: 1884
+        x: 1662
+        y: 1261
         width: 336
         height: 725
       alignment: 0
@@ -167,12 +173,12 @@ TextureImporter:
       name: BalconyRail
       rect:
         serializedVersion: 2
-        x: 1281
-        y: 2047
-        width: 289
-        height: 156
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 2048
+        y: 1636
+        width: 288
+        height: 131
+      alignment: 8
+      pivot: {x: 1, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -206,25 +212,12 @@ TextureImporter:
       name: Boat
       rect:
         serializedVersion: 2
-        x: 1671
-        y: 1089
-        width: 899
-        height: 349
+        x: 1898
+        y: 844
+        width: 898
+        height: 345
       alignment: 9
       pivot: {x: 0.51456124, y: 0.07132929}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: -1
-    - serializedVersion: 2
-      name: hitsprite
-      rect:
-        serializedVersion: 2
-        x: 1698
-        y: 1654
-        width: 149
-        height: 151
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: -1
@@ -232,8 +225,8 @@ TextureImporter:
       name: Pier
       rect:
         serializedVersion: 2
-        x: 19
-        y: 2371
+        x: 2823
+        y: 818
         width: 85
         height: 538
       alignment: 0
@@ -245,8 +238,8 @@ TextureImporter:
       name: Dock
       rect:
         serializedVersion: 2
-        x: 126
-        y: 2372
+        x: 2944
+        y: 1664
         width: 512
         height: 70
       alignment: 0
@@ -336,8 +329,8 @@ TextureImporter:
       name: WallSegment
       rect:
         serializedVersion: 2
-        x: 1
-        y: 3583
+        x: 2049
+        y: 1790
         width: 512
         height: 512
       alignment: 0
@@ -349,8 +342,8 @@ TextureImporter:
       name: StoneFloor
       rect:
         serializedVersion: 2
-        x: 1033
-        y: 3582
+        x: 3074
+        y: 1792
         width: 512
         height: 80
       alignment: 0
@@ -362,8 +355,8 @@ TextureImporter:
       name: StoneWall2x
       rect:
         serializedVersion: 2
-        x: 1550
-        y: 3582
+        x: 3584
+        y: 1791
         width: 512
         height: 512
       alignment: 0
@@ -401,10 +394,10 @@ TextureImporter:
       name: Column
       rect:
         serializedVersion: 2
-        x: 2176
+        x: 2178
         y: 0
-        width: 256
-        height: 886
+        width: 248
+        height: 844
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -414,8 +407,8 @@ TextureImporter:
       name: Stairs
       rect:
         serializedVersion: 2
-        x: 128
-        y: 2624
+        x: 2559
+        y: 2303
         width: 768
         height: 414
       alignment: 0
@@ -427,8 +420,8 @@ TextureImporter:
       name: StairBox
       rect:
         serializedVersion: 2
-        x: 900
-        y: 2624
+        x: 3328
+        y: 2303
         width: 768
         height: 288
       alignment: 0
@@ -440,8 +433,8 @@ TextureImporter:
       name: StoneWall2xDistance
       rect:
         serializedVersion: 2
-        x: 2069
-        y: 3582
+        x: 3072
+        y: 1791
         width: 512
         height: 512
       alignment: 0
@@ -466,10 +459,10 @@ TextureImporter:
       name: PressurePlate
       rect:
         serializedVersion: 2
-        x: 85
-        y: 3584
-        width: 173
-        height: 87
+        x: 1716
+        y: 1459
+        width: 253
+        height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -485,6 +478,84 @@ TextureImporter:
         height: 188
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_1
+      rect:
+        serializedVersion: 2
+        x: 1103
+        y: 2433
+        width: 613
+        height: 562
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_2
+      rect:
+        serializedVersion: 2
+        x: 3412
+        y: 1149
+        width: 42
+        height: 331
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_3
+      rect:
+        serializedVersion: 2
+        x: 2403
+        y: 1636
+        width: 264
+        height: 131
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1568
+        width: 990
+        height: 784
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_4
+      rect:
+        serializedVersion: 2
+        x: 888
+        y: 2433
+        width: 187
+        height: 308
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Atlas2_5
+      rect:
+        serializedVersion: 2
+        x: 1103
+        y: 2995
+        width: 613
+        height: 497
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
