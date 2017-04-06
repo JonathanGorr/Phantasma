@@ -18,11 +18,11 @@ Please use an xbox or ps4 controller.
 # Wishlist
 1. Archer enemy.
 2. Warlock enemy to replace the flying skull.
-2. Boss redesign.
-3. More levels; or at least a more finished first level.
-4. Fully implemented quest system.
-5. Fully implemented item system.
-6. Multiple save slots.
-7. Keyboard+Mouse controls.
-8. GooglePlay + IOS port.
-9. Finish art for pulley system-driven elevator.
+3. Boss redesign.
+4. More levels; or at least a more finished first level.
+5. Fully implemented quest system.
+6. Fully implemented item system.
+7. Multiple save slots.
+8. Keyboard+Mouse controls.
+9. GooglePlay + IOS port.
+10. Finish art for pulley system-driven elevator.
