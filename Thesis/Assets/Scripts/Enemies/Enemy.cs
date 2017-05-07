@@ -2,47 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// This class is dedicated to the enemy state machine and behavior.
+/// </summary>
 public class Enemy : Entity {
 
 	[Header("Enemy")]
-	public LineOfSight sight;
-	public LayerMask layers;
-	public bool canRotate = false;
-	public enum EnemyState { Patrol, Chase, Search }
-	public EnemyState _AIState = EnemyState.Patrol;
+	public LineOfSight sight;							//the compopnent responsible for detecting targetable entities
+	public bool canRotate = false;						//can this enemy rotate to look at a target?
+	public enum EnemyState { Patrol, Chase, Search }	//the state machine states
+	public EnemyState _AIState = EnemyState.Patrol;		//the current state of this machine
 
-	[HideInInspector] public CameraController cam;
-
-	[HideInInspector] public Color debugColor;
-
-	[HideInInspector] public Facing startFacing;
-	[HideInInspector] public Vector2 startLocation;
+	[HideInInspector] public Facing startFacing;		//save the start facing so we can return to it
+	[HideInInspector] public Vector2 startLocation;		//save the start location so we can return to it
 
 	[Header("Enemy References")]
-	public SpriteRenderer rend;
-	public Rigidbody2D rbody;
+	public SpriteRenderer rend;							//sprite renderer reference
+	public Rigidbody2D rbody;							//rigidbody reference
 
 	[Header("Ranges")]
-	public float distance = 99;
-	public float attackRange = 2f;
-	public float searchTime = 3f;
-	public float minDistance = 2f;
+	public float attackRange = 2f;						//how close the target needs to be to allow attacking
+	public float searchTime = 3f;						//how long we wait after losing a target before reentering the patrol state
+	public float minDistance = 2f;						//the distance at which we disable seeking movement
 
-	public DrawWireDisc[] ranges;
-
-	public float Distance() //returns the distance between me and my target
-	{
-		distance = Vector2.Distance(myTransform.position, sight.target.myTransform.position);
-		return distance;
-	}
-
-	#if UNITY_EDITOR
 	void OnGUI()
 	{
 		if(!rend.isVisible) return;
-		ranges[0].diameter = attackRange;
 	}
-	#endif
 
 	public override void Awake()
 	{
@@ -50,13 +36,10 @@ public class Enemy : Entity {
 
 		#if UNITY_EDITOR
 		//get all of our editor wire circles
-		ranges[0].color = Color.red;
-		ranges[0].diameter = attackRange;
 		#endif
 
 		startLocation = myTransform.position;
 		startFacing = facing;
-		cam = Camera.main.GetComponent<CameraController>();
 
 		StartCoroutine("StateMachine");
 	}

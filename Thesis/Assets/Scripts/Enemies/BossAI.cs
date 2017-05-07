@@ -20,8 +20,6 @@ public class BossAI : EnemyAI {
 		}
 	}
 
-
-
 	public override void UnSubscribe()
 	{
 		base.UnSubscribe();
@@ -47,12 +45,16 @@ public class BossAI : EnemyAI {
 		canFace = true;
 	}
 
-	public override void SetFacing(Facing face)
-	{
-		if(facing == face) return;
-		if(!canFace) return;
-		facing = face;
-		transform.localScale = new Vector2(facing == Facing.right ? -Mathf.Abs(startScale.x) : Mathf.Abs(startScale.x), startScale.y);
+	public override Facing Facing {
+		get {
+			return base.Facing;
+		}
+		set {
+			if(facing == value) return;
+			if(!canFace) return;
+			facing = value;
+			transform.localScale = new Vector2(facing == Facing.right ? -Mathf.Abs(startScale.x) : Mathf.Abs(startScale.x), startScale.y);
+		}
 	}
 
 	public override void OnHurt (Entity offender)
@@ -67,7 +69,7 @@ public class BossAI : EnemyAI {
 		//reset search time each time hit
 		t = searchTime;
 		//face the attacker on each hit
-		SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+		Facing = IsTargetLeft() ? Facing.left : Facing.right;
 	}
 
 	public override IEnumerator Patrol ()
@@ -83,11 +85,9 @@ public class BossAI : EnemyAI {
 
 	public override IEnumerator Chase ()
 	{
-		debugColor = Color.red;
-
 		while(_AIState == EnemyState.Chase)
 		{
-			if(canFace) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+			if(canFace) Facing = IsTargetLeft() ? Facing.left : Facing.right;
 			if(canMove) normalizedHorizontalSpeed = IsTargetLeft() ? -1 : 1;
 			else normalizedHorizontalSpeed = 0;
 
@@ -97,13 +97,13 @@ public class BossAI : EnemyAI {
 			&& !slideAttackState.inState)
 			{
 				//regular distance attack
-				if(Distance() <= tooCloseRange)
+				if(sight.Distance <= tooCloseRange)
 				{
 					_anim.SetTrigger("StrongAttack");
 				}
 
 				//too close distance attack
-				else if(Distance() <= attackRange)
+				else if(sight.Distance <= attackRange)
 				{
 					Attack();
 				}

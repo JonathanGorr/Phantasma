@@ -2,15 +2,6 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
-//triggers
-//analog buttons
-
-/// <summary>
-/// Player input:
-/// Used to separate controls for different input peripherals
-/// buttons are consistently named, but prefaced by the enum name so that they may listen to different input strings
-/// </summary>
-
 /*
 //Android keycodes:
 //Buttons
@@ -42,9 +33,16 @@ RANALOG_HORIZONTAL = AXIS_Z
 RANALOG_VERTICAL = AXIS_RZ
 */
 
+/// <summary>
+/// Used to separate controls for different input peripherals (xbox 360, ps4 and keyboard/mouse )
+/// Buttons are consistently named, but prefaced by the enum name so that they may listen to different input strings.
+/// </summary>
 public class PlayerInput : WaitForPlayer {
 
-	//this is a map for keycodes associated with different devices( most importantly PC vs Android )
+	/// <summary>
+	/// This is a class useable for saving and loading custom control schemes;
+	// This is a map for keycodes associated with different devices( most importantly PC vs Android )
+	/// </summary>
 	class ControllerMap
 	{
 		public KeyCode A{ get; }
@@ -96,17 +94,18 @@ public class PlayerInput : WaitForPlayer {
 	public enum InputState { Controller, MouseKeyboard }
 	public InputState inputState = InputState.MouseKeyboard;
 
-	//substate for specific controller
+	//substate for specific controllers
 	public enum ControllerState {XBOX,DS4,Android}
-	public ControllerState controllerState = ControllerState.XBOX;
+	public ControllerState controllerState = ControllerState.XBOX; //default state is xbox controller
 
+	// Input has switched event.
 	public delegate void InputSwitched( string inP );
 	public static event InputSwitched onSwitch;
 
 	void OnGUI()
 	{
 		switch( inputState )
-         {
+        {
              case InputState.MouseKeyboard: //if mouse and detect controller...switch
                  if(IsControllerInput())
                  {
@@ -132,6 +131,7 @@ public class PlayerInput : WaitForPlayer {
                  	}
                  	//set event system buttons
                  	DebugWindow.Instance.InputState(inputState);
+                 	//controller state event trigger
                  	if(onSwitch != null) onSwitch(controllerState.ToString());
 	                if(debug) print("Input - " + controllerState.ToString() + " controller is being used");
                  }
@@ -148,7 +148,10 @@ public class PlayerInput : WaitForPlayer {
          }
 	}
 
-	//checks keyboard mouse input to switch to that
+	/// <summary>
+	/// Tests keyboard input.
+	/// </summary>
+	/// <returns><c>true</c> If we detect keyboard input; Otherwise, <c>false</c>.</returns>
 	private bool IsMouseKeyboard()
     {
          // mouse & keyboard buttons
@@ -164,9 +167,12 @@ public class PlayerInput : WaitForPlayer {
              return true;
          }
          return false;
-     }
+    }
 
-	//returns true if a controller input is detected
+	/// <summary>
+	/// Tests controller input.
+	/// </summary>
+	/// <returns><c>true</c> If we detect controller input; Otherwise, <c>false</c>.</returns>
 	private bool IsControllerInput()
     {
          // joystick buttons
@@ -207,14 +213,14 @@ public class PlayerInput : WaitForPlayer {
          {
              return true;
          }
-         
+         //no input
          return false;
     }
 
 	void Awake()
 	{
+		//singleton
 		if(Instance == null) Instance = this;
-		//debug = false;
 		if(debug) Debug();
 	}
 
@@ -233,6 +239,7 @@ public class PlayerInput : WaitForPlayer {
 		while(Player.Instance == null) yield return null;
 	}
 
+	/// <returns>Left analog direction as a string.</returns>
 	string LogLeftAnalog()
 	{
 		string la = "";
@@ -263,6 +270,7 @@ public class PlayerInput : WaitForPlayer {
 		return la;
 	}
 
+	/// <returns>Right analog direction as a string.</returns>
 	string LogRightAnalog()
 	{
 		string ra = "";
@@ -295,6 +303,7 @@ public class PlayerInput : WaitForPlayer {
 
 	void Update()
 	{
+		//test all input
 		LTrigger();
 		RTrigger();
 		Dpad();
@@ -306,12 +315,65 @@ public class PlayerInput : WaitForPlayer {
 		R1();
 		StartButton();
 		Select();
-	
+
+		//test keyboard input
+		KeyboardJump();
+
+		//is the debug window open?
 		if(DebugWindow.Instance.isActiveAndEnabled)
 		{
+			//test the left and right analog if so
 			DebugWindow.Instance.Axes(LogLeftAnalog(), LogRightAnalog());
 		}
 	}
+
+	//keyboard -----------------------------------------
+
+	/// <summary>
+	/// Is A held?
+	/// </summary>
+	/// <returns><c>true</c>, if A is held, <c>false</c> otherwise.</returns>
+	public static bool KeyboardLeft
+	{
+		get {
+			if(Input.GetKey(KeyCode.A))
+			{
+				if(DebugWindow.Instance.isActiveAndEnabled) DebugWindow.Instance.Log("A");
+				return true;
+			}
+			return false;
+		}
+	}
+
+	/// <summary>
+	/// Is D held?
+	/// </summary>
+	/// <returns><c>true</c>, if D is held, <c>false</c> otherwise.</returns>
+	public static bool KeyboardRight
+	{
+		get{
+			if(Input.GetKey(KeyCode.D))
+			{
+				if(DebugWindow.Instance.isActiveAndEnabled) DebugWindow.Instance.Log("D");
+				return true;
+			}
+			return false;
+		}
+	}
+
+	//X (square) Button
+	public delegate void OnJump();
+	public static event OnJump onJump;
+	void KeyboardJump()
+	{
+		if(Input.GetKeyDown(KeyCode.Space))
+		{
+			if(DebugWindow.Instance.isActiveAndEnabled) DebugWindow.Instance.Log("Space");
+			if(onJump != null) onJump();
+		}
+	}
+
+	//controller ----------------------------------------
 
 	//left trigger
 	public static bool _lt;
@@ -320,16 +382,20 @@ public class PlayerInput : WaitForPlayer {
 
 	void LTrigger()
 	{
+		//if our left trigger axis > 0 and left trigger isn't already being held...
 		if(Input.GetAxis(controllerState.ToString() + "_LeftTrigger") > 0f && !_lt)
 		{
+			//trigger input event
 			if(onLeftTrigger != null) onLeftTrigger();
 			if(DebugWindow.Instance.isActiveAndEnabled) DebugWindow.Instance.Log(controllerState.ToString() + "_LeftTrigger");
 			_lt = true;
 		}
+		//wait until trigger is unpressed
 		while(Input.GetAxis(controllerState.ToString() + "_LeftTrigger") > 0f && _lt)
 		{
 			return;
 		}
+		//set lt back to false
 		_lt = false;
 	}
 

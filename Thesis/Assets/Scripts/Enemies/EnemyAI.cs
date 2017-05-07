@@ -206,12 +206,6 @@ public class EnemyAI : Enemy
 		base.Jump();
 	}
 
-	public override void SetFacing(Facing face)
-	{
-		if(!canFace) return;
-		base.SetFacing(face);
-	}
-
 	public bool IsTargetLeft() //is the target left or right of me?
 	{
 		//player is on the right side
@@ -250,13 +244,14 @@ public class EnemyAI : Enemy
 			_anim.SetFloat("Combo", (int) Random.Range(0, 3));
 			_anim.SetTrigger("Attack");
 			limit ++;
+			return;
 		}
 		else
 		{
 			limit = 0;
 			_anim.SetTrigger("StrongAttack");
+			return;
 		}
-
 		base.Attack();
 	}
 
@@ -264,8 +259,6 @@ public class EnemyAI : Enemy
 	{
 		while(true)
 		{
-			//don't update if invisible
-			//if(!rend.isVisible) yield return null;
 			yield return StartCoroutine(_AIState.ToString());
 		}
 	}
@@ -273,8 +266,7 @@ public class EnemyAI : Enemy
 	public override IEnumerator Patrol()
 	{
 		speed = walkSpeed;
-		SetFacing(myTransform.position.x < startLocation.x ? Facing.left : Facing.right);
-		debugColor = Color.green;
+		Facing = myTransform.position.x < startLocation.x ? Facing.left : Facing.right;
 
 		while(_AIState == EnemyState.Patrol)
 		{
@@ -286,12 +278,12 @@ public class EnemyAI : Enemy
 			//go home if not there already
 			if(Mathf.Abs(myTransform.position.x - startLocation.x) > .1f) //only check x distance
 			{
-				SetFacing(_velocity.x < 0 ? Facing.left : Facing.right);
+				Facing = _velocity.x < 0 ? Facing.left : Facing.right;
 				normalizedHorizontalSpeed = myTransform.position.x > startLocation.x ? -1 : 1;
 			}
 			else //we have arrived at start location. Dont move and face original facing.
 			{
-				SetFacing(startFacing);
+				Facing =(startFacing);
 				normalizedHorizontalSpeed = 0;
 			}
 
@@ -301,18 +293,15 @@ public class EnemyAI : Enemy
 
 	public override IEnumerator Chase()
 	{
-		SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+		Facing = IsTargetLeft() ? Facing.left : Facing.right;
 		speed = runSpeed;
-		debugColor = Color.red;
 
 		while(_AIState == EnemyState.Chase && sight.CanPlayerBeSeen())
 		{
 			//drop attack if falling from an adequate height
 			if(_anim.GetBool("Falling") && height >= dropAttackHeight)
 			{
-				//print("fall attack");
 				_anim.SetTrigger("Attack");
-
 				//TODO: wait until grounded again( finished falling to ground ) to wait ~2 seconds, then return to normal behavior
 				yield return null;
 			}
@@ -320,16 +309,16 @@ public class EnemyAI : Enemy
 			//if the sight.target's y distance does not exceed value
 			if(Mathf.Abs(sight.target.transform.position.y - myTransform.position.y) <= minYDistance)
 			{
-				if(canFace) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+				if(canFace) Facing = IsTargetLeft() ? Facing.left : Facing.right;
 
 				//far enough to chase
-				if(distance > attackRange)
+				if(sight.Distance > attackRange)
 				{
 					if(canMove && !attackState.inState && !staggerState.inState && !backstepState.inState) normalizedHorizontalSpeed = IsTargetLeft() ? -1 : 1; //chase
 					else normalizedHorizontalSpeed = 0;
 				}
 				//close enough to attack
-				else if (distance <= attackRange)
+				else if (sight.Distance <= attackRange)
 				{
 					//attack if not blocking, attacking or special attacking
 					if(	!attackState.inState
@@ -337,6 +326,7 @@ public class EnemyAI : Enemy
 					&& 	!blockState.inState
 					&& !backstepState.inState)
 					{
+						print("attack");
 						Attack();
 					}
 				}
@@ -354,7 +344,6 @@ public class EnemyAI : Enemy
 	{
 		print("search");
 		t = searchTime;
-		debugColor = Color.yellow;
 
 		//wait x seconds before giving up and returning to start location
 		while(t > 0 && !sight.CanPlayerBeSeen())
@@ -375,9 +364,9 @@ public class EnemyAI : Enemy
 	public override void BackStep()
 	{
 		if(Random.value > backstepChance) return;
-		if(Distance() > attackRange) return;
+		if(sight.Distance > attackRange) return;
 		Force(backstep);
-		if(sight.target) SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+		if(sight.target) Facing = IsTargetLeft() ? Facing.left : Facing.right;
 		base.BackStep();
 	}
 
@@ -420,7 +409,7 @@ public class EnemyAI : Enemy
 		//reset search time each time hit
 		t = searchTime;
 		//face the attacker on each hit
-		SetFacing(IsTargetLeft() ? Facing.left : Facing.right);
+		Facing = IsTargetLeft() ? Facing.left : Facing.right;
 		base.OnHurt(offender);
 	}
 
@@ -440,8 +429,6 @@ public class EnemyAI : Enemy
 	
 	public override void FixedUpdate()
 	{
-		//if(!rend.isVisible) return;
-		if(sight.target) Distance();
 		base.FixedUpdate();
 		Move();
 	}

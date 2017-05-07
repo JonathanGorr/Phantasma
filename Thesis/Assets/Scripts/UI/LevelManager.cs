@@ -52,6 +52,22 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
+	void Update()
+	{
+		if(Input.GetKeyDown(KeyCode.F12))
+		{
+			CaptureScreenShot();
+		}
+	}
+
+	int screenshotNumber;
+	//used to create screenshots
+	void CaptureScreenShot()
+	{
+		Application.CaptureScreenshot("Phantasma" + screenshotNumber.ToString() + ".png");
+		screenshotNumber ++;
+	}
+
 	public void StartNewGame ()
 	{
 		StartCoroutine (NewGame());

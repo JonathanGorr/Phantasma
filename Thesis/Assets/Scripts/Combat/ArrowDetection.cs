@@ -17,7 +17,7 @@ public class ArrowDetection : MonoBehaviour {
 		{
 			if(myEnemy._AIState == Enemy.EnemyState.Chase)
 			{
-				myEnemy.SetFacing(col.transform.position.x < myEnemy.myTransform.position.x ? Facing.left : Facing.right);
+				myEnemy.Facing = col.transform.position.x < myEnemy.myTransform.position.x ? Facing.left : Facing.right;
 				myEnemy.Block();
 			}
 		}

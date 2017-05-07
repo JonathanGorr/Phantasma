@@ -74,8 +74,7 @@ public class FlamingSkullAI : Enemy {
 	{
 		speed = walkSpeed;
 		//if the start location is left of me, face left
-		SetFacing(startLocation.x < myTransform.position.x ? Facing.left : Facing.right);
-		debugColor = Color.green;
+		Facing = startLocation.x < myTransform.position.x ? Facing.left : Facing.right;
 		while(_AIState == EnemyState.Patrol)
 		{
 			if(Vector2.Distance(myTransform.position, startLocation) > 0.1f)
@@ -85,7 +84,7 @@ public class FlamingSkullAI : Enemy {
 			}
 			else //we have arrived at start location. Dont move and face original facing.
 			{
-				SetFacing(startFacing);
+				Facing = startFacing;
 			}
 			yield return null;
 		}
@@ -93,17 +92,12 @@ public class FlamingSkullAI : Enemy {
 
 	public override void FixedUpdate()
 	{
-		if(sight.target) 
-		{
-			Distance();
-		}
 		if(_health.Dead) magnitude = rbody.velocity.sqrMagnitude;
 	}
 
 	public override IEnumerator Chase()
 	{
 		speed = runSpeed;
-		debugColor = Color.red;
 		while(_AIState == EnemyState.Chase)
 		{
 			SetTargetFacing();
@@ -124,7 +118,7 @@ public class FlamingSkullAI : Enemy {
 			}
 
 			//if player is within attack range, run the attack method
-			if (distance <= attackRange)
+			if (sight.Distance <= attackRange)
 			{
 				//only if caught in the fireball routine do we
 				//stop the fireball routine and set attacking to false
@@ -181,7 +175,6 @@ public class FlamingSkullAI : Enemy {
 		fire.Stop();
 		smoke.Stop();
 
-		cam.UnRegisterMe(myTransform);
 		myTrigger.enabled = false;
 		myCollider.enabled = true;
 
@@ -195,15 +188,9 @@ public class FlamingSkullAI : Enemy {
 		this.enabled = false;
 	}
 
-	public override void SetFacing(Facing face)
-	{
-		base.SetFacing(face);
-	}
-
 	public override IEnumerator Search()
 	{
 		float t = searchTime;
-		debugColor = Color.yellow;
 		while(_AIState == EnemyState.Search)
 		{
 			//wait x seconds before giving up and returning to start location
@@ -224,7 +211,7 @@ public class FlamingSkullAI : Enemy {
 
 	void SetTargetFacing()
 	{
-		SetFacing(targetPosition.x < myTransform.position.x ? Facing.left : Facing.right);
+		Facing = targetPosition.x < myTransform.position.x ? Facing.left : Facing.right;
 	}
 
 	void OnCollisionEnter2D(Collision2D col)

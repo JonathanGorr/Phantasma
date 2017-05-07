@@ -14,7 +14,6 @@ using System;
     scripts.Enqueue("You can <size=40>size 40</size> and <size=20>size 20</size>");
     scripts.Enqueue("You can <color=#ff0000ff>color</color> tag <color=#00ff00ff>like this</color>.");
 */
-
 public class ConversationManager : MonoBehaviour {
 
 	private Queue<ConversationEntry> scripts = new Queue<ConversationEntry>();
@@ -120,6 +119,7 @@ public class ConversationManager : MonoBehaviour {
     //called whenever a line of dialogue is completed
 	void HandleDialogueComplete()
     {
+    	//nothing yet
     }
 
 	//called whenever a line of dialogue is started

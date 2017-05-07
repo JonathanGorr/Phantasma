@@ -14,5 +14,5 @@ public interface IEntity {
 	void BackStep();
 	void RotateBody();
 	void SetPosition(Vector2 pos);
-	void SetFacing(Facing facing);
+	Facing Facing { get; set; }
 }

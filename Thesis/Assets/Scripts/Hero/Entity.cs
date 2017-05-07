@@ -4,15 +4,37 @@ using UnityEngine.UI;
 using CharacterController;
 
 /// <summary>
-///	Entity:
-/// Root class for all variables shared by humans, npcs, and enemies
+/// Is this entity facing left or right?
 /// </summary>
-
 public enum Facing { left, right }
+
+/// <summary>
+/// What combat state is this entity currently in: attacking, idle, jumping etc?
+/// </summary>
 public enum CombatState { Idle, Blocking, Aiming, Attacking, Rolling, BackStepping, Jumping }
+
+/// <summary>
+///	Root class for all variables shared by humans, npcs, and enemies
+/// </summary>
 public class Entity : MonoBehaviour, IEntity {
 
-	public Facing facing;
+	public Facing facing; //the facing of this entity
+	public virtual Facing Facing
+	{
+		get { return facing; }
+		set 
+		{
+			//don't bother if already facing this direction
+			if(facing == value) return;
+			//don't face if not allowed
+			if(!canFace) return;
+			//set facing
+			facing = value;
+			//facing is determined by localscale.x
+			transform.localScale = new Vector2(facing == Facing.left ? -Mathf.Abs(startScale.x) : Mathf.Abs(startScale.x), startScale.y);
+		}
+	}
+
 
 	[Header("Entity")]
 	public string title;
@@ -36,7 +58,6 @@ public class Entity : MonoBehaviour, IEntity {
 	public Vector2 rotOffset;
 	public float rotLerpSpeed = 2;
 
-	float lastRotation;
 	Vector2 lookDirection = Vector2.right;
 	public Vector2 LookDirection
 	{
@@ -126,7 +147,6 @@ public class Entity : MonoBehaviour, IEntity {
 		get { return myTrigger.bounds.center; }
 	}
 
-	//[HideInInspector]
 	public float normalizedHorizontalSpeed = 0;
 
 	public bool Moving
@@ -224,6 +244,9 @@ public class Entity : MonoBehaviour, IEntity {
 		SetDamping(groundDamping);
 	}
 
+	/// <summary>
+	/// Subscribes to all animation behaviours and component events.
+	/// </summary>
 	public virtual void Subscribe()
 	{
 		_health.onHurt += OnHurt;
@@ -361,47 +384,61 @@ public class Entity : MonoBehaviour, IEntity {
 		return true;
 	}
 
+	/// <summary>
+	/// Perform a backstep.
+	/// </summary>
 	public virtual void BackstepForce()
 	{
 		if(CanForce()) Force(backstep);
 	}
+
+	/// <summary>
+	/// Perform a jump.
+	/// </summary>
 	public virtual void Jump()
 	{
 		Force(jump);
 	}
+
+	/// <summary>
+	/// Perform a lunge.
+	/// </summary>
 	public virtual void Lunge()
 	{
 		if(CanForce()) Force(attack);
 	}
+
+	/// <summary>
+	/// Perform a leap.
+	/// </summary>
 	public virtual void Leap()
 	{
 		if(CanForce()) Force(leapAttack);
 	}
 
-	public virtual void SetFacing(Facing face)
-	{
-		if(facing == face) return;
-		if(!canFace) return;
-		facing = face;
-		transform.localScale = new Vector2(facing == Facing.left ? -Mathf.Abs(startScale.x) : Mathf.Abs(startScale.x), startScale.y);
-	}
-
+	/// <summary>
+	/// Rotates the body sprite.
+	/// </summary>
 	public virtual void RotateBody()
 	{
-		float lookRotation = Mathf.Atan2(facing == Facing.left ? -lookDirection.y : lookDirection.y, facing == Facing.left ? -lookDirection.x : lookDirection.x) * Mathf.Rad2Deg;
+		//transform the lookDirection v2 into an angle using Atan2
+		float lookRotation = Mathf.Atan2(
+		facing == Facing.left ? -lookDirection.y : lookDirection.y,
+		facing == Facing.left ? -lookDirection.x : lookDirection.x) * Mathf.Rad2Deg;
+		//normalized distance of lookdirection
 		float normalizedDistance = lookDirection.sqrMagnitude;
-
+		//if the lookDirection exceeds a minimum threshold...
 		if(normalizedDistance > 0.05f)
 		{
-			float angle = facing == Facing.left ? (lookRotation + rotOffset.x) : (lookRotation + rotOffset.y);
+			//set facing to clamped direction depending on facing
+			float angle = (facing == Facing.left ? (lookRotation + rotOffset.x) : (lookRotation + rotOffset.y));
 			angle = facing == Facing.left ? Mathf.Clamp(angle, -80, 30) : Mathf.Clamp(angle, -30, 80);
 			body.rotation = Quaternion.Euler(new Vector3(
 			body.rotation.eulerAngles.x, 
 			body.rotation.eulerAngles.y,
 			angle));
-
-			lastRotation = body.rotation.eulerAngles.z;
 		}
+		//does not exceed threshold
 		else
 		{
 			body.rotation = Quaternion.Euler(new Vector3(0,0, facing == Facing.left ? rotOffset.x : rotOffset.y ));

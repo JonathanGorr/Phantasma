@@ -21,12 +21,10 @@ public class ThiefAI : EnemyAI {
 
 	public override IEnumerator Patrol ()
 	{
-		debugColor = Color.green;
 		while(_AIState == EnemyState.Patrol)
 		{
 			if(sight.CanPlayerBeSeen())
 			{
-				cam.RegisterMe(myTransform);
 				_AIState = EnemyState.Chase;
 			}
 
@@ -36,10 +34,9 @@ public class ThiefAI : EnemyAI {
 
 	public override IEnumerator Chase ()
 	{
-		debugColor = Color.red;
 		while(_AIState == EnemyState.Chase)
 		{
-			if (Distance() < attackRange)
+			if (sight.Distance < attackRange)
 			{
 				speed = 0;
 				Attack();
